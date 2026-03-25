@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = SettingsViewModel()
     @State private var showDeleteConfirmation = false
 
@@ -105,7 +106,7 @@ struct SettingsView: View {
 
                     // Log Out
                     DNButton("Log Out", variant: .secondary) {
-                        viewModel.logout()
+                        authViewModel.signOut()
                     }
 
                     Spacer().frame(height: DNSpace.xxl)

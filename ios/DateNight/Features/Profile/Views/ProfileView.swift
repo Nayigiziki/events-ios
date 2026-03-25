@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileViewModel()
     @State private var showEditProfile = false
     @State private var showMatchPreferences = false
@@ -332,7 +333,7 @@ struct ProfileView: View {
                 }
 
                 Button {
-                    // Log out action
+                    authViewModel.signOut()
                 } label: {
                     DNCard {
                         HStack {
