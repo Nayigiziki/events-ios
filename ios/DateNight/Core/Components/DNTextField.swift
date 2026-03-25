@@ -22,8 +22,9 @@ struct DNTextField: View {
                 .foregroundColor(.dnTextPrimary)
                 .focused($isFocused)
         }
+        .padding(.vertical, DNSpace.md)
         .padding(.horizontal, DNSpace.lg)
-        .frame(minHeight: 44)
+        .frame(minHeight: 56)
         .dnNeuPressed(cornerRadius: DNRadius.md)
         .accessibilityLabel(label ?? placeholder)
     }

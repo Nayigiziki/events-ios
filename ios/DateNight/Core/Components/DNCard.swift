@@ -14,7 +14,7 @@ struct DNCard<Content: View>: View {
 
     var body: some View {
         content
-            .padding(DNSpace.md)
+            .padding(DNSpace.lg)
             .dnNeuRaised(cornerRadius: cornerRadius)
     }
 }

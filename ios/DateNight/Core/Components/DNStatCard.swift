@@ -28,7 +28,7 @@ struct DNStatCard: View {
                     .foregroundColor(.dnTextPrimary)
             }
         }
-        .padding(DNSpace.md)
+        .padding(DNSpace.lg)
         .dnNeuRaised()
     }
 }

@@ -46,11 +46,11 @@ struct DNButton: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 16, weight: .semibold))
+            .font(.system(size: 14, weight: .bold))
             .foregroundColor(variant.foregroundColor)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
-            .padding(.horizontal, DNSpace.lg)
+            .frame(minHeight: 56)
+            .padding(.horizontal, DNSpace.xxl)
             .background(
                 RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
                     .fill(variant.backgroundColor)

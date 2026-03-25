@@ -11,11 +11,10 @@ struct FilterChip: View {
             isActive.toggle()
         } label: {
             Text(title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(isActive ? .dnPrimary : .dnTextSecondary)
-                .padding(.horizontal, DNSpace.lg)
-                .padding(.vertical, DNSpace.sm)
-                .frame(minHeight: 44)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(isActive ? .white : .dnTextSecondary)
+                .padding(.horizontal, DNSpace.xl)
+                .padding(.vertical, DNSpace.md)
         }
         .buttonStyle(.plain)
         .modifier(ChipStyleModifier(isActive: isActive))
@@ -30,9 +29,14 @@ private struct ChipStyleModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if isActive {
-            content.dnNeuPressed(cornerRadius: DNRadius.full)
+            content
+                .background(
+                    RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
+                        .fill(Color.dnPrimary)
+                )
+                .dnNeuPressed(cornerRadius: DNRadius.md)
         } else {
-            content.dnNeuRaised(cornerRadius: DNRadius.full)
+            content.dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.md)
         }
     }
 }

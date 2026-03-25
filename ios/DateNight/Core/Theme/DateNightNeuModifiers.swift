@@ -28,8 +28,8 @@ enum DNShadowIntensity {
 
 /// Neumorphic raised effect — element appears extruded from the surface.
 /// Shadow values calibrated to visually match React CSS box-shadow rendering.
-/// CSS uses full-opacity rgb(163,177,198), but SwiftUI shadows bleed more,
-/// so we use 0.45 dark / 0.9 light to get the same visual depth.
+/// CSS uses full-opacity rgb(163,177,198), but SwiftUI shadows bleed more
+/// outward, so we reduce opacity to 0.40 dark / 0.85 light for visual parity.
 struct DNNeuRaised: ViewModifier {
     var intensity: DNShadowIntensity = .heavy
     var cornerRadius: CGFloat = DNRadius.lg
@@ -41,13 +41,13 @@ struct DNNeuRaised: ViewModifier {
                     .fill(Color.dnBackground)
             )
             .shadow(
-                color: Color(hex: "a3b1c6").opacity(0.45),
+                color: Color(hex: "a3b1c6").opacity(0.40),
                 radius: intensity.radius,
                 x: intensity.offset,
                 y: intensity.offset
             )
             .shadow(
-                color: Color.white.opacity(0.9),
+                color: Color.white.opacity(0.85),
                 radius: intensity.radius,
                 x: -intensity.offset,
                 y: -intensity.offset
@@ -58,12 +58,10 @@ struct DNNeuRaised: ViewModifier {
 // MARK: - Pressed Modifier
 
 /// Neumorphic pressed/inset effect — element appears pushed into the surface.
-/// SwiftUI has no native inset shadow, so we simulate it:
-/// - Inner dark shadow (top-left light source casts shadow inside bottom-right)
-/// - Inner light shadow (reflected light inside top-left)
-/// Uses overlaid shapes with shadows clipped to create the inset illusion.
+/// SwiftUI has no native inset shadow, so we simulate it with overlaid strokes
+/// blurred and clipped. Matches React CSS: inset 4px 4px 8px rgb(163,177,198).
 struct DNNeuPressed: ViewModifier {
-    var intensity: DNShadowIntensity = .heavy
+    var intensity: DNShadowIntensity = .light
     var cornerRadius: CGFloat = DNRadius.lg
 
     func body(content: Content) -> some View {
@@ -75,18 +73,18 @@ struct DNNeuPressed: ViewModifier {
             .overlay(
                 // Inner shadow simulation
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(Color.dnBackground)
+                    .fill(Color.clear)
                     .overlay(
                         // Dark inner shadow (bottom-right)
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(Color(hex: "a3b1c6"), lineWidth: intensity.offset)
+                            .stroke(Color(hex: "a3b1c6").opacity(0.50), lineWidth: intensity.offset)
                             .blur(radius: intensity.radius / 2)
                             .offset(x: intensity.offset / 2, y: intensity.offset / 2)
                     )
                     .overlay(
                         // Light inner shadow (top-left)
                         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(Color.white, lineWidth: intensity.offset)
+                            .stroke(Color.white.opacity(0.70), lineWidth: intensity.offset)
                             .blur(radius: intensity.radius / 2)
                             .offset(x: -intensity.offset / 2, y: -intensity.offset / 2)
                     )
@@ -100,7 +98,7 @@ struct DNNeuPressed: ViewModifier {
 
 /// Neumorphic button — raised when idle, flat/pressed when tapped.
 struct DNNeuButton: ViewModifier {
-    var cornerRadius: CGFloat = DNRadius.lg
+    var cornerRadius: CGFloat = DNRadius.md
     var isPressed: Bool = false
 
     func body(content: Content) -> some View {
@@ -110,13 +108,13 @@ struct DNNeuButton: ViewModifier {
                     .fill(Color.dnBackground)
             )
             .shadow(
-                color: isPressed ? .clear : Color(hex: "a3b1c6").opacity(0.45),
+                color: isPressed ? .clear : Color(hex: "a3b1c6").opacity(0.40),
                 radius: isPressed ? 0 : 16,
                 x: isPressed ? 0 : 8,
                 y: isPressed ? 0 : 8
             )
             .shadow(
-                color: isPressed ? .clear : Color.white.opacity(0.9),
+                color: isPressed ? .clear : Color.white.opacity(0.85),
                 radius: isPressed ? 0 : 16,
                 x: isPressed ? 0 : -8,
                 y: isPressed ? 0 : -8
@@ -136,14 +134,14 @@ extension View {
     }
 
     func dnNeuPressed(
-        intensity: DNShadowIntensity = .heavy,
+        intensity: DNShadowIntensity = .light,
         cornerRadius: CGFloat = DNRadius.lg
     ) -> some View {
         modifier(DNNeuPressed(intensity: intensity, cornerRadius: cornerRadius))
     }
 
     func dnNeuButton(
-        cornerRadius: CGFloat = DNRadius.lg,
+        cornerRadius: CGFloat = DNRadius.md,
         isPressed: Bool = false
     ) -> some View {
         modifier(DNNeuButton(cornerRadius: cornerRadius, isPressed: isPressed))

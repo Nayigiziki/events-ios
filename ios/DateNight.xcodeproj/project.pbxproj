@@ -70,6 +70,7 @@
 		E0592AF7D2211E5A95FBBC69 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 992E5CFD3BF97647D671E37A /* Supabase */; };
 		E494E618C639D4BB8E346246 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8DBC29EE492BC634C2DF2F5 /* SupabaseService.swift */; };
 		E6B6673F24591EDCC8D9C0B5 /* EventDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3422DB6FE56A54B2F8BBC5 /* EventDetailViewModel.swift */; };
+		E73D17F1D5B98AEF61BB616A /* DNOverlayChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB9142E3BEC23BB4EDD88A /* DNOverlayChip.swift */; };
 		E7B3C777712C4D3EC27084F8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82B0395DE0F48CB51ED07FE /* ChatViewModel.swift */; };
 		E7E23E7FFD728DBE8D516225 /* DateRequestCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1739FAD47945F1E3F574F2 /* DateRequestCard.swift */; };
 		E9A6CF2022E8CC0CFEA43B44 /* PhotoIndicatorBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E416B9205B05FDAD4E75714 /* PhotoIndicatorBar.swift */; };
@@ -90,6 +91,7 @@
 		0A044D04D3771929AC451BB5 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
 		0BB6E69F53353DD515CD6E76 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		113A966CD580BD8D09821FCB /* ConversationChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationChatView.swift; sourceTree = "<group>"; };
+		11CB9142E3BEC23BB4EDD88A /* DNOverlayChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNOverlayChip.swift; sourceTree = "<group>"; };
 		139EFA60DB21194D6132757D /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		1866666567FBE8FA81DA6060 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		1901CE524692800477FDCBB0 /* DiscoverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewModel.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				98955286F4B16AF67FDBA634 /* AvatarView.swift */,
 				8E07912290499AE1BFF2625A /* DNButton.swift */,
 				0962BB8D88FB9EDC35F50B23 /* DNCard.swift */,
+				11CB9142E3BEC23BB4EDD88A /* DNOverlayChip.swift */,
 				5E2D58086FFE5BAA67F77E1F /* DNScreen.swift */,
 				B702861E6BDB1BDAE74E0935 /* DNStatCard.swift */,
 				893752F0D4C97FE6F6C7189B /* DNTabButton.swift */,
@@ -663,6 +666,7 @@
 				2AB351498200C346F0B04D14 /* CreateDateSheet.swift in Sources */,
 				7DB1A6FA275AD1C9F3D7483B /* DNButton.swift in Sources */,
 				5B25FAFC4F8D7297CADFB9FF /* DNCard.swift in Sources */,
+				E73D17F1D5B98AEF61BB616A /* DNOverlayChip.swift in Sources */,
 				9B3B36D6F5415DE4605E3D3C /* DNScreen.swift in Sources */,
 				2869C3A3F013198B64749115 /* DNStatCard.swift in Sources */,
 				3F274569ADAF729304A9667A /* DNTabButton.swift in Sources */,
