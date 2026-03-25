@@ -211,6 +211,9 @@ struct EventDetailView: View {
 
             // Attendees
             attendeesSection(event: event)
+
+            // Comments
+            commentsSection
         }
         .padding(DNSpace.xl)
     }
@@ -251,6 +254,112 @@ struct EventDetailView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Comments
+
+    private var commentsSection: some View {
+        VStack(alignment: .leading, spacing: DNSpace.md) {
+            HStack {
+                Text("Comments")
+                    .dnH3()
+                Spacer()
+                HStack(spacing: DNSpace.xs) {
+                    Image(systemName: "bubble.left.fill")
+                        .font(.system(size: 14, weight: .bold))
+                    Text("\(viewModel.comments.count)")
+                        .font(.system(size: 14, weight: .bold))
+                }
+                .foregroundColor(.dnPrimary)
+            }
+
+            // Comment input
+            HStack(spacing: DNSpace.sm) {
+                DNTextField(
+                    placeholder: "Add a comment...",
+                    text: $viewModel.newCommentText,
+                    icon: "text.bubble"
+                )
+
+                Button { viewModel.addComment() } label: {
+                    Image(systemName: "paperplane.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 52, height: 52)
+                        .background(Circle().fill(Color.dnPrimary))
+                        .dnNeuCTAButton(cornerRadius: DNRadius.full)
+                }
+                .buttonStyle(.plain)
+                .opacity(viewModel.newCommentText.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1.0)
+            }
+
+            // Comment list
+            LazyVStack(spacing: DNSpace.md) {
+                ForEach(viewModel.comments) { comment in
+                    commentRow(comment)
+                }
+            }
+        }
+    }
+
+    private func commentRow(_ comment: EventComment) -> some View {
+        DNCard {
+            HStack(alignment: .top, spacing: DNSpace.md) {
+                AvatarView(
+                    url: URL(string: comment.avatarUrl ?? ""),
+                    size: 40
+                )
+
+                VStack(alignment: .leading, spacing: DNSpace.xs) {
+                    HStack {
+                        Text(comment.userName)
+                            .dnLabel()
+                        Spacer()
+                        Text(comment.timestamp)
+                            .dnSmall()
+                    }
+
+                    Text(comment.text)
+                        .dnBody()
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    commentVoteButtons(comment)
+                }
+            }
+        }
+    }
+
+    private func commentVoteButtons(_ comment: EventComment) -> some View {
+        HStack(spacing: DNSpace.lg) {
+            Button {
+                viewModel.vote(commentId: comment.id, direction: .up)
+            } label: {
+                HStack(spacing: DNSpace.xs) {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 14, weight: .bold))
+                    Text("\(comment.upvotes)")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .foregroundColor(comment.userVote == .up ? .dnSuccess : .dnTextTertiary)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                viewModel.vote(commentId: comment.id, direction: .down)
+            } label: {
+                HStack(spacing: DNSpace.xs) {
+                    Image(systemName: "arrow.down")
+                        .font(.system(size: 14, weight: .bold))
+                    Text("\(comment.downvotes)")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .foregroundColor(comment.userVote == .down ? .dnDestructive : .dnTextTertiary)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+        }
+        .padding(.top, DNSpace.xs)
     }
 
     // MARK: - Sticky Bottom Bar

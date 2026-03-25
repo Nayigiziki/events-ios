@@ -55,8 +55,8 @@ struct LoginView: View {
 
                             Spacer()
 
-                            Button {
-                                // Forgot password action
+                            NavigationLink {
+                                ForgotPasswordView()
                             } label: {
                                 Text(String(localized: "auth_forgot_password"))
                                     .dnCaption()

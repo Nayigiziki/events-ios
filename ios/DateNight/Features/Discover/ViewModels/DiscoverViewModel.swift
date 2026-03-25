@@ -182,6 +182,8 @@ class DiscoverViewModel: ObservableObject {
     @Published var users: [UserProfile] = DiscoverMockData.users
     @Published var currentIndex: Int = 0
     @Published var showFilters: Bool = false
+    @Published var showMatchDetail: Bool = false
+    @Published var matchedUser: UserProfile?
 
     var currentUser: UserProfile? {
         guard currentIndex < users.count else { return nil }
@@ -194,13 +196,28 @@ class DiscoverViewModel: ObservableObject {
     }
 
     func swipeRight(userId: UUID) {
-        print("Liked: \(currentUser?.name ?? "unknown")")
-        advanceIndex()
+        let liked = currentUser
+        print("Liked: \(liked?.name ?? "unknown")")
+
+        // Mock: 30% chance of mutual match
+        let isMutualMatch = Double.random(in: 0 ... 1) < 0.3
+        if isMutualMatch, let liked {
+            matchedUser = liked
+            advanceIndex()
+            showMatchDetail = true
+        } else {
+            advanceIndex()
+        }
     }
 
     func swipeLeft(userId: UUID) {
         print("Passed: \(currentUser?.name ?? "unknown")")
         advanceIndex()
+    }
+
+    func dismissMatch() {
+        showMatchDetail = false
+        matchedUser = nil
     }
 
     private func advanceIndex() {

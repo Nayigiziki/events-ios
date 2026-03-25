@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var showEditProfile = false
+    @State private var showMatchPreferences = false
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,9 @@ struct ProfileView: View {
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $showEditProfile) {
                 ProfileEditView()
+            }
+            .navigationDestination(isPresented: $showMatchPreferences) {
+                MatchPreferencesView()
             }
         }
     }
@@ -282,7 +286,11 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
             VStack(spacing: DNSpace.sm) {
                 ForEach(settingsItems, id: \.self) { item in
-                    NavigationLink(destination: EmptyView()) {
+                    Button {
+                        if item == "Preferencias" {
+                            showMatchPreferences = true
+                        }
+                    } label: {
                         DNCard {
                             HStack {
                                 Text(item)

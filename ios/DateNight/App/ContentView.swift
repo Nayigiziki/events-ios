@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var authViewModel = AuthViewModel()
+    @AppStorage("profileComplete") var profileComplete = false
 
     var body: some View {
         Group {
@@ -11,6 +12,8 @@ struct ContentView: View {
                 }
             } else if authViewModel.isFirstLaunch {
                 OnboardingView()
+            } else if !profileComplete {
+                ProfileSetupView()
             } else {
                 MainTabView()
             }

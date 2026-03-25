@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct UserSwipeView: View {
-    @StateObject private var viewModel = DiscoverViewModel()
+struct EventSwipeView: View {
+    @StateObject private var viewModel = EventSwipeViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -10,39 +10,23 @@ struct UserSwipeView: View {
                 // Header
                 HStack {
                     VStack(alignment: .leading, spacing: DNSpace.xs) {
-                        Text("Discover")
+                        Text("Events")
                             .dnH2()
-                        Text("\(viewModel.users.count - viewModel.currentIndex) people nearby")
+                        Text("\(viewModel.events.count - viewModel.currentIndex) events to explore")
                             .dnCaption()
                     }
                     Spacer()
-                    Button {
-                        withAnimation(.dnModalPresent) {
-                            viewModel.showFilters.toggle()
-                        }
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundColor(.dnPrimary)
-                            .frame(width: 52, height: 52)
-                            .dnNeuRaised(cornerRadius: DNRadius.full)
-                    }
                 }
                 .padding(.horizontal, DNSpace.lg)
                 .padding(.vertical, DNSpace.md)
 
-                if viewModel.showFilters {
-                    SwipeFiltersView(showFilters: $viewModel.showFilters)
-                        .zIndex(10)
-                }
-
-                if let currentUser = viewModel.currentUser {
+                if let currentEvent = viewModel.currentEvent {
                     // Card deck
                     ZStack {
                         // Next card (behind)
-                        if let nextUser = viewModel.nextUser {
-                            SwipeCardView(
-                                user: nextUser,
+                        if let nextEvent = viewModel.nextEvent {
+                            EventSwipeCardView(
+                                event: nextEvent,
                                 isTopCard: false
                             )
                             .scaleEffect(0.95)
@@ -50,14 +34,14 @@ struct UserSwipeView: View {
                         }
 
                         // Current card (top)
-                        SwipeCardView(
-                            user: currentUser,
+                        EventSwipeCardView(
+                            event: currentEvent,
                             isTopCard: true,
                             onSwipeLeft: {
-                                viewModel.swipeLeft(userId: currentUser.id)
+                                viewModel.swipeLeft()
                             },
                             onSwipeRight: {
-                                viewModel.swipeRight(userId: currentUser.id)
+                                viewModel.swipeRight()
                             }
                         )
                         .id(viewModel.currentIndex)
@@ -69,9 +53,9 @@ struct UserSwipeView: View {
 
                     // Action buttons
                     HStack(spacing: DNSpace.xxl) {
-                        // Pass button
+                        // Skip button
                         Button {
-                            viewModel.swipeLeft(userId: currentUser.id)
+                            viewModel.swipeLeft()
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 24, weight: .bold))
@@ -81,9 +65,9 @@ struct UserSwipeView: View {
                         }
                         .buttonStyle(.plain)
 
-                        // Like button — larger and purple
+                        // Interested button
                         Button {
-                            viewModel.swipeRight(userId: currentUser.id)
+                            viewModel.swipeRight()
                         } label: {
                             Image(systemName: "heart.fill")
                                 .font(.system(size: 32, weight: .bold))
@@ -102,29 +86,16 @@ struct UserSwipeView: View {
                     // Empty state
                     Spacer()
                     VStack(spacing: DNSpace.md) {
-                        Image(systemName: "person.2.slash")
+                        Image(systemName: "calendar.badge.clock")
                             .font(.system(size: 48))
                             .foregroundColor(.dnTextTertiary)
-                        Text("No more people")
+                        Text("No more events")
                             .dnH3()
-                        Text("Come back later to see new profiles")
+                        Text("Come back later for new events")
                             .dnCaption()
                     }
                     Spacer()
                 }
-            }
-        }
-        .fullScreenCover(isPresented: $viewModel.showMatchDetail) {
-            if let matched = viewModel.matchedUser {
-                MatchDetailView(
-                    viewModel: MatchDetailViewModel(matchedUser: matched),
-                    onSendMessage: {
-                        viewModel.dismissMatch()
-                    },
-                    onKeepSwiping: {
-                        viewModel.dismissMatch()
-                    }
-                )
             }
         }
     }
