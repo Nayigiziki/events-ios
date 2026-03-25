@@ -14,19 +14,11 @@ struct UserProfileModal: View {
             TabView(selection: $currentPhotoIndex) {
                 ForEach(Array(user.photos.enumerated()), id: \.offset) { index, photo in
                     GeometryReader { geo in
-                        AsyncImage(url: URL(string: photo)) { phase in
-                            switch phase {
-                            case let .success(image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: geo.size.width, height: geo.size.height)
-                                    .clipped()
-                            default:
-                                Color.dnBackground
-                                    .frame(width: geo.size.width, height: geo.size.height)
-                            }
-                        }
+                        DNAsyncImage(
+                            url: URL(string: photo),
+                            height: geo.size.height,
+                            cornerRadius: 0
+                        )
                     }
                     .tag(index)
                 }

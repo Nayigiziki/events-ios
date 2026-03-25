@@ -100,20 +100,10 @@ struct ProfileSetupView: View {
 
     private func filledPhotoSlot(at index: Int) -> some View {
         ZStack(alignment: .topTrailing) {
-            AsyncImage(url: URL(string: viewModel.photos[index])) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Color.dnMuted
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(.dnTextTertiary)
-                    )
-            }
-            .frame(height: 140)
-            .clipShape(RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous))
+            DNAsyncImage(
+                url: URL(string: viewModel.photos[index]),
+                height: 140
+            )
             .dnNeuRaised(intensity: .medium, cornerRadius: DNRadius.md)
 
             // Remove button

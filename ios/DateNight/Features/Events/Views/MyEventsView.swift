@@ -99,21 +99,12 @@ struct MyEventsView: View {
     }
 
     private func eventThumbnail(_ event: Event) -> some View {
-        AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-            switch phase {
-            case let .success(image):
-                image.resizable().scaledToFill()
-            default:
-                Rectangle()
-                    .fill(Color.dnMuted)
-                    .overlay(
-                        Image(systemName: "photo")
-                            .foregroundColor(.dnTextTertiary)
-                    )
-            }
-        }
-        .frame(width: 80, height: 80)
-        .clipShape(RoundedRectangle(cornerRadius: DNRadius.sm, style: .continuous))
+        DNAsyncImage(
+            url: URL(string: event.imageUrl ?? ""),
+            height: 80,
+            cornerRadius: DNRadius.sm
+        )
+        .frame(width: 80)
     }
 
     private func eventInfo(_ event: Event) -> some View {
@@ -160,21 +151,12 @@ struct MyEventsView: View {
     private func attendingEventRow(_ event: Event) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
-                AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image.resizable().scaledToFill()
-                    default:
-                        Rectangle()
-                            .fill(Color.dnMuted)
-                            .overlay(
-                                Image(systemName: "photo")
-                                    .foregroundColor(.dnTextTertiary)
-                            )
-                    }
-                }
-                .frame(width: 80, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: DNRadius.sm, style: .continuous))
+                DNAsyncImage(
+                    url: URL(string: event.imageUrl ?? ""),
+                    height: 80,
+                    cornerRadius: DNRadius.sm
+                )
+                .frame(width: 80)
 
                 VStack(alignment: .leading, spacing: DNSpace.xs) {
                     Text(event.title)

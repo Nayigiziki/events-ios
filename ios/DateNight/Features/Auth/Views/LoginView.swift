@@ -46,19 +46,13 @@ struct LoginView: View {
 
     private var heroSection: some View {
         ZStack {
-            AsyncImage(
+            DNAsyncImage(
                 url: URL(
                     string: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=400&fit=crop"
-                )
-            ) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Color.dnMuted
-            }
-            .frame(height: 260)
-            .clipped()
+                ),
+                height: 260,
+                cornerRadius: DNRadius.xxl
+            )
 
             // Gradient overlay
             LinearGradient(

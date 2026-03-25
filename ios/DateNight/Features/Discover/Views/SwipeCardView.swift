@@ -21,24 +21,11 @@ struct SwipeCardView: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 // Photo
-                AsyncImage(url: URL(string: user.photos.first ?? user.avatarUrl ?? "")) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    case .failure:
-                        photoPlaceholder
-                    case .empty:
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.dnMuted)
-                    @unknown default:
-                        photoPlaceholder
-                    }
-                }
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
+                DNAsyncImage(
+                    url: URL(string: user.photos.first ?? user.avatarUrl ?? ""),
+                    height: geometry.size.height,
+                    cornerRadius: 0
+                )
 
                 // Gradient overlay: from #101828 at bottom to clear at top
                 LinearGradient(
@@ -158,16 +145,6 @@ struct SwipeCardView: View {
                     : nil
             )
         }
-    }
-
-    private var photoPlaceholder: some View {
-        Rectangle()
-            .fill(Color.dnMuted)
-            .overlay(
-                Image(systemName: "person.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.dnTextTertiary)
-            )
     }
 
     private func handleSwipeEnd(translation: CGSize) {

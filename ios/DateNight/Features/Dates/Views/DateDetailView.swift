@@ -51,25 +51,11 @@ struct DateDetailView: View {
     }
 
     private var heroImage: some View {
-        GeometryReader { geo in
-            AsyncImage(url: URL(string: viewModel.dateRequest.event?.imageUrl ?? "")) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                case .failure:
-                    imagePlaceholder
-                case .empty:
-                    imagePlaceholder
-                @unknown default:
-                    imagePlaceholder
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
-            .clipped()
-        }
-        .frame(height: 200)
+        DNAsyncImage(
+            url: URL(string: viewModel.dateRequest.event?.imageUrl ?? ""),
+            height: 200,
+            cornerRadius: 0
+        )
         .overlay(GradientOverlay(opacity: 0.7))
     }
 
@@ -115,16 +101,6 @@ struct DateDetailView: View {
             .padding(.horizontal, DNSpace.xl)
             .padding(.bottom, DNSpace.lg)
         }
-    }
-
-    private var imagePlaceholder: some View {
-        Rectangle()
-            .fill(Color.dnMuted.opacity(0.3))
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 40))
-                    .foregroundColor(.dnTextTertiary)
-            )
     }
 
     // MARK: - Content Section
@@ -199,24 +175,13 @@ struct DateDetailView: View {
                 }
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: DNSpace.md) {
-                    ForEach(viewModel.dateRequest.attendees ?? []) { attendee in
-                        VStack(spacing: DNSpace.sm) {
-                            AvatarView(
-                                url: URL(string: attendee.avatarUrl ?? ""),
-                                size: 56
-                            )
-                            Text(attendee.name)
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.dnTextPrimary)
-                                .frame(width: 56)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                        }
-                    }
-                }
-            }
+            DNAttendeeRow(
+                attendees: viewModel.dateRequest.attendees ?? [],
+                maxVisible: 5,
+                avatarSize: 56,
+                showNames: true,
+                label: ""
+            )
         }
     }
 
@@ -229,30 +194,13 @@ struct DateDetailView: View {
                     .dnH3()
 
                 if let event = viewModel.dateRequest.event {
-                    detailRow(icon: "building.2", label: "Venue", value: event.venue)
-                    detailRow(icon: "mappin.and.ellipse", label: "Location", value: event.location)
-                    detailRow(icon: "clock", label: "Time", value: event.time)
-                    detailRow(icon: "dollarsign.circle", label: "Price", value: event.price)
+                    DNInfoPill(icon: "building.2", text: event.venue)
+                    DNInfoPill(icon: "mappin.and.ellipse", text: event.location)
+                    DNInfoPill(icon: "clock", text: event.time)
+                    DNInfoPill(icon: "dollarsign.circle", text: event.price)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    private func detailRow(icon: String, label: String, value: String) -> some View {
-        HStack(spacing: DNSpace.md) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.dnPrimary)
-                .frame(width: 24)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label.uppercased())
-                    .dnSmall()
-                Text(value)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.dnTextPrimary)
-            }
         }
     }
 

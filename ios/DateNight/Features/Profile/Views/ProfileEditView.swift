@@ -60,20 +60,12 @@ struct ProfileEditView: View {
             LazyVGrid(columns: columns, spacing: DNSpace.md) {
                 ForEach(Array(viewModel.photos.enumerated()), id: \.offset) { index, photo in
                     ZStack(alignment: .topTrailing) {
-                        AsyncImage(url: URL(string: photo)) { phase in
-                            switch phase {
-                            case let .success(image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            default:
-                                Color.dnMuted
-                            }
-                        }
-                        .frame(minHeight: 110)
-                        .clipShape(RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous))
-                        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.md)
+                        DNAsyncImage(
+                            url: URL(string: photo),
+                            height: 120
+                        )
                         .aspectRatio(1, contentMode: .fill)
+                        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.md)
 
                         Button {
                             viewModel.removePhoto(at: index)

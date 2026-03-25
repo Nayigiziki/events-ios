@@ -72,16 +72,11 @@ struct ProfileView: View {
         ZStack(alignment: .bottom) {
             TabView(selection: $viewModel.selectedPhotoIndex) {
                 ForEach(Array(viewModel.profile.photos.enumerated()), id: \.offset) { index, photo in
-                    AsyncImage(url: URL(string: photo)) { phase in
-                        switch phase {
-                        case let .success(image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        default:
-                            Color.dnBackground
-                        }
-                    }
+                    DNAsyncImage(
+                        url: URL(string: photo),
+                        height: UIScreen.main.bounds.height * 0.45,
+                        cornerRadius: 0
+                    )
                     .tag(index)
                 }
             }
@@ -212,12 +207,12 @@ struct ProfileView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: DNSpace.md) {
                 ForEach(Array(viewModel.profile.photos.enumerated()), id: \.offset) { index, photo in
-                    AsyncImage(url: URL(string: photo)) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Color.dnMuted
-                    }
-                    .frame(width: 64, height: 64)
+                    DNAsyncImage(
+                        url: URL(string: photo),
+                        height: 64,
+                        cornerRadius: DNRadius.full
+                    )
+                    .frame(width: 64)
                     .clipShape(Circle())
                     .overlay(
                         Circle()

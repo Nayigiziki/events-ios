@@ -47,25 +47,11 @@ struct EventDetailView: View {
     }
 
     private func heroImage(event: Event) -> some View {
-        GeometryReader { geo in
-            AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                case .failure:
-                    heroPlaceholder
-                case .empty:
-                    heroPlaceholder
-                @unknown default:
-                    heroPlaceholder
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
-            .clipped()
-        }
-        .frame(height: UIScreen.main.bounds.height * 0.6)
+        DNAsyncImage(
+            url: URL(string: event.imageUrl ?? ""),
+            height: UIScreen.main.bounds.height * 0.6,
+            cornerRadius: 0
+        )
         .overlay(
             LinearGradient(
                 colors: [
@@ -114,17 +100,7 @@ struct EventDetailView: View {
     private func heroEventInfo(event: Event) -> some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
             HStack(spacing: DNSpace.sm) {
-                Text(event.category.uppercased())
-                    .font(.system(size: 11, weight: .heavy))
-                    .tracking(0.8)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, DNSpace.lg)
-                    .padding(.vertical, DNSpace.sm)
-                    .background(
-                        Capsule()
-                            .fill(Color.dnPrimary)
-                            .shadow(color: .black.opacity(0.3), radius: 4, x: 2, y: 2)
-                    )
+                DNCategoryBadge(category: event.category)
                 Text(event.venue)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
@@ -161,15 +137,7 @@ struct EventDetailView: View {
         .padding(.bottom, DNSpace.xl)
     }
 
-    private var heroPlaceholder: some View {
-        Rectangle()
-            .fill(Color.dnMuted.opacity(0.3))
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 50))
-                    .foregroundColor(.dnTextTertiary)
-            )
-    }
+    // heroPlaceholder removed — DNAsyncImage handles placeholder internally
 
     // MARK: - Detail Content
 

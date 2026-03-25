@@ -21,24 +21,11 @@ struct EventSwipeCardView: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 // Event image
-                AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    case .failure:
-                        imagePlaceholder
-                    case .empty:
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.dnMuted)
-                    @unknown default:
-                        imagePlaceholder
-                    }
-                }
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
+                DNAsyncImage(
+                    url: URL(string: event.imageUrl ?? ""),
+                    height: geometry.size.height,
+                    cornerRadius: 0
+                )
 
                 // Gradient overlay
                 LinearGradient(
@@ -52,16 +39,7 @@ struct EventSwipeCardView: View {
                 )
 
                 // Category badge (top-left)
-                Text(event.category.uppercased())
-                    .font(.system(size: 11, weight: .heavy))
-                    .tracking(0.8)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, DNSpace.lg)
-                    .padding(.vertical, DNSpace.sm)
-                    .background(
-                        Capsule()
-                            .fill(Color.dnPrimary)
-                    )
+                DNCategoryBadge(category: event.category)
                     .position(x: 70, y: 40)
 
                 // Price badge (top-right)
@@ -159,15 +137,7 @@ struct EventSwipeCardView: View {
         }
     }
 
-    private var imagePlaceholder: some View {
-        Rectangle()
-            .fill(Color.dnMuted)
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 60))
-                    .foregroundColor(.dnTextTertiary)
-            )
-    }
+    // imagePlaceholder removed — DNAsyncImage handles placeholder internally
 
     private func handleSwipeEnd(translation: CGSize) {
         if abs(translation.width) > 150 {
