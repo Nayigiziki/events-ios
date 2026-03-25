@@ -8,21 +8,27 @@ struct MatchesView: View {
             ScrollView {
                 VStack(spacing: DNSpace.lg) {
                     // Header
-                    HStack {
-                        Text("Dates")
-                            .dnH2()
-                        Spacer()
+                    VStack(alignment: .leading, spacing: DNSpace.xs) {
+                        Text("TUS CITAS")
+                            .font(.system(size: 28, weight: .black))
+                            .tracking(-0.6)
+                            .foregroundColor(.dnTextPrimary)
+                            .textCase(.uppercase)
+
+                        Text("Encuentra personas para ir a eventos juntos")
+                            .dnCaption()
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, DNSpace.lg)
                     .padding(.top, DNSpace.md)
 
-                    // Segmented picker
-                    DNCard(cornerRadius: DNRadius.xl) {
-                        HStack(spacing: DNSpace.sm) {
-                            tabButton(title: "Available", index: 0)
-                            tabButton(title: "Your Dates", index: 1)
-                        }
+                    // Segmented picker — full-width pill toggle
+                    HStack(spacing: 0) {
+                        tabButton(title: "CITAS DISPONIBLES", index: 0)
+                        tabButton(title: "TUS CITAS", index: 1)
                     }
+                    .padding(4)
+                    .dnNeuRaised(cornerRadius: DNRadius.xl)
                     .padding(.horizontal, DNSpace.lg)
 
                     // Content
@@ -31,8 +37,12 @@ struct MatchesView: View {
                     } else {
                         yourDatesContent
                     }
+
+                    // Create your own date card
+                    createDateCard
+                        .padding(.horizontal, DNSpace.lg)
                 }
-                .padding(.bottom, DNSpace.xxl)
+                .padding(.bottom, DNSpace.xxl * 3)
             }
         }
     }
@@ -46,23 +56,26 @@ struct MatchesView: View {
             }
         } label: {
             Text(title)
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .textCase(.uppercase)
                 .foregroundColor(
                     viewModel.selectedTab == index
-                        ? .dnPrimary
+                        ? .white
                         : .dnTextSecondary
                 )
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: 44)
+                .background(
+                    Group {
+                        if viewModel.selectedTab == index {
+                            Capsule()
+                                .fill(Color.dnPrimary)
+                        }
+                    }
+                )
+                .clipShape(Capsule())
         }
         .buttonStyle(.plain)
-        .if(viewModel.selectedTab == index) { view in
-            view.dnNeuPressed(cornerRadius: DNRadius.md)
-        }
-        .if(viewModel.selectedTab != index) { view in
-            view.dnNeuRaised(cornerRadius: DNRadius.md)
-        }
     }
 
     // MARK: - Available Dates
@@ -106,6 +119,39 @@ struct MatchesView: View {
         }
     }
 
+    // MARK: - Create Date Card
+
+    private var createDateCard: some View {
+        DNCard(cornerRadius: DNRadius.xxl) {
+            VStack(spacing: DNSpace.md) {
+                ZStack {
+                    Circle()
+                        .fill(Color.dnBackground)
+                        .frame(width: 64, height: 64)
+                        .dnNeuPressed(cornerRadius: DNRadius.full)
+
+                    Image(systemName: "plus")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.dnPrimary)
+                }
+
+                Text("CREA TU PROPIA CITA")
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundColor(.dnTextPrimary)
+                    .multilineTextAlignment(.center)
+
+                Text("Organiza una cita para un evento que te guste")
+                    .dnCaption()
+                    .multilineTextAlignment(.center)
+
+                DNButton("NAVEGA POR EVENTOS", variant: .secondary) {
+                    // Navigate to events
+                }
+            }
+            .padding(.vertical, DNSpace.lg)
+        }
+    }
+
     // MARK: - Empty State
 
     private var emptyState: some View {
@@ -116,10 +162,10 @@ struct MatchesView: View {
                 .frame(width: 80, height: 80)
                 .dnNeuRaised(cornerRadius: DNRadius.full)
 
-            Text("No dates yet")
+            Text("No tienes citas aún")
                 .dnH3()
 
-            Text("Browse events and create a date to get started")
+            Text("Explora eventos y crea una cita para empezar")
                 .dnCaption()
                 .multilineTextAlignment(.center)
         }

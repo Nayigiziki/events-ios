@@ -9,11 +9,14 @@ struct ChatListView: View {
                 VStack(spacing: 0) {
                     // Header
                     VStack(alignment: .leading, spacing: DNSpace.md) {
-                        Text("Messages")
-                            .dnH2()
+                        Text("MENSAJES")
+                            .font(.system(size: 28, weight: .black))
+                            .tracking(-0.6)
+                            .foregroundColor(.dnTextPrimary)
+                            .textCase(.uppercase)
 
                         DNTextField(
-                            placeholder: "Search conversations...",
+                            placeholder: "Buscar conversaciones...",
                             text: $viewModel.searchText,
                             icon: "magnifyingglass"
                         )
@@ -27,7 +30,7 @@ struct ChatListView: View {
                         emptyState
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: DNSpace.sm) {
+                            LazyVStack(spacing: DNSpace.xs) {
                                 ForEach(viewModel.filteredConversations) { conversation in
                                     NavigationLink(destination: ConversationChatView(partner: conversation.user)) {
                                         conversationRow(conversation)
@@ -48,32 +51,32 @@ struct ChatListView: View {
     // MARK: - Conversation Row
 
     private func conversationRow(_ conversation: MockConversation) -> some View {
-        DNCard {
-            HStack(spacing: DNSpace.md) {
-                ConversationAvatarView(conversation: conversation)
+        HStack(spacing: DNSpace.md) {
+            ConversationAvatarView(conversation: conversation)
 
-                VStack(alignment: .leading, spacing: DNSpace.xs) {
-                    Text(conversation.isGroup ? (conversation.groupName ?? conversation.user.name) : conversation.user
-                        .name)
-                        .dnBody()
-                        .fontWeight(.bold)
+            VStack(alignment: .leading, spacing: DNSpace.xs) {
+                Text(conversation.isGroup ? (conversation.groupName ?? conversation.user.name) : conversation.user.name)
+                    .font(.system(size: 18, weight: .bold))
+                    .tracking(-0.6)
+                    .foregroundColor(.dnTextPrimary)
+                    .lineLimit(1)
+
+                if conversation.isTyping {
+                    TypingIndicator()
+                } else {
+                    Text(conversation.lastMessage)
+                        .dnCaption()
                         .lineLimit(1)
-
-                    if conversation.isTyping {
-                        TypingIndicator()
-                    } else {
-                        Text(conversation.lastMessage)
-                            .dnCaption()
-                            .lineLimit(1)
-                    }
                 }
-
-                Spacer()
-
-                Text(conversation.timestamp)
-                    .dnSmall()
             }
+
+            Spacer()
+
+            Text(conversation.timestamp.uppercased())
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.dnTextTertiary)
         }
+        .padding(.vertical, DNSpace.md)
     }
 
     // MARK: - Empty State
@@ -92,10 +95,10 @@ struct ChatListView: View {
             }
             .dnNeuRaised()
 
-            Text("No conversations yet")
+            Text("No hay conversaciones aún")
                 .dnH3()
 
-            Text("When you match with someone, you can start chatting here")
+            Text("Cuando hagas match con alguien, podrás chatear aquí")
                 .dnCaption()
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, DNSpace.xxl)
@@ -112,7 +115,7 @@ struct TypingIndicator: View {
 
     var body: some View {
         HStack(spacing: 3) {
-            Text("typing")
+            Text("escribiendo")
                 .dnCaption()
                 .foregroundColor(.dnPrimary)
             ForEach(0 ..< 3, id: \.self) { index in
@@ -140,16 +143,16 @@ struct ConversationAvatarView: View {
             ZStack(alignment: .bottomTrailing) {
                 AvatarView(
                     url: URL(string: conversation.user.avatar),
-                    size: 48
+                    size: 56
                 )
 
                 if conversation.isGroup {
                     ZStack {
                         Circle()
                             .fill(Color.dnPrimary)
-                            .frame(width: 22, height: 22)
+                            .frame(width: 24, height: 24)
                         Image(systemName: "person.2.fill")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundColor(.white)
                     }
                     .offset(x: 4, y: 4)
@@ -160,9 +163,9 @@ struct ConversationAvatarView: View {
                 ZStack {
                     Circle()
                         .fill(Color.dnAccentPink)
-                        .frame(width: 22, height: 22)
+                        .frame(width: 24, height: 24)
                     Text("\(conversation.unread)")
-                        .font(.system(size: 11, weight: .black))
+                        .font(.system(size: 12, weight: .black))
                         .foregroundColor(.white)
                 }
                 .offset(x: 4, y: -4)

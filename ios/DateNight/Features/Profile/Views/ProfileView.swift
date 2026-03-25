@@ -16,8 +16,6 @@ struct ProfileView: View {
                         interestTagsSection
                         photoThumbnailRow
                         statsSection
-                        aboutSection
-                        interestsSection
                         recentActivitySection
                         settingsSection
                     }
@@ -55,7 +53,7 @@ struct ProfileView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: UIScreen.main.bounds.height * 0.7)
+            .frame(height: UIScreen.main.bounds.height * 0.45)
 
             // Gradient overlay
             GradientOverlay(opacity: 0.7)
@@ -70,15 +68,12 @@ struct ProfileView: View {
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(width: 36, height: 36)
-                            .background(
-                                Circle()
-                                    .fill(Color.black.opacity(0.3))
-                            )
+                            .foregroundColor(.dnTextPrimary)
+                            .frame(width: 40, height: 40)
+                            .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                     }
                     .padding(.trailing, DNSpace.lg)
-                    .padding(.top, DNSpace.xxl)
+                    .padding(.top, DNSpace.xxl * 2)
                 }
 
                 HStack(spacing: 6) {
@@ -104,7 +99,7 @@ struct ProfileView: View {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.dnTextPrimary)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                     }
                     Spacer()
@@ -119,7 +114,7 @@ struct ProfileView: View {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.dnTextPrimary)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                     }
                 }
@@ -164,14 +159,16 @@ struct ProfileView: View {
     // MARK: - Interest Tags Section
 
     private var interestTagsSection: some View {
-        HStack(spacing: DNSpace.sm) {
-            ForEach(viewModel.profile.interests, id: \.self) { interest in
-                Text(interest.uppercased())
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.dnTextPrimary)
-                    .padding(.horizontal, DNSpace.md)
-                    .padding(.vertical, DNSpace.xs)
-                    .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.sm)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: DNSpace.sm) {
+                ForEach(viewModel.profile.interests, id: \.self) { interest in
+                    Text(interest.uppercased())
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.dnTextPrimary)
+                        .padding(.horizontal, DNSpace.md)
+                        .padding(.vertical, DNSpace.sm)
+                        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.sm)
+                }
             }
         }
     }
@@ -189,10 +186,9 @@ struct ProfileView: View {
                     }
                     .frame(width: 64, height: 64)
                     .clipShape(Circle())
-                    .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                     .overlay(
                         Circle()
-                            .stroke(index == viewModel.selectedPhotoIndex ? Color.dnPrimary : Color.clear, lineWidth: 2)
+                            .stroke(index == viewModel.selectedPhotoIndex ? Color.dnPrimary : Color.clear, lineWidth: 3)
                     )
                     .onTapGesture {
                         withAnimation {
@@ -207,7 +203,7 @@ struct ProfileView: View {
     // MARK: - Stats Section
 
     private var statsSection: some View {
-        HStack(spacing: DNSpace.md) {
+        HStack(spacing: DNSpace.sm) {
             DNStatCard(
                 icon: "heart.fill",
                 label: "Matches",
@@ -217,50 +213,17 @@ struct ProfileView: View {
 
             DNStatCard(
                 icon: "calendar",
-                label: "Dates",
+                label: "Citas",
                 value: "\(viewModel.stats.dates)",
                 accentColor: .dnPrimary
             )
 
             DNStatCard(
-                icon: "star.fill",
-                label: "Events",
+                icon: "mappin.and.ellipse",
+                label: "Eventos",
                 value: "\(viewModel.stats.events)",
                 accentColor: .dnSuccess
             )
-        }
-    }
-
-    // MARK: - About Section
-
-    private var aboutSection: some View {
-        VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("About")
-                .dnH3()
-
-            Text(viewModel.profile.bio)
-                .dnBody()
-        }
-    }
-
-    // MARK: - Interests Section
-
-    private var interestsSection: some View {
-        VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("Interests")
-                .dnH3()
-
-            FlowLayout(spacing: DNSpace.sm) {
-                ForEach(viewModel.profile.interests, id: \.self) { interest in
-                    Text(interest)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.dnTextSecondary)
-                        .textCase(.uppercase)
-                        .padding(.horizontal, DNSpace.lg)
-                        .padding(.vertical, DNSpace.sm)
-                        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
-                }
-            }
         }
     }
 
@@ -268,8 +231,9 @@ struct ProfileView: View {
 
     private var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("Recent Activity")
-                .dnH3()
+            Text("ACTIVIDAD RECIENTE")
+                .dnLabel()
+                .textCase(.uppercase)
 
             LazyVStack(spacing: DNSpace.sm) {
                 ForEach(viewModel.activities) { activity in
@@ -296,8 +260,15 @@ struct ProfileView: View {
                             Spacer()
 
                             Text(activity.timeAgo)
-                                .dnSmall()
-                                .textCase(.uppercase)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.dnTextTertiary)
+                                .padding(.horizontal, DNSpace.sm)
+                                .padding(.vertical, DNSpace.xs)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.dnBackground)
+                                )
+                                .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                         }
                     }
                 }
@@ -309,9 +280,6 @@ struct ProfileView: View {
 
     private var settingsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("Settings")
-                .dnH3()
-
             VStack(spacing: DNSpace.sm) {
                 ForEach(settingsItems, id: \.self) { item in
                     NavigationLink(destination: EmptyView()) {
@@ -334,7 +302,7 @@ struct ProfileView: View {
                 } label: {
                     DNCard {
                         HStack {
-                            Text("Log Out")
+                            Text("Cerrar Sesión")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.dnDestructive)
                             Spacer()
@@ -352,7 +320,16 @@ struct ProfileView: View {
     // MARK: - Helpers
 
     private var settingsItems: [String] {
-        ["Edit Profile", "Notifications", "Privacy", "Help"]
+        [
+            "Ver Tutorial de Inicio",
+            "Explorador de Diseños",
+            "Galería de Pantallas",
+            "Configuración de Cuenta",
+            "Preferencias",
+            "Notificaciones",
+            "Privacidad y Seguridad",
+            "Ayuda y Soporte"
+        ]
     }
 
     private func activityColor(for colorName: String) -> Color {
