@@ -34,6 +34,8 @@ struct DNTabButton: View {
     }
 }
 
+/// Active tab: purple bg with inset shadow (light intensity — 4px 4px 8px)
+/// Inactive tab: standard neumorphic raised
 private struct TabButtonStyleModifier: ViewModifier {
     let isActive: Bool
 
@@ -44,24 +46,7 @@ private struct TabButtonStyleModifier: ViewModifier {
                     RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
                         .fill(Color.dnPrimary)
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                        .fill(Color.clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                                .stroke(Color.black.opacity(0.20), lineWidth: 4)
-                                .blur(radius: 4)
-                                .offset(x: 4, y: 4)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                                .stroke(Color.white.opacity(0.10), lineWidth: 4)
-                                .blur(radius: 4)
-                                .offset(x: -4, y: -4)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous))
-                        .allowsHitTesting(false)
-                )
+                .dnNeuPressed(intensity: .light, cornerRadius: DNRadius.md)
         } else {
             content.dnNeuRaised(intensity: .light, cornerRadius: DNRadius.md)
         }

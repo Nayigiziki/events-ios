@@ -30,8 +30,8 @@ extension Color {
 
 extension Color {
     static let dnBackground = Color(hex: "E0E5EC")
-    static let dnShadowDark = Color(hex: "a3b1c6").opacity(0.15)
-    static let dnShadowLight = Color.white.opacity(0.8)
+    static let dnShadowDark = Color(hex: "a3b1c6").opacity(0.50)
+    static let dnShadowLight = Color.white.opacity(0.95)
 
     static let dnTextPrimary = Color(hex: "1a1a2e")
     static let dnTextSecondary = Color(hex: "4a4a6a")
@@ -72,6 +72,17 @@ enum DNGradient {
         colors: [Color.black.opacity(0.4), Color.clear],
         startPoint: .top,
         endPoint: .bottom
+    )
+
+    /// Hero gradient from Figma: rgba(26,26,46,0.8) -> rgba(26,26,46,0.4) -> clear
+    static let heroGradient = LinearGradient(
+        stops: [
+            .init(color: Color(hex: "1a1a2e").opacity(0.8), location: 0),
+            .init(color: Color(hex: "1a1a2e").opacity(0.4), location: 0.5),
+            .init(color: .clear, location: 1.0)
+        ],
+        startPoint: .bottom,
+        endPoint: .top
     )
 }
 

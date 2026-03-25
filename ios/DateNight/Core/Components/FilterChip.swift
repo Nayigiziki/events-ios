@@ -12,6 +12,7 @@ struct FilterChip: View {
         } label: {
             Text(title)
                 .font(.system(size: 14, weight: .bold))
+                .tracking(0.2)
                 .foregroundColor(isActive ? .white : .dnTextSecondary)
                 .padding(.horizontal, DNSpace.xl)
                 .padding(.vertical, DNSpace.md)
@@ -29,13 +30,15 @@ private struct ChipStyleModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if isActive {
+            // Active: purple bg + inset shadow
             content
                 .background(
                     RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
                         .fill(Color.dnPrimary)
                 )
-                .dnNeuPressed(cornerRadius: DNRadius.md)
+                .dnNeuPressed(intensity: .medium, cornerRadius: DNRadius.md)
         } else {
+            // Inactive: standard neumorphic raised
             content.dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.md)
         }
     }

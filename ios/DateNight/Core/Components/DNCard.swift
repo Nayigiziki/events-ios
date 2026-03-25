@@ -5,7 +5,7 @@ struct DNCard<Content: View>: View {
     let content: Content
 
     init(
-        cornerRadius: CGFloat = DNRadius.lg,
+        cornerRadius: CGFloat = DNRadius.xl,
         @ViewBuilder content: () -> Content
     ) {
         self.cornerRadius = cornerRadius
