@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Mock Data
 
-enum MockData {
+enum DiscoverMockData {
     static let users: [UserProfile] = [
         UserProfile(
             name: "Emma",
@@ -179,7 +179,7 @@ enum MockData {
 
 @MainActor
 class DiscoverViewModel: ObservableObject {
-    @Published var users: [UserProfile] = MockData.users
+    @Published var users: [UserProfile] = DiscoverMockData.users
     @Published var currentIndex: Int = 0
     @Published var showFilters: Bool = false
 

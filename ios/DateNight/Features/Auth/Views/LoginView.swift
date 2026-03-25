@@ -65,12 +65,10 @@ struct LoginView: View {
 
                         // Remember Me + Forgot Password
                         HStack {
-                            Toggle(isOn: $rememberMe) {
-                                Text(String(localized: "auth_remember_me"))
-                                    .dnCaption()
-                                    .foregroundColor(.dnTextPrimary)
-                            }
-                            .toggleStyle(DNCheckboxToggleStyle())
+                            DNCheckbox(
+                                label: String(localized: "auth_remember_me"),
+                                isOn: $rememberMe
+                            )
 
                             Spacer()
 
@@ -189,26 +187,29 @@ struct DNSecureField: View {
 
 // MARK: - Checkbox Toggle Style
 
-struct DNCheckboxToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
+struct DNCheckbox: View {
+    let label: String
+    @Binding var isOn: Bool
+
+    var body: some View {
         Button {
-            configuration.isOn.toggle()
+            isOn.toggle()
         } label: {
             HStack(spacing: DNSpace.sm) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .fill(Color.dnBackground)
                         .frame(width: 22, height: 22)
-                        .dnNeuPressed(cornerRadius: 6)
 
-                    if configuration.isOn {
+                    if isOn {
                         Image(systemName: "checkmark")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(.dnPrimary)
                     }
                 }
 
-                configuration.label
+                Text(label)
+                    .dnCaption()
             }
         }
         .buttonStyle(.plain)

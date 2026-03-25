@@ -2,12 +2,12 @@ import Foundation
 
 @MainActor
 class MatchesViewModel: ObservableObject {
-    @Published var availableDates: [DateRequest] = MockData.dateRequests
+    @Published var availableDates: [DateRequest] = DiscoverMockData.dateRequests
     @Published var myDates: [DateRequest] = []
     @Published var selectedTab: Int = 0
 
     init() {
-        self.myDates = MockData.dateRequests.filter { $0.status == .confirmed }
+        self.myDates = DiscoverMockData.dateRequests.filter { $0.status == .confirmed }
     }
 
     func joinDate(requestId: UUID) {

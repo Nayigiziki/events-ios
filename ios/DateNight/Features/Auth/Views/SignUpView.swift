@@ -149,12 +149,10 @@ struct SignUpView: View {
                         }
 
                         // Terms
-                        Toggle(isOn: $agreedToTerms) {
-                            Text(String(localized: "auth_terms_agree"))
-                                .dnCaption()
-                                .foregroundColor(.dnTextSecondary)
-                        }
-                        .toggleStyle(DNCheckboxToggleStyle())
+                        DNCheckbox(
+                            label: String(localized: "auth_terms_agree"),
+                            isOn: $agreedToTerms
+                        )
                         .padding(.vertical, DNSpace.xs)
 
                         // Sign Up Button
