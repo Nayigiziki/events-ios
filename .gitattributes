@@ -1,0 +1,10 @@
+# Xcode project files - union merge
+*.pbxproj merge=union -diff
+*.xcworkspace merge=union -diff
+
+# Binary files
+*.ipa binary
+*.dSYM binary
+
+# Swift files
+*.swift text eol=lf

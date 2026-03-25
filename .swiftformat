@@ -1,0 +1,8 @@
+--indent 4
+--maxwidth 120
+--wraparguments before-first
+--wrapcollections before-first
+--commas inline
+--stripunusedargs closure-only
+--self init-only
+--exclude Pods,DerivedData,.build

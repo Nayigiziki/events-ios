@@ -1,0 +1,24 @@
+disabled_rules:
+  - line_length
+  - trailing_whitespace
+  - identifier_name
+  - nesting
+  - multiple_closures_with_trailing_closure
+  - force_unwrapping
+  - force_try
+  - file_length
+  - non_optional_string_data_conversion
+  - trailing_comma
+  - implicitly_unwrapped_optional
+  - type_body_length
+  - static_over_final_class
+
+opt_in_rules:
+  - empty_count
+
+excluded:
+  - Pods
+  - DerivedData
+  - .build
+
+force_cast: warning

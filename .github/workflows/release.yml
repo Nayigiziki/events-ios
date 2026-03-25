@@ -1,0 +1,15 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  ios:
+    uses: Nayigiziki/deploy-workflows/.github/workflows/deploy-testflight.yml@main
+    with:
+      scheme: DateNight
+      bundle-id: com.tron.datenight
+      ios-directory: ios
+    secrets: inherit

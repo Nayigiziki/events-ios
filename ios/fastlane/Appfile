@@ -1,0 +1,17 @@
+# App Store Connect Configuration
+# Documentation: https://docs.fastlane.tools/advanced/Appfile/
+
+# Your App Store Connect Team ID (different from Developer Team ID)
+# Find at: App Store Connect > Users and Access > Team ID
+app_identifier ENV["APP_IDENTIFIER"] || "com.example.swiftapp"
+apple_id ENV["APPLE_ID"]  # Your Apple ID email
+
+# Developer Portal Team ID
+team_id ENV["APPLE_TEAM_ID"] || "L6JNH6A9TS"
+
+# App Store Connect Team ID (for itc_team_id)
+itc_team_id ENV["ITC_TEAM_ID"]
+
+# App Store Connect API Key (recommended for CI/CD)
+# Create at: App Store Connect > Users and Access > Keys
+# Required: Key ID, Issuer ID, and .p8 file

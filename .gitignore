@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# iOS
+ios/SwiftApp.xcodeproj/xcuserdata/
+ios/SwiftApp.xcodeproj/project.xcworkspace/xcuserdata/
+ios/SwiftApp.xcworkspace/xcuserdata/
+ios/Pods/
+ios/build/
+ios/fastlane/build/
+ios/.env
+ios/Secrets.xcconfig
+ios/vendor/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Backend
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.local
+backend/.vercel
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Misc
+*.log
+.env
+.env.local
+
+# Logs
+logs/

@@ -1,0 +1,28 @@
+# match - Code Signing Management
+# Documentation: https://docs.fastlane.tools/actions/match/
+
+# Git repository to store certificates and profiles
+# Create a private repo like: github.com/your-username/certificates
+git_url ENV["MATCH_GIT_URL"]
+
+# Storage mode - git is recommended
+storage_mode "git"
+
+# App bundle identifier(s)
+app_identifier [ENV["APP_IDENTIFIER"] || "com.example.swiftapp"]
+
+# Apple Developer Team ID
+team_id ENV["APPLE_TEAM_ID"] || "L6JNH6A9TS"
+
+# Default type for match
+type "appstore"
+
+# Clone using HTTPS with token auth
+git_basic_authorization ENV["MATCH_GIT_BASIC_AUTH"]
+
+# Keychain for CI environments
+keychain_name ENV["MATCH_KEYCHAIN_NAME"] || "login.keychain"
+keychain_password ENV["MATCH_KEYCHAIN_PASSWORD"]
+
+# Read-only mode for CI (faster, doesn't modify certs)
+readonly ENV["CI"] == "true"

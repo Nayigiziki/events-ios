@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites name='JoeDaddyTests.xctest' tests='8' failures='0'>
+  <testsuite name='JoeDaddyTests.AICalibrationEvalTests' tests='8' failures='0'>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testAIStopsWhenReady' time='3.434'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testClearUrgentBug' time='6.159'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testHobbyTask' time='4.950'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testOverallPassRate' time='36.060'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testReasoningIsConcise' time='2.315'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testUnderestimatedTask' time='4.894'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testUrgentLowImportance' time='5.359'/>
+    <testcase classname='JoeDaddyTests.AICalibrationEvalTests' name='testVagueResearchTask' time='5.650'/>
+  </testsuite>
+</testsuites>
