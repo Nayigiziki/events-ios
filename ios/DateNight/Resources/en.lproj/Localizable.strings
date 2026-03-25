@@ -1,0 +1,104 @@
+/* Tab Labels */
+"tab_explore" = "Explore";
+"tab_discover" = "Discover";
+"tab_dates" = "Dates";
+"tab_chats" = "Chats";
+"tab_profile" = "Profile";
+
+/* Category Names */
+"category_dinner" = "Dinner";
+"category_drinks" = "Drinks";
+"category_outdoor" = "Outdoor";
+"category_adventure" = "Adventure";
+"category_movies" = "Movies";
+"category_cooking" = "Cooking";
+"category_wellness" = "Wellness";
+"category_games" = "Games";
+
+/* Auth */
+"auth_sign_in" = "Sign In";
+"auth_sign_up" = "Sign Up";
+"auth_email" = "Email";
+"auth_password" = "Password";
+"auth_forgot_password" = "Forgot Password?";
+"auth_welcome_back" = "Welcome Back";
+"auth_create_account" = "Create Account";
+"auth_or_continue_with" = "Or continue with";
+"auth_sign_out" = "Sign Out";
+
+/* Buttons */
+"button_save" = "Save";
+"button_cancel" = "Cancel";
+"button_done" = "Done";
+"button_next" = "Next";
+"button_back" = "Back";
+"button_continue" = "Continue";
+"button_skip" = "Skip";
+"button_edit" = "Edit";
+"button_delete" = "Delete";
+"button_share" = "Share";
+"button_filter" = "Filter";
+"button_apply" = "Apply";
+"button_reset" = "Reset";
+"button_confirm" = "Confirm";
+"button_join" = "Join";
+"button_leave" = "Leave";
+"button_invite" = "Invite";
+
+/* Placeholders */
+"placeholder_search" = "Search...";
+"placeholder_message" = "Type a message...";
+"placeholder_name" = "Your name";
+"placeholder_bio" = "Tell us about yourself";
+
+/* Onboarding */
+"onboarding_title_1" = "Find Your Perfect Date";
+"onboarding_subtitle_1" = "Discover unique experiences curated just for you and your partner.";
+"onboarding_title_2" = "Plan Together";
+"onboarding_subtitle_2" = "Collaborate on date ideas and find something you both love.";
+"onboarding_title_3" = "Make Memories";
+"onboarding_subtitle_3" = "Save your favorite moments and keep the spark alive.";
+"onboarding_get_started" = "Get Started";
+
+/* Errors */
+"error_generic" = "Something went wrong. Please try again.";
+"error_network" = "No internet connection. Please check your network.";
+"error_invalid_email" = "Please enter a valid email address.";
+"error_invalid_password" = "Password must be at least 8 characters.";
+"error_loading" = "Failed to load. Tap to retry.";
+
+/* Empty States */
+"empty_dates" = "No dates yet";
+"empty_dates_subtitle" = "Start exploring to find your perfect date night!";
+"empty_chats" = "No conversations yet";
+"empty_chats_subtitle" = "Match with someone to start chatting.";
+"empty_explore" = "Nothing to explore";
+"empty_explore_subtitle" = "Check back later for new experiences.";
+"empty_favorites" = "No favorites yet";
+"empty_favorites_subtitle" = "Tap the heart on dates you love.";
+
+/* Dates */
+"date_details" = "Date Details";
+"date_book_now" = "Book Now";
+"date_save" = "Save Date";
+"date_share" = "Share Date";
+"date_reviews" = "Reviews";
+"date_location" = "Location";
+"date_time" = "Time";
+"date_price" = "Price";
+"date_spots_left" = "spots left";
+"date_per_couple" = "per couple";
+
+/* Profile */
+"profile_edit" = "Edit Profile";
+"profile_settings" = "Settings";
+"profile_favorites" = "Favorites";
+"profile_history" = "History";
+"profile_notifications" = "Notifications";
+"profile_privacy" = "Privacy";
+"profile_help" = "Help & Support";
+
+/* Status */
+"status_open" = "Open";
+"status_full" = "Full";
+"status_confirmed" = "Confirmed";
