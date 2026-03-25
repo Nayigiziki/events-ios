@@ -74,10 +74,10 @@ struct UserSwipeView: View {
                             viewModel.swipeLeft(userId: currentUser.id)
                         } label: {
                             Image(systemName: "xmark")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.system(size: 28, weight: .bold))
                                 .foregroundColor(.dnDestructive)
-                                .frame(width: 60, height: 60)
-                                .dnNeuRaised(cornerRadius: DNRadius.full)
+                                .frame(width: 70, height: 70)
+                                .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.full)
                         }
                         .buttonStyle(.plain)
 
@@ -86,10 +86,10 @@ struct UserSwipeView: View {
                             viewModel.swipeRight(userId: currentUser.id)
                         } label: {
                             Image(systemName: "heart.fill")
-                                .font(.system(size: 26, weight: .bold))
-                                .foregroundColor(.dnAccentPink)
-                                .frame(width: 60, height: 60)
-                                .dnNeuRaised(cornerRadius: DNRadius.full)
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundColor(.dnPrimary)
+                                .frame(width: 70, height: 70)
+                                .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.full)
                         }
                         .buttonStyle(.plain)
                     }

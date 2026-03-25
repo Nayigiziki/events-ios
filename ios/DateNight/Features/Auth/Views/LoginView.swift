@@ -13,25 +13,49 @@ struct LoginView: View {
                 VStack(spacing: DNSpace.xl) {
                     // MARK: - Hero / Logo
 
-                    VStack(spacing: DNSpace.md) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous)
-                                .fill(Color.dnPrimary)
-                                .frame(width: 80, height: 80)
-                                .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.xl)
-
-                            Image(systemName: "heart.fill")
-                                .font(.system(size: 36))
-                                .foregroundColor(.white)
-                        }
-
-                        Text("DateNight")
-                            .dnH1()
-
-                        Text(String(localized: "auth_app_tagline"))
-                            .dnCaption()
-                            .multilineTextAlignment(.center)
+                    AsyncImage(
+                        url: URL(
+                            string: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=400&fit=crop"
+                        )
+                    ) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Color.dnMuted
                     }
+                    .frame(height: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.black.opacity(0.5), Color.clear],
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
+                            )
+                    )
+                    .overlay(
+                        VStack(spacing: DNSpace.sm) {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .padding(DNSpace.md)
+                                .background(
+                                    RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
+                                        .fill(Color.dnPrimary)
+                                )
+                            Text("DATENIGHT")
+                                .font(.system(size: 28, weight: .heavy))
+                                .foregroundColor(.white)
+                                .tracking(2)
+                            Text(String(localized: "auth_app_tagline"))
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
+                    )
+                    .padding(.horizontal, DNSpace.lg)
                     .padding(.top, DNSpace.xxl)
 
                     // MARK: - Form

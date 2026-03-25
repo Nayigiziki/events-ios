@@ -16,9 +16,11 @@ struct DNTabButton: View {
                     .foregroundColor(isActive ? .white : .dnTextSecondary)
 
                 Text(label.uppercased())
-                    .font(.system(size: 10, weight: .bold))
-                    .tracking(1.0)
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.5)
                     .foregroundColor(isActive ? .white : .dnTextSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(minWidth: 44, minHeight: 44)
             .padding(.horizontal, DNSpace.sm)

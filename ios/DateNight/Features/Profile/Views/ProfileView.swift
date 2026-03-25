@@ -13,6 +13,8 @@ struct ProfileView: View {
 
                     // Content below photo
                     VStack(alignment: .leading, spacing: DNSpace.xl) {
+                        interestTagsSection
+                        photoThumbnailRow
                         statsSection
                         aboutSection
                         interestsSection
@@ -58,8 +60,27 @@ struct ProfileView: View {
             // Gradient overlay
             GradientOverlay(opacity: 0.7)
 
-            // Photo indicator bar
+            // Photo indicator bar + overlays
             VStack {
+                HStack {
+                    Spacer()
+                    // Settings gear icon
+                    Button {
+                        // Settings action
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .fill(Color.black.opacity(0.3))
+                            )
+                    }
+                    .padding(.trailing, DNSpace.lg)
+                    .padding(.top, DNSpace.xxl)
+                }
+
                 HStack(spacing: 6) {
                     ForEach(0 ..< viewModel.profile.photos.count, id: \.self) { index in
                         Capsule()
@@ -69,9 +90,40 @@ struct ProfileView: View {
                     }
                 }
                 .padding(.horizontal, DNSpace.lg)
-                .padding(.top, DNSpace.lg)
+                .padding(.top, DNSpace.sm)
 
                 Spacer()
+
+                // Photo carousel arrow buttons
+                HStack {
+                    Button {
+                        withAnimation {
+                            viewModel.selectedPhotoIndex = max(0, viewModel.selectedPhotoIndex - 1)
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.dnTextPrimary)
+                            .frame(width: 36, height: 36)
+                            .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
+                    }
+                    Spacer()
+                    Button {
+                        withAnimation {
+                            viewModel.selectedPhotoIndex = min(
+                                viewModel.profile.photos.count - 1,
+                                viewModel.selectedPhotoIndex + 1
+                            )
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.dnTextPrimary)
+                            .frame(width: 36, height: 36)
+                            .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
+                    }
+                }
+                .padding(.horizontal, DNSpace.lg)
 
                 // Name + age overlay
                 HStack(alignment: .bottom) {
@@ -105,6 +157,49 @@ struct ProfileView: View {
                 }
                 .padding(.horizontal, DNSpace.lg)
                 .padding(.bottom, DNSpace.lg)
+            }
+        }
+    }
+
+    // MARK: - Interest Tags Section
+
+    private var interestTagsSection: some View {
+        HStack(spacing: DNSpace.sm) {
+            ForEach(viewModel.profile.interests, id: \.self) { interest in
+                Text(interest.uppercased())
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.dnTextPrimary)
+                    .padding(.horizontal, DNSpace.md)
+                    .padding(.vertical, DNSpace.xs)
+                    .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.sm)
+            }
+        }
+    }
+
+    // MARK: - Photo Thumbnail Row
+
+    private var photoThumbnailRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: DNSpace.md) {
+                ForEach(Array(viewModel.profile.photos.enumerated()), id: \.offset) { index, photo in
+                    AsyncImage(url: URL(string: photo)) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Color.dnMuted
+                    }
+                    .frame(width: 64, height: 64)
+                    .clipShape(Circle())
+                    .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
+                    .overlay(
+                        Circle()
+                            .stroke(index == viewModel.selectedPhotoIndex ? Color.dnPrimary : Color.clear, lineWidth: 2)
+                    )
+                    .onTapGesture {
+                        withAnimation {
+                            viewModel.selectedPhotoIndex = index
+                        }
+                    }
+                }
             }
         }
     }
