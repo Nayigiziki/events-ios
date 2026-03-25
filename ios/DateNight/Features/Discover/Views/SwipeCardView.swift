@@ -89,20 +89,7 @@ struct SwipeCardView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: DNSpace.sm) {
                             ForEach(user.interests.prefix(4), id: \.self) { interest in
-                                Text(interest)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .textCase(.uppercase)
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, DNSpace.md)
-                                    .padding(.vertical, DNSpace.xs)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.white.opacity(0.2))
-                                    )
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                    )
+                                DNOverlayChip(text: interest.uppercased())
                             }
                         }
                     }

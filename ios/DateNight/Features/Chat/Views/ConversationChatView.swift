@@ -67,8 +67,7 @@ struct ConversationChatView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(viewModel.conversationPartner.name)
-                    .font(.system(size: 16, weight: .black))
-                    .foregroundColor(.dnTextPrimary)
+                    .dnH4()
 
                 HStack(spacing: 4) {
                     if viewModel.conversationPartner.isOnline {

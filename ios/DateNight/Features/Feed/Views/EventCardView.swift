@@ -175,14 +175,7 @@ struct EventCardView: View {
                 )
         }
         .buttonStyle(.plain)
-        .shadow(
-            color: isLiked ? .clear : Color(hex: "a3b1c6").opacity(0.15),
-            radius: 8, x: 4, y: 4
-        )
-        .shadow(
-            color: isLiked ? .clear : Color.white.opacity(0.8),
-            radius: 8, x: -4, y: -4
-        )
+        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
         .animation(.dnButtonPress, value: isLiked)
     }
 
@@ -239,7 +232,7 @@ struct EventCardView: View {
         case "Food": .dnSuccess
         case "Wellness": .dnInfo
         case "Wine": .dnDestructive
-        case "Social": Color(hex: "0984e3")
+        case "Social": .dnInfo
         default: .dnPrimary
         }
     }

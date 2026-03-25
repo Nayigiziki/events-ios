@@ -101,8 +101,7 @@ struct EventDetailView: View {
             .foregroundColor(.dnTextPrimary)
             .frame(width: 48, height: 48)
             .background(Circle().fill(Color.dnBackground))
-            .shadow(color: Color(hex: "a3b1c6").opacity(0.3), radius: 8, x: 4, y: 4)
-            .shadow(color: Color.white.opacity(0.2), radius: 8, x: -4, y: -4)
+            .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
     }
 
     private func heroEventInfo(event: Event) -> some View {
@@ -258,11 +257,6 @@ struct EventDetailView: View {
 
     private func stickyBottomBar(event: Event) -> some View {
         VStack(spacing: 0) {
-            Rectangle()
-                .fill(Color.dnBackground)
-                .frame(height: 1)
-                .shadow(color: Color(hex: "a3b1c6").opacity(0.15), radius: 8, x: 0, y: -8)
-
             HStack {
                 VStack(alignment: .leading, spacing: DNSpace.xs) {
                     Text("Price")
@@ -280,6 +274,7 @@ struct EventDetailView: View {
             .padding(.horizontal, DNSpace.xl)
             .padding(.vertical, DNSpace.lg)
             .background(Color.dnBackground)
+            .dnNeuRaised(intensity: .medium, cornerRadius: 0)
         }
     }
 }

@@ -21,18 +21,7 @@ struct AvatarView: View {
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
-        .shadow(
-            color: Color(hex: "a3b1c6").opacity(0.15),
-            radius: 8,
-            x: 4,
-            y: 4
-        )
-        .shadow(
-            color: Color.white.opacity(0.8),
-            radius: 8,
-            x: -4,
-            y: -4
-        )
+        .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
     }
 
     private var placeholderView: some View {

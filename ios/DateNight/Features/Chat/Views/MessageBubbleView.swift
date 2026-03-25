@@ -20,37 +20,15 @@ struct MessageBubbleView: View {
                             if message.isSent {
                                 RoundedRectangle(cornerRadius: DNRadius.lg, style: .continuous)
                                     .fill(Color.dnPrimary)
-                                    .shadow(
-                                        color: Color(hex: "a3b1c6").opacity(0.15),
-                                        radius: 8,
-                                        x: 4,
-                                        y: 4
-                                    )
-                                    .shadow(
-                                        color: Color.white.opacity(0.4),
-                                        radius: 8,
-                                        x: -2,
-                                        y: -2
-                                    )
+                                    .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.lg)
                             } else {
                                 RoundedRectangle(cornerRadius: DNRadius.lg, style: .continuous)
                                     .fill(Color.dnBackground)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: DNRadius.lg, style: .continuous)
-                                            .stroke(Color(hex: "a3b1c6").opacity(0.3), lineWidth: 1)
+                                            .stroke(Color.dnShadowDark, lineWidth: 1)
                                     )
-                                    .shadow(
-                                        color: Color(hex: "a3b1c6").opacity(0.15),
-                                        radius: 4,
-                                        x: 2,
-                                        y: 2
-                                    )
-                                    .shadow(
-                                        color: Color.white.opacity(0.8),
-                                        radius: 4,
-                                        x: -2,
-                                        y: -2
-                                    )
+                                    .dnNeuPressed(intensity: .light, cornerRadius: DNRadius.lg)
                             }
                         }
                     )

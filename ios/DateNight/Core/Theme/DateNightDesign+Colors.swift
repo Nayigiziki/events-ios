@@ -46,6 +46,33 @@ extension Color {
 
     static let dnBorder = Color(hex: "a4b0c0")
     static let dnMuted = Color(hex: "c8d0e0")
+
+    // MARK: - Overlay Colors (for text/chips on dark image backgrounds)
+
+    static let dnOverlayChipBg = Color.white.opacity(0.2)
+    static let dnOverlayChipStroke = Color.white.opacity(0.3)
+    static let dnOverlayText = Color.white
+    static let dnOverlayTextMuted = Color.white.opacity(0.9)
+}
+
+// MARK: - Gradients
+
+enum DNGradient {
+    static let accentPill = LinearGradient(
+        colors: [Color.dnAccentPink, Color.dnPrimary],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
+    static let imageOverlayBottom = LinearGradient(
+        colors: [Color.black.opacity(0.7), Color.clear],
+        startPoint: .bottom,
+        endPoint: .top
+    )
+    static let imageOverlayTop = LinearGradient(
+        colors: [Color.black.opacity(0.4), Color.clear],
+        startPoint: .top,
+        endPoint: .bottom
+    )
 }
 
 // MARK: - Spacing
@@ -62,6 +89,7 @@ enum DNSpace {
 // MARK: - Corner Radius
 
 enum DNRadius {
+    static let xs: CGFloat = 6
     static let sm: CGFloat = 12
     static let md: CGFloat = 16
     static let lg: CGFloat = 20

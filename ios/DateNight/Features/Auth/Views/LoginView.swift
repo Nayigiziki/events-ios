@@ -197,7 +197,7 @@ struct DNCheckbox: View {
         } label: {
             HStack(spacing: DNSpace.sm) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    RoundedRectangle(cornerRadius: DNRadius.xs, style: .continuous)
                         .fill(Color.dnBackground)
                         .frame(width: 22, height: 22)
 

@@ -194,13 +194,7 @@ struct ProfileEditView: View {
                     .padding(.vertical, DNSpace.sm)
                     .background(
                         Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [.dnAccentPink, .dnPrimary],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            .fill(DNGradient.accentPill)
                     )
                 }
             }
@@ -215,13 +209,7 @@ struct ProfileEditView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                         .frame(width: 44, height: 44)
-                        .background(
-                            LinearGradient(
-                                colors: [.dnAccentPink, .dnPrimary],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(DNGradient.accentPill)
                         .clipShape(RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous))
                 }
             }

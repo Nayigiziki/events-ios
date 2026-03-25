@@ -100,7 +100,7 @@ struct ProfileView: View {
                                 Circle()
                                     .fill(Color.dnPrimary)
                             )
-                            .shadow(color: .black.opacity(0.3), radius: 8, x: 4, y: 4)
+                            .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
                     }
                 }
                 .padding(.horizontal, DNSpace.lg)

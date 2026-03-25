@@ -95,20 +95,7 @@ struct UserProfileModal: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: DNSpace.sm) {
                                 ForEach(user.interests, id: \.self) { interest in
-                                    Text(interest)
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .textCase(.uppercase)
-                                        .padding(.horizontal, DNSpace.md)
-                                        .padding(.vertical, DNSpace.sm)
-                                        .background(
-                                            Capsule()
-                                                .fill(Color.white.opacity(0.2))
-                                                .overlay(
-                                                    Capsule()
-                                                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                                )
-                                        )
+                                    DNOverlayChip(text: interest.uppercased())
                                 }
                             }
                         }
