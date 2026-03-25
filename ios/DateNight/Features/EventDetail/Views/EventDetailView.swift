@@ -3,6 +3,8 @@ import SwiftUI
 struct EventDetailView: View {
     @StateObject private var viewModel: EventDetailViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedUser: MockUser?
+    @State private var showUserProfile = false
 
     init(event: Event) {
         _viewModel = StateObject(wrappedValue: EventDetailViewModel(event: event))
@@ -26,6 +28,11 @@ struct EventDetailView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $viewModel.showCreateDate) {
                 CreateDateSheet(viewModel: viewModel)
+            }
+            .fullScreenCover(isPresented: $showUserProfile) {
+                if let user = selectedUser {
+                    UserProfileModal(user: user)
+                }
             }
         }
     }
@@ -238,18 +245,32 @@ struct EventDetailView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: DNSpace.md) {
                     ForEach(event.attendees ?? []) { user in
-                        VStack(spacing: DNSpace.sm) {
-                            AvatarView(
-                                url: URL(string: user.avatarUrl ?? ""),
-                                size: 64
+                        Button {
+                            selectedUser = MockUser(
+                                id: user.id.uuidString,
+                                name: user.name,
+                                age: user.age ?? 0,
+                                avatar: user.avatarUrl ?? "",
+                                photos: user.photos,
+                                bio: user.bio ?? "",
+                                interests: user.interests
                             )
-                            Text(user.name)
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.dnTextPrimary)
-                                .frame(width: 64)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
+                            showUserProfile = true
+                        } label: {
+                            VStack(spacing: DNSpace.sm) {
+                                AvatarView(
+                                    url: URL(string: user.avatarUrl ?? ""),
+                                    size: 64
+                                )
+                                Text(user.name)
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.dnTextPrimary)
+                                    .frame(width: 64)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }

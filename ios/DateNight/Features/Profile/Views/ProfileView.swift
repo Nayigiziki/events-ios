@@ -4,6 +4,13 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var showEditProfile = false
     @State private var showMatchPreferences = false
+    @State private var showSettings = false
+    @State private var showNotifications = false
+    @State private var showHelpSupport = false
+    @State private var showMyReviews = false
+    @State private var showFriends = false
+    @State private var showOnboarding = false
+    @State private var showMyEvents = false
 
     var body: some View {
         NavigationStack {
@@ -33,6 +40,27 @@ struct ProfileView: View {
             }
             .navigationDestination(isPresented: $showMatchPreferences) {
                 MatchPreferencesView()
+            }
+            .navigationDestination(isPresented: $showSettings) {
+                SettingsView()
+            }
+            .navigationDestination(isPresented: $showNotifications) {
+                NotificationsView()
+            }
+            .navigationDestination(isPresented: $showHelpSupport) {
+                HelpSupportView()
+            }
+            .navigationDestination(isPresented: $showMyReviews) {
+                MyReviewsView()
+            }
+            .navigationDestination(isPresented: $showFriends) {
+                FriendsListView()
+            }
+            .navigationDestination(isPresented: $showMyEvents) {
+                MyEventsView()
+            }
+            .sheet(isPresented: $showOnboarding) {
+                OnboardingView()
             }
         }
     }
@@ -287,9 +315,7 @@ struct ProfileView: View {
             VStack(spacing: DNSpace.sm) {
                 ForEach(settingsItems, id: \.self) { item in
                     Button {
-                        if item == "Preferencias" {
-                            showMatchPreferences = true
-                        }
+                        handleSettingsTap(item)
                     } label: {
                         DNCard {
                             HStack {
@@ -336,8 +362,34 @@ struct ProfileView: View {
             "Preferencias",
             "Notificaciones",
             "Privacidad y Seguridad",
-            "Ayuda y Soporte"
+            "Ayuda y Soporte",
+            "Mis Reseñas",
+            "Mis Amigos",
+            "Mis Eventos"
         ]
+    }
+
+    private func handleSettingsTap(_ item: String) {
+        switch item {
+        case "Ver Tutorial de Inicio":
+            showOnboarding = true
+        case "Configuración de Cuenta", "Privacidad y Seguridad":
+            showSettings = true
+        case "Preferencias":
+            showMatchPreferences = true
+        case "Notificaciones":
+            showNotifications = true
+        case "Ayuda y Soporte":
+            showHelpSupport = true
+        case "Mis Reseñas":
+            showMyReviews = true
+        case "Mis Amigos":
+            showFriends = true
+        case "Mis Eventos":
+            showMyEvents = true
+        default:
+            break
+        }
     }
 
     private func activityColor(for colorName: String) -> Color {

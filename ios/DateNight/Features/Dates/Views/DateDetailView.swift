@@ -3,6 +3,8 @@ import SwiftUI
 struct DateDetailView: View {
     @StateObject private var viewModel: DateDetailViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showRateMatch = false
+    @State private var showInvite = false
 
     init(dateRequest: DateRequest) {
         _viewModel = StateObject(wrappedValue: DateDetailViewModel(dateRequest: dateRequest))
@@ -28,6 +30,12 @@ struct DateDetailView: View {
                     if let event = viewModel.dateRequest.event {
                         GroupChatView(groupName: event.title)
                     }
+                }
+                .sheet(isPresented: $showRateMatch) {
+                    RateMatchView(ratedUser: MockData.users.first!)
+                }
+                .sheet(isPresented: $showInvite) {
+                    InviteToDateView()
                 }
             }
         }
@@ -177,7 +185,9 @@ struct DateDetailView: View {
                     .dnH3()
                 Spacer()
                 if viewModel.dateRequest.dateType == .group {
-                    Button {} label: {
+                    Button {
+                        showInvite = true
+                    } label: {
                         HStack(spacing: DNSpace.xs) {
                             Image(systemName: "plus.circle.fill")
                                 .font(.system(size: 16, weight: .bold))
@@ -262,6 +272,9 @@ struct DateDetailView: View {
             case .confirmed:
                 DNButton("Open Chat", variant: .primary) {
                     viewModel.openChat()
+                }
+                DNButton("Rate Your Date", variant: .accent) {
+                    showRateMatch = true
                 }
                 Button {
                     viewModel.cancel()

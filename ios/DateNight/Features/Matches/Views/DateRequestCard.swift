@@ -5,6 +5,15 @@ struct DateRequestCard: View {
     var onJoin: (() -> Void)?
 
     var body: some View {
+        NavigationLink {
+            DateDetailView(dateRequest: dateRequest)
+        } label: {
+            cardContent
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var cardContent: some View {
         DNCard(cornerRadius: DNRadius.xxl) {
             VStack(alignment: .leading, spacing: 0) {
                 // Event image + info

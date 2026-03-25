@@ -2,47 +2,69 @@ import SwiftUI
 
 struct MatchesView: View {
     @StateObject private var viewModel = MatchesViewModel()
+    @State private var showMyDates = false
 
     var body: some View {
-        DNScreen {
-            ScrollView {
-                VStack(spacing: DNSpace.lg) {
-                    // Header
-                    VStack(alignment: .leading, spacing: DNSpace.xs) {
-                        Text("TUS CITAS")
-                            .font(.system(size: 28, weight: .black))
-                            .tracking(-0.6)
-                            .foregroundColor(.dnTextPrimary)
-                            .textCase(.uppercase)
+        NavigationStack {
+            DNScreen {
+                ScrollView {
+                    VStack(spacing: DNSpace.lg) {
+                        // Header
+                        VStack(alignment: .leading, spacing: DNSpace.xs) {
+                            Text("TUS CITAS")
+                                .font(.system(size: 28, weight: .black))
+                                .tracking(-0.6)
+                                .foregroundColor(.dnTextPrimary)
+                                .textCase(.uppercase)
 
-                        Text("Encuentra personas para ir a eventos juntos")
-                            .dnCaption()
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, DNSpace.lg)
-                    .padding(.top, DNSpace.md)
-
-                    // Segmented picker — full-width pill toggle
-                    HStack(spacing: 0) {
-                        tabButton(title: "CITAS DISPONIBLES", index: 0)
-                        tabButton(title: "TUS CITAS", index: 1)
-                    }
-                    .padding(4)
-                    .dnNeuRaised(cornerRadius: DNRadius.xl)
-                    .padding(.horizontal, DNSpace.lg)
-
-                    // Content
-                    if viewModel.selectedTab == 0 {
-                        availableDatesContent
-                    } else {
-                        yourDatesContent
-                    }
-
-                    // Create your own date card
-                    createDateCard
+                            Text("Encuentra personas para ir a eventos juntos")
+                                .dnCaption()
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, DNSpace.lg)
+                        .padding(.top, DNSpace.md)
+
+                        // Segmented picker — full-width pill toggle
+                        HStack(spacing: 0) {
+                            tabButton(title: "CITAS DISPONIBLES", index: 0)
+                            tabButton(title: "TUS CITAS", index: 1)
+                        }
+                        .padding(4)
+                        .dnNeuRaised(cornerRadius: DNRadius.xl)
+                        .padding(.horizontal, DNSpace.lg)
+
+                        // Content
+                        if viewModel.selectedTab == 0 {
+                            availableDatesContent
+                        } else {
+                            yourDatesContent
+
+                            // Link to full My Dates view
+                            NavigationLink {
+                                MyDatesView()
+                            } label: {
+                                DNCard {
+                                    HStack {
+                                        Text("Ver Todas Mis Citas")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(.dnPrimary)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.dnPrimary)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, DNSpace.lg)
+                        }
+
+                        // Create your own date card
+                        createDateCard
+                            .padding(.horizontal, DNSpace.lg)
+                    }
+                    .padding(.bottom, DNSpace.xxl * 3)
                 }
-                .padding(.bottom, DNSpace.xxl * 3)
             }
         }
     }
@@ -144,9 +166,22 @@ struct MatchesView: View {
                     .dnCaption()
                     .multilineTextAlignment(.center)
 
-                DNButton("NAVEGA POR EVENTOS", variant: .secondary) {
-                    // Navigate to events
+                NavigationLink {
+                    EventSwipeView()
+                } label: {
+                    Text("NAVEGA POR EVENTOS")
+                        .font(.system(size: 16, weight: .bold))
+                        .tracking(-0.47)
+                        .foregroundColor(.dnTextPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
+                                .fill(Color.dnBackground)
+                        )
+                        .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.md)
                 }
+                .buttonStyle(.plain)
             }
             .padding(.vertical, DNSpace.lg)
         }
