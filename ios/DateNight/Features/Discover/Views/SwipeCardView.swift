@@ -40,8 +40,16 @@ struct SwipeCardView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .clipped()
 
-                // Gradient overlay
-                GradientOverlay(opacity: 0.7)
+                // Gradient overlay: from #101828 at bottom to clear at top
+                LinearGradient(
+                    stops: [
+                        .init(color: Color(hex: "101828").opacity(0.85), location: 0),
+                        .init(color: Color(hex: "101828").opacity(0.4), location: 0.5),
+                        .init(color: .clear, location: 1.0)
+                    ],
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
 
                 // Like indicator
                 Circle()
@@ -71,18 +79,55 @@ struct SwipeCardView: View {
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading, spacing: DNSpace.xs) {
+                            // Name: 30px black weight
                             Text("\(user.name), \(user.age ?? 0)")
-                                .font(.system(size: 24, weight: .bold))
+                                .font(.system(size: 30, weight: .black))
+                                .tracking(-0.2)
                                 .foregroundColor(.white)
 
+                            // Occupation line
                             if let bio = user.bio {
-                                Text(bio)
+                                HStack(spacing: DNSpace.sm) {
+                                    Image(systemName: "briefcase.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white.opacity(0.8))
+                                    Text(bio)
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .tracking(-0.47)
+                                        .foregroundColor(.white.opacity(0.8))
+                                        .lineLimit(1)
+                                }
+                            }
+
+                            // Distance line
+                            HStack(spacing: DNSpace.sm) {
+                                Image(systemName: "location.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.white.opacity(0.8))
+                                Text("A 2 km de distancia")
                                     .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .lineLimit(2)
+                                    .tracking(-0.47)
+                                    .foregroundColor(.white.opacity(0.8))
                             }
                         }
                         Spacer()
+
+                        // Info button: 48pt circle
+                        Button {} label: {
+                            Image(systemName: "info")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 48, height: 48)
+                                .background(
+                                    Circle()
+                                        .fill(Color.white.opacity(0.2))
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     // Interest chips
@@ -97,7 +142,8 @@ struct SwipeCardView: View {
                 .padding(DNSpace.lg)
             }
             .clipShape(RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous))
-            .shadow(color: .black.opacity(0.2), radius: 16, x: 0, y: 8)
+            // Standard drop shadow, NOT neumorphic
+            .shadow(color: Color.black.opacity(0.25), radius: 25, x: 0, y: 25)
             .rotationEffect(.degrees(Double(offset.width) / 20))
             .offset(x: offset.width, y: offset.height)
             .gesture(

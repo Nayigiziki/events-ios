@@ -74,22 +74,26 @@ struct UserSwipeView: View {
                             viewModel.swipeLeft(userId: currentUser.id)
                         } label: {
                             Image(systemName: "xmark")
-                                .font(.system(size: 28, weight: .bold))
+                                .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(.dnDestructive)
-                                .frame(width: 70, height: 70)
+                                .frame(width: 64, height: 64)
                                 .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.full)
                         }
                         .buttonStyle(.plain)
 
-                        // Like button
+                        // Like button — larger and purple
                         Button {
                             viewModel.swipeRight(userId: currentUser.id)
                         } label: {
                             Image(systemName: "heart.fill")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.dnPrimary)
-                                .frame(width: 70, height: 70)
-                                .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.full)
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 80, height: 80)
+                                .background(
+                                    Circle()
+                                        .fill(Color.dnPrimary)
+                                )
+                                .dnNeuCTAButton(cornerRadius: DNRadius.full)
                         }
                         .buttonStyle(.plain)
                     }

@@ -10,53 +10,12 @@ struct LoginView: View {
     var body: some View {
         DNScreen {
             ScrollView {
-                VStack(spacing: DNSpace.xl) {
+                VStack(spacing: DNSpace.xxl) {
                     // MARK: - Hero / Logo
 
-                    AsyncImage(
-                        url: URL(
-                            string: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=400&fit=crop"
-                        )
-                    ) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    } placeholder: {
-                        Color.dnMuted
-                    }
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color.black.opacity(0.5), Color.clear],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            )
-                    )
-                    .overlay(
-                        VStack(spacing: DNSpace.sm) {
-                            Image(systemName: "heart.fill")
-                                .font(.system(size: 32))
-                                .foregroundColor(.white)
-                                .padding(DNSpace.md)
-                                .background(
-                                    RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                                        .fill(Color.dnPrimary)
-                                )
-                            Text("DATENIGHT")
-                                .font(.system(size: 28, weight: .heavy))
-                                .foregroundColor(.white)
-                                .tracking(2)
-                            Text(String(localized: "auth_app_tagline"))
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.white.opacity(0.9))
-                        }
-                    )
-                    .padding(.horizontal, DNSpace.lg)
-                    .padding(.top, DNSpace.xxl)
+                    heroSection
+                        .padding(.horizontal, DNSpace.lg)
+                        .padding(.top, DNSpace.xxl)
 
                     // MARK: - Form
 
@@ -64,7 +23,7 @@ struct LoginView: View {
                         // Email
                         VStack(alignment: .leading, spacing: DNSpace.sm) {
                             Text(String(localized: "auth_email"))
-                                .dnSmall()
+                                .dnLabel()
                                 .textCase(.uppercase)
 
                             DNTextField(
@@ -77,7 +36,7 @@ struct LoginView: View {
                         // Password
                         VStack(alignment: .leading, spacing: DNSpace.sm) {
                             Text(String(localized: "auth_password"))
-                                .dnSmall()
+                                .dnLabel()
                                 .textCase(.uppercase)
 
                             DNSecureField(
@@ -153,7 +112,8 @@ struct LoginView: View {
 
                     HStack(spacing: DNSpace.xs) {
                         Text(String(localized: "auth_no_account"))
-                            .dnBody()
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.dnTextSecondary)
 
                         NavigationLink {
                             SignUpView()
@@ -178,6 +138,75 @@ struct LoginView: View {
             }
         }
     }
+
+    // MARK: - Hero Section
+
+    private var heroSection: some View {
+        ZStack {
+            // Background image
+            AsyncImage(
+                url: URL(
+                    string: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=400&fit=crop"
+                )
+            ) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Color.dnMuted
+            }
+            .frame(height: 341)
+            .clipped()
+
+            // Gradient overlay: rgba(26,26,46,0.8) at bottom -> 0.4 at 50% -> clear at top
+            DNGradient.heroGradient
+
+            // Content overlay
+            VStack(spacing: DNSpace.sm) {
+                // Heart icon in purple rounded square
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 48, weight: .regular))
+                    .foregroundColor(.white)
+                    .frame(width: 96, height: 96)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(Color.dnPrimary)
+                    )
+                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 8, y: 8)
+                    .shadow(color: Color.white.opacity(0.1), radius: 4, x: -2, y: -2)
+
+                // Title
+                Text("DATENIGHT")
+                    .font(.system(size: 48, weight: .black))
+                    .tracking(-0.85)
+                    .foregroundColor(.white)
+                    .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 4)
+
+                // Subtitle
+                Text(String(localized: "auth_app_tagline"))
+                    .font(.system(size: 18, weight: .bold))
+                    .tracking(-0.6)
+                    .foregroundColor(.white)
+                    .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 2)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 244)
+            }
+        }
+        .frame(height: 341)
+        .clipShape(RoundedRectangle(cornerRadius: DNRadius.xxl, style: .continuous))
+        .shadow(
+            color: Color(hex: "a3b1c6"),
+            radius: 24,
+            x: 12,
+            y: 12
+        )
+        .shadow(
+            color: Color.white,
+            radius: 24,
+            x: -12,
+            y: -12
+        )
+    }
 }
 
 // MARK: - Secure Field Component
@@ -190,22 +219,27 @@ struct DNSecureField: View {
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        HStack(spacing: DNSpace.sm) {
+        HStack(spacing: 0) {
             if let icon {
                 Image(systemName: icon)
                     .foregroundColor(isFocused ? .dnPrimary : .dnTextTertiary)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 24, weight: .medium))
+                    .frame(width: 24, height: 24)
+                    .padding(.leading, 20)
                     .animation(.easeInOut(duration: 0.2), value: isFocused)
             }
 
             SecureField(placeholder, text: $text)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(size: 16, weight: .semibold))
+                .tracking(-0.47)
                 .foregroundColor(.dnTextPrimary)
                 .focused($isFocused)
+                .padding(.leading, icon != nil ? 12 : 56)
+                .padding(.trailing, 20)
         }
-        .padding(.horizontal, DNSpace.lg)
-        .frame(minHeight: 44)
-        .dnNeuPressed(cornerRadius: DNRadius.md)
+        .padding(.vertical, 20)
+        .frame(height: 64)
+        .dnNeuPressed(intensity: .medium, cornerRadius: DNRadius.md)
     }
 }
 
@@ -221,14 +255,15 @@ struct DNCheckbox: View {
         } label: {
             HStack(spacing: DNSpace.sm) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: DNRadius.xs, style: .continuous)
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .fill(Color.dnBackground)
-                        .frame(width: 22, height: 22)
+                        .frame(width: 24, height: 24)
+                        .dnNeuPressed(intensity: .light, cornerRadius: 24)
 
                     if isOn {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.dnPrimary)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color.dnPrimary)
+                            .frame(width: 16, height: 16)
                     }
                 }
 

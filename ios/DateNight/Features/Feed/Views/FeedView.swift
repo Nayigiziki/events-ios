@@ -7,7 +7,6 @@ struct FeedView: View {
         DNScreen {
             ScrollView {
                 VStack(spacing: DNSpace.xl) {
-                    headerView
                     filterChips
                     eventList
                 }
@@ -21,26 +20,6 @@ struct FeedView: View {
         .navigationDestination(for: Event.self) { event in
             EventDetailView(event: event)
         }
-    }
-
-    // MARK: - Header
-
-    private var headerView: some View {
-        HStack {
-            Text("Explore Events")
-                .dnH2()
-            Spacer()
-            Button {} label: {
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundColor(.dnPrimary)
-                    .frame(width: 48, height: 48)
-                    .dnNeuRaised(cornerRadius: DNRadius.sm)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, DNSpace.lg)
-        .padding(.top, DNSpace.lg)
     }
 
     // MARK: - Filter Chips
@@ -57,6 +36,7 @@ struct FeedView: View {
                     } label: {
                         Text(category)
                             .font(.system(size: 14, weight: .bold))
+                            .tracking(0.2)
                             .foregroundColor(isActive ? .white : .dnTextPrimary)
                             .padding(.horizontal, DNSpace.xl)
                             .padding(.vertical, DNSpace.md)
@@ -74,6 +54,7 @@ struct FeedView: View {
                 }
             }
             .padding(.horizontal, DNSpace.lg)
+            .padding(.top, DNSpace.lg)
         }
     }
 
@@ -105,7 +86,7 @@ private struct CategoryChipModifier: ViewModifier {
         if isActive {
             content.dnNeuPressed(cornerRadius: DNRadius.full)
         } else {
-            content.dnNeuRaised(cornerRadius: DNRadius.full)
+            content.dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.full)
         }
     }
 }

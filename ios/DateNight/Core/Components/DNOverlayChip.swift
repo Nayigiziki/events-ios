@@ -5,6 +5,7 @@ struct DNOverlayChip: View {
     var body: some View {
         Text(text)
             .font(.system(size: 12, weight: .bold))
+            .tracking(0.3)
             .foregroundColor(.dnOverlayText)
             .padding(.horizontal, DNSpace.md)
             .padding(.vertical, DNSpace.xs)
