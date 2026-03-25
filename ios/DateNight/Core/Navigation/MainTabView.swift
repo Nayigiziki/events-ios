@@ -4,11 +4,11 @@ struct MainTabView: View {
     @State private var selectedTab: Int = 0
 
     private let tabs: [(icon: String, labelKey: String)] = [
-        ("safari", "tab_explore"),
-        ("sparkles", "tab_discover"),
-        ("heart.circle", "tab_dates"),
-        ("message", "tab_chats"),
-        ("person.circle", "tab_profile")
+        ("house.fill", "tab_explore"),
+        ("bolt.fill", "tab_discover"),
+        ("heart.fill", "tab_dates"),
+        ("bubble.left.and.bubble.right.fill", "tab_chats"),
+        ("person.fill", "tab_profile")
     ]
 
     var body: some View {
@@ -19,18 +19,25 @@ struct MainTabView: View {
 
                 switch selectedTab {
                 case 0:
-                    Text(String(localized: "tab_explore"))
-                        .dnH2()
+                    NavigationStack {
+                        FeedView()
+                    }
                 case 1:
-                    Text(String(localized: "tab_discover"))
-                        .dnH2()
+                    NavigationStack {
+                        UserSwipeView()
+                    }
                 case 2:
-                    Text(String(localized: "tab_dates"))
-                        .dnH2()
+                    NavigationStack {
+                        MatchesView()
+                    }
                 case 3:
-                    ChatListView()
+                    NavigationStack {
+                        ChatListView()
+                    }
                 case 4:
-                    ProfileView()
+                    NavigationStack {
+                        ProfileView()
+                    }
                 default:
                     EmptyView()
                 }

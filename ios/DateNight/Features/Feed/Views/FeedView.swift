@@ -4,24 +4,22 @@ struct FeedView: View {
     @StateObject private var viewModel = FeedViewModel()
 
     var body: some View {
-        NavigationStack {
-            DNScreen {
-                ScrollView {
-                    VStack(spacing: DNSpace.xl) {
-                        headerView
-                        filterChips
-                        eventList
-                    }
-                    .padding(.bottom, DNSpace.xxl)
+        DNScreen {
+            ScrollView {
+                VStack(spacing: DNSpace.xl) {
+                    headerView
+                    filterChips
+                    eventList
                 }
-                .refreshable {
-                    await viewModel.refresh()
-                }
+                .padding(.bottom, DNSpace.xxl)
             }
-            .navigationBarHidden(true)
-            .navigationDestination(for: Event.self) { event in
-                EventDetailView(event: event)
+            .refreshable {
+                await viewModel.refresh()
             }
+        }
+        .navigationBarHidden(true)
+        .navigationDestination(for: Event.self) { event in
+            EventDetailView(event: event)
         }
     }
 
@@ -91,8 +89,6 @@ struct FeedView: View {
                         viewModel.toggleLike(eventId: event.id.uuidString)
                     }
                 )
-                .opacity(0)
-                .onAppear {}
                 .modifier(StaggeredEntryModifier(index: index))
             }
         }
