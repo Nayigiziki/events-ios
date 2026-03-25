@@ -84,16 +84,12 @@ struct EventAgreementView: View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
                 HStack(spacing: DNSpace.md) {
-                    AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-                        switch phase {
-                        case let .success(image):
-                            image.resizable().scaledToFill()
-                        default:
-                            Rectangle().fill(Color.dnMuted)
-                        }
-                    }
-                    .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: DNRadius.sm))
+                    DNAsyncImage(
+                        url: URL(string: event.imageUrl ?? ""),
+                        height: 60,
+                        cornerRadius: DNRadius.sm
+                    )
+                    .frame(width: 60)
 
                     VStack(alignment: .leading, spacing: DNSpace.xs) {
                         Text(event.title)
@@ -136,16 +132,12 @@ struct EventAgreementView: View {
     private func compactEventCard(event: Event) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
-                AsyncImage(url: URL(string: event.imageUrl ?? "")) { phase in
-                    switch phase {
-                    case let .success(image):
-                        image.resizable().scaledToFill()
-                    default:
-                        Rectangle().fill(Color.dnMuted)
-                    }
-                }
-                .frame(width: 80, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: DNRadius.sm))
+                DNAsyncImage(
+                    url: URL(string: event.imageUrl ?? ""),
+                    height: 80,
+                    cornerRadius: DNRadius.sm
+                )
+                .frame(width: 80)
 
                 VStack(alignment: .leading, spacing: DNSpace.xs) {
                     Text(event.title)

@@ -118,21 +118,12 @@ struct MyDatesView: View {
     }
 
     private func dateCardImage(_ dateRequest: DateRequest) -> some View {
-        AsyncImage(url: URL(string: dateRequest.event?.imageUrl ?? "")) { phase in
-            switch phase {
-            case let .success(image):
-                image.resizable().scaledToFill()
-            default:
-                Rectangle().fill(Color.dnMuted)
-                    .overlay(
-                        Image(systemName: "calendar")
-                            .font(.system(size: 20))
-                            .foregroundColor(.dnTextTertiary)
-                    )
-            }
-        }
-        .frame(width: 80, height: 80)
-        .clipShape(RoundedRectangle(cornerRadius: DNRadius.sm))
+        DNAsyncImage(
+            url: URL(string: dateRequest.event?.imageUrl ?? ""),
+            height: 80,
+            cornerRadius: DNRadius.sm
+        )
+        .frame(width: 80)
     }
 
     private func dateCardInfo(_ dateRequest: DateRequest) -> some View {
