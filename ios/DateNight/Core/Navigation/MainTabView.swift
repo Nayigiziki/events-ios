@@ -28,11 +28,9 @@ struct MainTabView: View {
                     Text(String(localized: "tab_dates"))
                         .dnH2()
                 case 3:
-                    Text(String(localized: "tab_chats"))
-                        .dnH2()
+                    ChatListView()
                 case 4:
-                    Text(String(localized: "tab_profile"))
-                        .dnH2()
+                    ProfileView()
                 default:
                     EmptyView()
                 }
