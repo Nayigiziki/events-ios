@@ -20,11 +20,30 @@
 "auth_sign_up" = "Registrarse";
 "auth_email" = "Correo Electrónico";
 "auth_password" = "Contraseña";
+"auth_confirm_password" = "Confirmar Contraseña";
 "auth_forgot_password" = "¿Olvidaste tu contraseña?";
 "auth_welcome_back" = "Bienvenido de Nuevo";
 "auth_create_account" = "Crear Cuenta";
 "auth_or_continue_with" = "O continuar con";
 "auth_sign_out" = "Cerrar Sesión";
+"auth_remember_me" = "Recordarme";
+"auth_no_account" = "¿No tienes una cuenta?";
+"auth_have_account" = "¿Ya tienes una cuenta?";
+"auth_name" = "Nombre Completo";
+"auth_birthdate" = "Fecha de Nacimiento";
+"auth_gender" = "Género";
+"auth_gender_male" = "Hombre";
+"auth_gender_female" = "Mujer";
+"auth_gender_nonbinary" = "No binario";
+"auth_gender_prefer_not" = "Prefiero no decir";
+"auth_gender_select" = "Selecciona tu género";
+"auth_terms_agree" = "Acepto los Términos y Condiciones y la Política de Privacidad";
+"auth_terms" = "Términos y Condiciones";
+"auth_privacy" = "Política de Privacidad";
+"auth_google" = "Google";
+"auth_facebook" = "Facebook";
+"auth_app_tagline" = "Encuentra tu cita perfecta en eventos increíbles";
+"auth_create_subtitle" = "Crea tu cuenta en segundos";
 
 /* Buttons */
 "button_save" = "Guardar";
@@ -52,13 +71,18 @@
 "placeholder_bio" = "Cuéntanos sobre ti";
 
 /* Onboarding */
-"onboarding_title_1" = "Encuentra Tu Cita Perfecta";
-"onboarding_subtitle_1" = "Descubre experiencias únicas seleccionadas para ti y tu pareja.";
-"onboarding_title_2" = "Planifiquen Juntos";
-"onboarding_subtitle_2" = "Colaboren en ideas para citas y encuentren algo que ambos amen.";
-"onboarding_title_3" = "Creen Recuerdos";
-"onboarding_subtitle_3" = "Guarda tus momentos favoritos y mantén la chispa viva.";
+"onboarding_welcome_title" = "Bienvenido a DateNight";
+"onboarding_welcome_subtitle" = "Encuentra tu cita perfecta en eventos increíbles cerca de ti.";
+"onboarding_events_title" = "Descubre Eventos";
+"onboarding_events_subtitle" = "Explora eventos seleccionados y encuentra la actividad perfecta para una cita.";
+"onboarding_matches_title" = "Encuentra Tu Match";
+"onboarding_matches_subtitle" = "Desliza perfiles y conecta con personas que comparten tus intereses.";
+"onboarding_chat_title" = "Empieza a Chatear";
+"onboarding_chat_subtitle" = "Envía mensajes a tus matches y planifiquen juntos su noche de cita perfecta.";
+"onboarding_profile_title" = "Configura Tu Perfil";
+"onboarding_profile_subtitle" = "Muéstrale al mundo quién eres y qué estás buscando.";
 "onboarding_get_started" = "Comenzar";
+"onboarding_step" = "Paso %lld de %lld";
 
 /* Errors */
 "error_generic" = "Algo salió mal. Por favor, intenta de nuevo.";

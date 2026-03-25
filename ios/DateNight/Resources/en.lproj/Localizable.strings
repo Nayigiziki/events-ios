@@ -20,11 +20,30 @@
 "auth_sign_up" = "Sign Up";
 "auth_email" = "Email";
 "auth_password" = "Password";
+"auth_confirm_password" = "Confirm Password";
 "auth_forgot_password" = "Forgot Password?";
 "auth_welcome_back" = "Welcome Back";
 "auth_create_account" = "Create Account";
 "auth_or_continue_with" = "Or continue with";
 "auth_sign_out" = "Sign Out";
+"auth_remember_me" = "Remember Me";
+"auth_no_account" = "Don't have an account?";
+"auth_have_account" = "Already have an account?";
+"auth_name" = "Full Name";
+"auth_birthdate" = "Birthdate";
+"auth_gender" = "Gender";
+"auth_gender_male" = "Male";
+"auth_gender_female" = "Female";
+"auth_gender_nonbinary" = "Non-binary";
+"auth_gender_prefer_not" = "Prefer not to say";
+"auth_gender_select" = "Select gender";
+"auth_terms_agree" = "I agree to the Terms & Conditions and Privacy Policy";
+"auth_terms" = "Terms & Conditions";
+"auth_privacy" = "Privacy Policy";
+"auth_google" = "Google";
+"auth_facebook" = "Facebook";
+"auth_app_tagline" = "Find your perfect date at amazing events";
+"auth_create_subtitle" = "Create your account in seconds";
 
 /* Buttons */
 "button_save" = "Save";
@@ -52,13 +71,18 @@
 "placeholder_bio" = "Tell us about yourself";
 
 /* Onboarding */
-"onboarding_title_1" = "Find Your Perfect Date";
-"onboarding_subtitle_1" = "Discover unique experiences curated just for you and your partner.";
-"onboarding_title_2" = "Plan Together";
-"onboarding_subtitle_2" = "Collaborate on date ideas and find something you both love.";
-"onboarding_title_3" = "Make Memories";
-"onboarding_subtitle_3" = "Save your favorite moments and keep the spark alive.";
+"onboarding_welcome_title" = "Welcome to DateNight";
+"onboarding_welcome_subtitle" = "Find your perfect date at amazing events near you.";
+"onboarding_events_title" = "Discover Events";
+"onboarding_events_subtitle" = "Browse curated events and find the perfect date activity.";
+"onboarding_matches_title" = "Find Your Match";
+"onboarding_matches_subtitle" = "Swipe through profiles and connect with people who share your interests.";
+"onboarding_chat_title" = "Start Chatting";
+"onboarding_chat_subtitle" = "Message your matches and plan your perfect date night together.";
+"onboarding_profile_title" = "Set Up Your Profile";
+"onboarding_profile_subtitle" = "Show the world who you are and what you're looking for.";
 "onboarding_get_started" = "Get Started";
+"onboarding_step" = "Step %lld of %lld";
 
 /* Errors */
 "error_generic" = "Something went wrong. Please try again.";

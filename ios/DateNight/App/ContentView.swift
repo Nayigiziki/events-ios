@@ -1,50 +1,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var claudeService: ClaudeService
+    @StateObject var authViewModel = AuthViewModel()
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.blue)
-
-                Text("DateNight")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-
-                Text("Powered by Claude AI")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                if claudeService.isConfigured {
-                    Label("Claude configured", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                } else {
-                    Label("Add API key in Settings", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+        Group {
+            if !authViewModel.isAuthenticated {
+                NavigationStack {
+                    LoginView()
                 }
-
-                Spacer()
-
-                NavigationLink("Try Example Chat") {
-                    ChatView()
-                }
-                .buttonStyle(.borderedProminent)
-
-                NavigationLink("Settings") {
-                    SettingsView()
-                }
-                .buttonStyle(.bordered)
+            } else if authViewModel.isFirstLaunch {
+                OnboardingView()
+            } else {
+                MainTabView()
             }
-            .padding()
-            .navigationTitle("Home")
+        }
+        .environmentObject(authViewModel)
+        .onAppear {
+            authViewModel.checkSession()
         }
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(ClaudeService())
 }
