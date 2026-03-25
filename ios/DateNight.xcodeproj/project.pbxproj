@@ -50,7 +50,6 @@
 		616D6034E812C0CB86C838D1 /* MatchesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A67D29A41ABA02C1170D09F /* MatchesViewModel.swift */; };
 		657BFE224E74AF4D8AD2DA53 /* MatchesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEAE29BEAB9B38BCA7B7DCA /* MatchesView.swift */; };
 		6FE50CD43987A96FEDCB83AD /* ProfileSetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185ABC31690D07F84A1B4D2E /* ProfileSetupViewModel.swift */; };
-		75C8D970CFD5F03EC6CFBA5E /* GroupChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB2D86231B25CE387456A28 /* GroupChatView.swift */; };
 		7A8B0CE5244008C82E10342F /* ChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E97F0AAF7B61F8EA96D2AC /* ChatListView.swift */; };
 		7D94E3334A3D50605AE8CD3B /* GradientOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF678EA3C736253593E3300 /* GradientOverlay.swift */; };
 		7DB1A6FA275AD1C9F3D7483B /* DNButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E07912290499AE1BFF2625A /* DNButton.swift */; };
@@ -131,7 +130,6 @@
 		1E416B9205B05FDAD4E75714 /* PhotoIndicatorBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoIndicatorBar.swift; sourceTree = "<group>"; };
 		1F58A1FD09C0B6E19C19A966 /* UserSwipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSwipeView.swift; sourceTree = "<group>"; };
 		1FB0B87501994C3B29C97463 /* AddEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEventView.swift; sourceTree = "<group>"; };
-		1FB2D86231B25CE387456A28 /* GroupChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupChatView.swift; sourceTree = "<group>"; };
 		2261D4FC97C32151C841FED2 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		248D612484AA592F9432D71E /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 		29248BC03B823B84BD3FF651 /* MyEventsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyEventsViewModel.swift; sourceTree = "<group>"; };
@@ -684,7 +682,6 @@
 			children = (
 				93E805044DB3FB5A0D255CC2 /* DateDetailView.swift */,
 				0EB52D50B846CE932F9378D3 /* EventAgreementView.swift */,
-				1FB2D86231B25CE387456A28 /* GroupChatView.swift */,
 				5825BF6B58B26FFFF79820CB /* InviteToDateView.swift */,
 				B1B4F4358D3DCDCEFEE7770C /* MyDatesView.swift */,
 			);
@@ -862,7 +859,6 @@
 				C538E111B004046C2599CE4C /* FriendsListView.swift in Sources */,
 				E1EE15985535FE7D0C8D78D8 /* FriendsViewModel.swift in Sources */,
 				7D94E3334A3D50605AE8CD3B /* GradientOverlay.swift in Sources */,
-				75C8D970CFD5F03EC6CFBA5E /* GroupChatView.swift in Sources */,
 				153EA76D944F4F2CBE0EDA1B /* GroupChatView.swift in Sources */,
 				A8DCACD0ABF148FDCF70DE41 /* GroupChatViewModel.swift in Sources */,
 				1EE4465E659F792AD38D9A45 /* InviteToDateView.swift in Sources */,
