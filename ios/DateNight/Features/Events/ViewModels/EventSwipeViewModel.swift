@@ -63,10 +63,13 @@ final class EventSwipeViewModel: ObservableObject {
         currentIndex += 1
     }
 
-    // swiftlint:disable:next function_body_length
     private func loadMockData() {
-        let users = Self.mockUsers
-        events = [
+        events = Self.mockEventSet1 + Self.mockEventSet2
+    }
+
+    private static var mockEventSet1: [Event] {
+        let users = mockUsers
+        return [
             Event(
                 title: "Indie Rock Night",
                 category: "Music",
@@ -105,7 +108,13 @@ final class EventSwipeViewModel: ObservableObject {
                 description: "Laugh the night away with up-and-coming comedians.",
                 totalSpots: 100,
                 attendees: [users[1], users[4]]
-            ),
+            )
+        ]
+    }
+
+    private static var mockEventSet2: [Event] {
+        let users = mockUsers
+        return [
             Event(
                 title: "Street Food Festival",
                 category: "Food",

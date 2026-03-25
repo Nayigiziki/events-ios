@@ -51,14 +51,22 @@ class GroupChatViewModel: ObservableObject {
 
     // MARK: - Mock Data
 
-    // swiftlint:disable:next function_body_length
     private func loadMockData() {
         let emma = MockData.users[0]
         let sarah = MockData.users[1]
         let alex = MockData.users[2]
         participants = [emma, sarah, alex]
+        messages = Self.mockMessages(emma: emma, sarah: sarah, alex: alex)
+    }
 
-        messages = [
+    private static func mockMessages(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
+        mockMessagesPartOne(emma: emma, sarah: sarah, alex: alex)
+            + mockMessagesPartTwo(emma: emma, sarah: sarah, alex: alex)
+    }
+
+    private static func mockMessagesPartOne(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
+        let me = MockData.currentUser
+        return [
             GroupMessage(
                 id: "g1",
                 senderId: emma.id,
@@ -70,9 +78,9 @@ class GroupChatViewModel: ObservableObject {
             ),
             GroupMessage(
                 id: "g2",
-                senderId: "current-user",
+                senderId: me.id,
                 senderName: "You",
-                senderAvatar: MockData.currentUser.avatar,
+                senderAvatar: me.avatar,
                 isSent: true,
                 text: "Me too! I've been looking forward to this all week",
                 timestamp: "14:02"
@@ -94,12 +102,18 @@ class GroupChatViewModel: ObservableObject {
                 isSent: false,
                 text: "Great idea! I know a place nearby",
                 timestamp: "14:06"
-            ),
+            )
+        ]
+    }
+
+    private static func mockMessagesPartTwo(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
+        let me = MockData.currentUser
+        return [
             GroupMessage(
                 id: "g5",
-                senderId: "current-user",
+                senderId: me.id,
                 senderName: "You",
-                senderAvatar: MockData.currentUser.avatar,
+                senderAvatar: me.avatar,
                 isSent: true,
                 text: "That sounds perfect! What time should we meet?",
                 timestamp: "14:08"

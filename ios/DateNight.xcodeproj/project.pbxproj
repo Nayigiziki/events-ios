@@ -15,6 +15,7 @@
 		0FB39D42379E529B822C38B8 /* DateNightAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 064BBE495A6CD5E0E12E6E45 /* DateNightAnimations.swift */; };
 		10B49542A8BFF56CD45238AF /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB6E69F53353DD515CD6E76 /* Message.swift */; };
 		12C798EA3B7716419121AE6B /* MyEventsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29248BC03B823B84BD3FF651 /* MyEventsViewModel.swift */; };
+		153EA76D944F4F2CBE0EDA1B /* GroupChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEA642BFF34DA74E70D14EB /* GroupChatView.swift */; };
 		17814E3D35B71758C74E6FC7 /* FilterChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A71F86632E3C96A6DF36385 /* FilterChip.swift */; };
 		196E29A8AED71483B2E18D19 /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BDD3FB467192E5380EBE47E /* ProfileEditViewModel.swift */; };
 		1E789A0683679AD627280C77 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A3A9D0B343623EFF994A28 /* ContentView.swift */; };
@@ -119,6 +120,7 @@
 		0A044D04D3771929AC451BB5 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
 		0BB6E69F53353DD515CD6E76 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		0EB52D50B846CE932F9378D3 /* EventAgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventAgreementView.swift; sourceTree = "<group>"; };
+		0FEA642BFF34DA74E70D14EB /* GroupChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupChatView.swift; sourceTree = "<group>"; };
 		113A966CD580BD8D09821FCB /* ConversationChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationChatView.swift; sourceTree = "<group>"; };
 		11CB9142E3BEC23BB4EDD88A /* DNOverlayChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNOverlayChip.swift; sourceTree = "<group>"; };
 		139EFA60DB21194D6132757D /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 			children = (
 				C6E97F0AAF7B61F8EA96D2AC /* ChatListView.swift */,
 				113A966CD580BD8D09821FCB /* ConversationChatView.swift */,
+				0FEA642BFF34DA74E70D14EB /* GroupChatView.swift */,
 				66239894E81BE858F1344539 /* MessageBubbleView.swift */,
 			);
 			path = Views;
@@ -860,6 +863,7 @@
 				E1EE15985535FE7D0C8D78D8 /* FriendsViewModel.swift in Sources */,
 				7D94E3334A3D50605AE8CD3B /* GradientOverlay.swift in Sources */,
 				75C8D970CFD5F03EC6CFBA5E /* GroupChatView.swift in Sources */,
+				153EA76D944F4F2CBE0EDA1B /* GroupChatView.swift in Sources */,
 				A8DCACD0ABF148FDCF70DE41 /* GroupChatViewModel.swift in Sources */,
 				1EE4465E659F792AD38D9A45 /* InviteToDateView.swift in Sources */,
 				3D70D73ECA0CEB67605557D8 /* InviteToDateViewModel.swift in Sources */,
