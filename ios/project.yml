@@ -49,9 +49,8 @@ targets:
           CODE_SIGN_STYLE: Automatic
           CODE_SIGN_IDENTITY: "Apple Development"
         Release:
-          CODE_SIGN_STYLE: Manual
-          CODE_SIGN_IDENTITY: "iPhone Distribution"
-          PROVISIONING_PROFILE_SPECIFIER: "match AppStore com.tron.datenight"
+          CODE_SIGN_STYLE: Automatic
+          CODE_SIGN_IDENTITY: "Apple Distribution"
     info:
       path: DateNight/Info.plist
       properties:

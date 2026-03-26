@@ -83,15 +83,8 @@ platform :ios do
       output_name: "DateNight",
       archive_path: archive_path,
       export_method: "app-store",
-      export_options: {
-        method: "app-store",
-        signingStyle: "manual",
-        teamID: team_id,
-        provisioningProfiles: {
-          "com.tron.datenight" => "com.tron.datenight AppStore"
-        }
-      },
-      xcargs: "DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates -authenticationKeyPath '#{api_key_path}' -authenticationKeyID #{key_id} -authenticationKeyIssuerID #{issuer_id}"
+      export_method: "app-store",
+      xcargs: "DEVELOPMENT_TEAM=#{team_id} CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates -authenticationKeyPath '#{api_key_path}' -authenticationKeyID #{key_id} -authenticationKeyIssuerID #{issuer_id}"
     )
     UI.success("Archive created successfully")
 

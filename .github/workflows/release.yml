@@ -78,6 +78,18 @@ jobs:
         working-directory: ios
         run: bundle install
 
+      - name: Create Secrets.xcconfig
+        working-directory: ios
+        run: |
+          cat > Secrets.xcconfig << 'EOF'
+          ANTHROPIC_API_KEY =
+          AIPROXY_PARTIAL_KEY =
+          AIPROXY_SERVICE_URL =
+          AIPROXY_DEVICE_CHECK_BYPASS =
+          SUPABASE_URL =
+          SUPABASE_ANON_KEY =
+          EOF
+
       - name: Setup App Store Connect API key
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
