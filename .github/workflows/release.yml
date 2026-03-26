@@ -1,12 +1,22 @@
-name: Release to TestFlight
+name: iOS TestFlight Deployment
 
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g., v1.0.0)'
+        required: true
+        type: string
+
+concurrency:
+  group: testflight-deployment
+  cancel-in-progress: false
 
 jobs:
-  testflight:
+  deploy:
     name: Build and Deploy to TestFlight
     runs-on: macos-15
     timeout-minutes: 60
@@ -17,21 +27,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Deploying version: ${VERSION}"
-
       - name: Select Xcode
         run: |
           XCODE_APP=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
           sudo xcode-select -s "$XCODE_APP/Contents/Developer"
           echo "Selected: $XCODE_APP"
           xcodebuild -version
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Deploying version: ${VERSION}"
 
       - name: Install Apple Distribution certificate
         env:
@@ -51,14 +65,18 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -k "actions" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
-          echo "Distribution certificate installed"
+          echo "✅ Distribution certificate installed"
 
-      - name: Setup Ruby and install dependencies
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Install dependencies
         working-directory: ios
-        run: |
-          gem install bundler --no-document
-          gem install fastlane --no-document
-          gem install dotenv --no-document
+        run: bundle install
 
       - name: Setup App Store Connect API key
         env:
@@ -66,22 +84,9 @@ jobs:
           API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
-          echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          echo "$API_KEY_CONTENT" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
           chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
-          echo "API key configured"
-
-      - name: Create .env for Fastlane
-        working-directory: ios
-        run: |
-          cat > .env << EOF
-          APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}
-          APP_IDENTIFIER=com.tron.datenight
-          APP_NAME=DateNight
-          APP_STORE_CONNECT_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID=${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          ASC_KEY_FILEPATH=$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
-          ITC_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}
-          EOF
+          echo "✅ API key configured"
 
       - name: Build and upload to TestFlight
         id: testflight
@@ -92,22 +97,10 @@ jobs:
           FASTLANE_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           FASTLANE_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_SKIP_UPDATE_CHECK: 'true'
-          FASTLANE_HIDE_CHANGELOG: 'true'
+          FASTLANE_SKIP_UPDATE_CHECK: "true"
+          FASTLANE_HIDE_CHANGELOG: "true"
         run: |
-          fastlane beta skip_wait:true
-
-      - name: Upload build artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-${{ steps.version.outputs.version }}
-          path: |
-            ios/build/*.ipa
-            ios/build/*.dSYM.zip
-          retention-days: 30
-          if-no-files-found: warn
+          bundle exec fastlane deploy_testflight
 
       - name: Cleanup
         if: always()
@@ -118,7 +111,6 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## TestFlight Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 TestFlight Deployment" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Scheme:** DateNight" >> $GITHUB_STEP_SUMMARY
           echo "- **Bundle ID:** com.tron.datenight" >> $GITHUB_STEP_SUMMARY

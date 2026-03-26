@@ -1,366 +1,127 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Run SwiftLint and SwiftFormat"
-  lane :lint do
-    sh("cd .. && swiftlint lint --strict --config ../.swiftlint.yml")
-    sh("cd .. && swiftformat --lint . --config ../.swiftformat")
-  end
-
-  desc "Run tests"
-  lane :test do
-    run_tests(
-      scheme: "DateNight",
-      device: "iPhone 15 Pro"
-    )
-  end
-
-  desc "Build for development"
-  lane :build do
-    build_app(
-      scheme: "DateNight",
-      skip_archive: true,
-      skip_codesigning: true
-    )
-  end
-
-  desc "Find unused code"
-  lane :unused do
-    sh("periphery scan --format xcode")
-  end
-
-  desc "Run AI calibration evals (requires Claude API)"
-  lane :ai_evals do
-    UI.message("Running AI Calibration Evals with Promptfoo...")
-    UI.message("This will make live API calls to Claude.")
-
-    # Run promptfoo evals from the evals directory
-    # Use error_callback to handle non-zero exit codes (promptfoo returns 100 on failures)
-    evals_dir = File.expand_path("../../evals", __dir__)
-    sh("cd '#{evals_dir}' && ./run-evals.sh", error_callback: ->(result) {
-      UI.important("Evals completed with some failures (exit code #{result})")
-    })
-
-    UI.success("AI Evals complete!")
-    UI.message("View detailed results: cd evals && ./run-evals.sh view")
-    UI.message("Logs: logs/promptfoo-evals.log")
-  end
-
-  desc "Run Priority Stack evals (no API required)"
-  lane :priority_evals do
-    UI.message("Running Priority Stack Evals (data layer tests)...")
-
-    run_tests(
-      scheme: "DateNight",
-      device: "DateNight_Simulator",
-      only_testing: [
-        "DateNightTests/QuadrantAssignmentTests",
-        "DateNightTests/PriorityScoreTests",
-        "DateNightTests/OneThingConstraintTests"
-      ]
-    )
-  end
-
-  desc "Deploy to connected physical device"
-  lane :device do |options|
-    # Load environment from .env file
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
-
-    team_id = ENV["APPLE_TEAM_ID"]
-    UI.user_error!("APPLE_TEAM_ID not set. Create ios/.env from ios/.env.example") unless team_id && !team_id.empty?
-
-    # Auto-detect connected iOS device (not Mac, not Simulator)
-    device_id = options[:device_id]
-    device_name = nil
-    unless device_id
-      # Get devices, filter out Macs and Simulators, find iOS devices by UDID format
-      devices_output = sh("xcrun xctrace list devices 2>/dev/null | grep -E '\\([0-9a-fA-F]{8}-[0-9a-fA-F]{16}\\)' | head -1", log: false).strip
-      if devices_output.empty?
-        UI.user_error!("No physical iOS device connected. Connect your iPhone/iPad via USB and trust this Mac.")
-      end
-      device_id = devices_output.match(/\(([0-9a-fA-F]{8}-[0-9a-fA-F]{16})\)/)[1] rescue nil
-      device_name = devices_output.split("(").first.strip
-    end
-
-    UI.user_error!("Could not determine device ID") unless device_id && !device_id.empty?
-    UI.message("Target device: #{device_name || device_id}")
-
-    # Get ios directory path
-    ios_dir = File.expand_path("..", __dir__)
-
-    # Regenerate Xcode project with signing configuration
-    UI.message("Regenerating Xcode project with signing...")
-    sh("cd '#{ios_dir}' && xcodegen generate")
-
-    # Resolve package dependencies
-    UI.message("Resolving Swift Package dependencies...")
-    sh("xcodebuild -resolvePackageDependencies -project '#{ios_dir}/DateNight.xcodeproj'")
-
-    # Get absolute paths
-    ios_dir = File.expand_path("..", __dir__)
-    build_dir = File.join(ios_dir, "build")
-    archive_path = File.join(build_dir, "DateNight.xcarchive")
-    export_options_plist = File.join(build_dir, "ExportOptions.plist")
-    ipa_path = File.join(build_dir, "DateNight.ipa")
-
-    # Ensure build directory exists
-    FileUtils.mkdir_p(build_dir)
-
-    # Build the app for device using xcodebuild directly
-    UI.message("Building for device...")
-    sh("xcodebuild -scheme DateNight -project '#{ios_dir}/DateNight.xcodeproj' -configuration Debug -destination 'generic/platform=iOS' -archivePath '#{archive_path}' DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates clean archive")
-
-    # Export IPA
-    UI.message("Exporting IPA...")
-
-    # Create export options plist
-    File.write(export_options_plist, <<~PLIST)
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>method</key>
-        <string>development</string>
-        <key>teamID</key>
-        <string>#{team_id}</string>
-        <key>signingStyle</key>
-        <string>automatic</string>
-      </dict>
-      </plist>
-    PLIST
-
-    sh("xcodebuild -exportArchive -archivePath '#{archive_path}' -exportPath '#{build_dir}' -exportOptionsPlist '#{export_options_plist}' -allowProvisioningUpdates")
-
-    # Install on device using ios-deploy
-    UI.message("Installing on device #{device_id}...")
-    sh("ios-deploy --id #{device_id} --bundle '#{ipa_path}' --no-wifi")
-
-    UI.success("Successfully deployed DateNight to device!")
-  end
-
   # =============================================================================
-  # App Store Connect API Key Helper
+  # Helpers
   # =============================================================================
 
-  desc "Load App Store Connect API Key"
-  private_lane :load_api_key do
-    # Load environment
+  private_lane :load_env do
     require 'dotenv'
     Dotenv.load("../.env") if File.exist?("../.env")
-
-    key_id = ENV["APP_STORE_CONNECT_KEY_ID"]
-    issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"]
-    key_path = ENV["ASC_KEY_FILEPATH"]
-
-    unless key_id && issuer_id && key_path
-      UI.user_error!(
-        "Missing App Store Connect API Key configuration.\n" \
-        "Required environment variables:\n" \
-        "  - APP_STORE_CONNECT_KEY_ID\n" \
-        "  - APP_STORE_CONNECT_ISSUER_ID\n" \
-        "  - ASC_KEY_FILEPATH"
-      )
-    end
-
-    app_store_connect_api_key(
-      key_id: key_id,
-      issuer_id: issuer_id,
-      key_filepath: key_path,
-      duration: 1200,  # 20 minutes
-      in_house: false
-    )
   end
 
-  # =============================================================================
-  # Code Signing with Match
-  # =============================================================================
+  private_lane :get_api_key_path do
+    key_id = ENV["FASTLANE_KEY_ID"] || ENV["APP_STORE_CONNECT_API_KEY_ID"] || ENV["APP_STORE_CONNECT_KEY_ID"]
+    paths = [
+      File.expand_path("~/.appstoreconnect/private_keys/AuthKey_#{key_id}.p8"),
+      File.expand_path("~/.private_keys/AuthKey_#{key_id}.p8"),
+      ENV["ASC_KEY_FILEPATH"],
+    ].compact
 
-  desc "Sync certificates and profiles (run once per machine)"
-  lane :sync_signing do |options|
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
-
-    # Load API key (sets it in lane context for subsequent actions)
-    load_api_key
-
-    # Sync both development and distribution certificates
-    match(
-      type: "development",
-      readonly: options[:readonly] || false
-    )
-
-    match(
-      type: "appstore",
-      readonly: options[:readonly] || false
-    )
-
-    UI.success("Certificates and profiles synced!")
-  end
-
-  desc "Create new certificates (use when expired)"
-  lane :renew_certs do
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
-
-    api_key = load_api_key
-
-    # Force regenerate certificates
-    match(
-      type: "appstore",
-      api_key: api_key,
-      force_for_new_devices: true,
-      force: true
-    )
-
-    UI.success("Certificates renewed!")
+    path = paths.find { |p| File.exist?(p) }
+    UI.user_error!("API key .p8 file not found. Searched:\n  #{paths.join("\n  ")}") unless path
+    path
   end
 
   # =============================================================================
   # TestFlight Deployment
   # =============================================================================
 
-  desc "Register app identifier in Developer Portal"
-  lane :register_app do
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
-
-    # Load API key (sets it globally for subsequent actions)
-    load_api_key
-
-    bundle_id = ENV["APP_IDENTIFIER"] || "com.example.swiftapp"
-    app_name = ENV["APP_NAME"] || "DateNight"
-    team_id = ENV["APPLE_TEAM_ID"]
-    itc_team_id = ENV["ITC_TEAM_ID"] || team_id
-
-    produce(
-      app_identifier: bundle_id,
-      app_name: app_name,
-      language: "English",
-      app_version: "1.0",
-      sku: bundle_id.gsub(".", "_"),
-      team_id: team_id,
-      itc_team_id: itc_team_id,
-      enable_services: {}
-    )
-
-    UI.success("App '#{app_name}' (#{bundle_id}) registered!")
-  end
-
   desc "Build and upload to TestFlight"
-  lane :beta do |options|
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
+  lane :deploy_testflight do
+    load_env
 
-    # Validate required configuration
-    bundle_id = ENV["APP_IDENTIFIER"]
-    UI.user_error!("APP_IDENTIFIER not set in .env") unless bundle_id && !bundle_id.empty?
+    team_id = ENV["APPLE_TEAM_ID"]
+    UI.user_error!("APPLE_TEAM_ID not set") unless team_id && !team_id.empty?
 
-    # Load API key
-    api_key = load_api_key
+    api_key_path = get_api_key_path
+    UI.message("Found API key at: #{api_key_path}")
 
-    # Get ios directory path (parent of fastlane dir)
     ios_dir = File.expand_path("..", __dir__)
-    xcodeproj_path = File.join(ios_dir, "DateNight.xcodeproj")
+    build_dir = File.join(ios_dir, "build")
+    archive_path = File.join(build_dir, "DateNight.xcarchive")
+    FileUtils.mkdir_p(build_dir)
 
-    # Increment build number (use timestamp for uniqueness)
-    increment_build_number(
-      build_number: Time.now.strftime("%Y%m%d%H%M"),
-      xcodeproj: xcodeproj_path
+    key_id = ENV["FASTLANE_KEY_ID"] || ENV["APP_STORE_CONNECT_API_KEY_ID"]
+    issuer_id = ENV["FASTLANE_ISSUER_ID"] || ENV["APP_STORE_CONNECT_ISSUER_ID"]
+    UI.user_error!("FASTLANE_KEY_ID not set") unless key_id && !key_id.empty?
+    UI.user_error!("FASTLANE_ISSUER_ID not set") unless issuer_id && !issuer_id.empty?
+
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: api_key_path,
+      duration: 1200,
+      in_house: false
     )
 
-    # Sync certificates and profiles
-    match(
-      type: "appstore",
+    # Step 1: Get provisioning profile (automatic signing)
+    UI.message("\nStep 1: Getting provisioning profile...")
+    get_provisioning_profile(
+      app_identifier: "com.tron.datenight",
       api_key: api_key,
-      readonly: true  # Don't modify certs, just fetch
+      readonly: false,
+      adhoc: false,
+      skip_install: false
     )
+    UI.success("Provisioning profile ready")
 
-    # Build the app
+    # Step 2: Increment build number
+    UI.message("\nStep 2: Incrementing build number...")
+    build_number = increment_build_number(
+      xcodeproj: "#{ios_dir}/DateNight.xcodeproj"
+    )
+    UI.message("New build number: #{build_number}")
+
+    # Step 3: Build and archive
+    UI.message("\nStep 3: Building and archiving...")
     build_app(
       scheme: "DateNight",
-      project: xcodeproj_path,
+      project: "#{ios_dir}/DateNight.xcodeproj",
       configuration: "Release",
+      output_directory: build_dir,
+      output_name: "DateNight",
+      archive_path: archive_path,
       export_method: "app-store",
       export_options: {
+        method: "app-store",
+        signingStyle: "manual",
+        teamID: team_id,
         provisioningProfiles: {
-          bundle_id => "match AppStore #{bundle_id}"
+          "com.tron.datenight" => "com.tron.datenight AppStore"
         }
-      }
+      },
+      xcargs: "DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates -authenticationKeyPath '#{api_key_path}' -authenticationKeyID #{key_id} -authenticationKeyIssuerID #{issuer_id}"
     )
+    UI.success("Archive created successfully")
 
-    # Upload to TestFlight
+    # Step 4: Upload to TestFlight
+    UI.message("\nStep 4: Uploading to TestFlight...")
     upload_to_testflight(
       api_key: api_key,
-      skip_waiting_for_build_processing: options[:skip_wait] || false,
-      changelog: options[:changelog] || "Bug fixes and improvements",
-      distribute_external: false,  # Set to true to auto-distribute to external testers
+      skip_waiting_for_build_processing: true,
+      changelog: "Beta build",
+      distribute_external: false,
       notify_external_testers: false
     )
 
-    UI.success("Build uploaded to TestFlight!")
-  end
-
-  desc "Build and upload to TestFlight (quick - skip processing wait)"
-  lane :beta_quick do |options|
-    beta(
-      skip_wait: true,
-      changelog: options[:changelog]
-    )
+    UI.success("🚀 Build uploaded to TestFlight!")
   end
 
   # =============================================================================
-  # App Store Release
+  # Utility Lanes
   # =============================================================================
 
-  desc "Submit to App Store Review"
-  lane :release do |options|
-    require 'dotenv'
-    Dotenv.load("../.env") if File.exist?("../.env")
-
-    api_key = load_api_key
-
-    # Build first if not already built
-    unless options[:skip_build]
-      beta(skip_wait: false)
-    end
-
-    # Submit for review
-    deliver(
-      api_key: api_key,
-      submit_for_review: true,
-      automatic_release: options[:auto_release] || false,
-      skip_screenshots: true,
-      skip_metadata: options[:skip_metadata] || false,
-      force: true  # Skip confirmation prompt
-    )
-
-    UI.success("App submitted for review!")
+  desc "Run SwiftLint"
+  lane :lint do
+    sh("cd .. && swiftlint lint --strict --config ../.swiftlint.yml")
   end
 
-  # =============================================================================
-  # Utilities
-  # =============================================================================
-
-  desc "Print current version and build number"
+  desc "Print current version"
   lane :version do
     ios_dir = File.expand_path("..", __dir__)
-    xcodeproj_path = File.join(ios_dir, "DateNight.xcodeproj")
-    version = get_version_number(xcodeproj: xcodeproj_path)
-    build = get_build_number(xcodeproj: xcodeproj_path)
+    version = get_version_number(xcodeproj: "#{ios_dir}/DateNight.xcodeproj")
+    build = get_build_number(xcodeproj: "#{ios_dir}/DateNight.xcodeproj")
     UI.message("Version: #{version} (#{build})")
-  end
-
-  desc "Bump version number"
-  lane :bump do |options|
-    bump_type = options[:type] || "patch"  # major, minor, patch
-
-    increment_version_number(
-      bump_type: bump_type,
-      xcodeproj: "../DateNight.xcodeproj"
-    )
-
-    version = get_version_number(xcodeproj: "../DateNight.xcodeproj")
-    UI.success("Version bumped to #{version}")
   end
 end
