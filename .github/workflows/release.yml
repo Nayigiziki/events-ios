@@ -70,13 +70,10 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
+          bundler: '2.5.0'
           bundler-cache: true
           working-directory: ios
-
-      - name: Install dependencies
-        working-directory: ios
-        run: bundle install
 
       - name: Setup App Store Connect API key
         env:
