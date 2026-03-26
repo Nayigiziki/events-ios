@@ -50,7 +50,6 @@ targets:
           CODE_SIGN_IDENTITY: "Apple Development"
         Release:
           CODE_SIGN_STYLE: Automatic
-          CODE_SIGN_IDENTITY: "Apple Distribution"
     info:
       path: DateNight/Info.plist
       properties:
