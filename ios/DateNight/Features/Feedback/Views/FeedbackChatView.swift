@@ -38,7 +38,7 @@ struct FeedbackChatView: View {
                         proxy.scrollTo(viewModel.messages.last?.id ?? "loading", anchor: .bottom)
                     }
                 }
-                .onChange(of: viewModel.streamingText) { _ in
+                .onChange(of: viewModel.isStreaming) { _ in
                     withAnimation {
                         proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
                     }
