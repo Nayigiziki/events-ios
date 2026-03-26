@@ -53,16 +53,11 @@ jobs:
 
           echo "Distribution certificate installed"
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-          working-directory: ios
-
-      - name: Install Fastlane dependencies
+      - name: Setup Ruby and install dependencies
         working-directory: ios
-        run: bundle install
+        run: |
+          gem install bundler -v 2.5.0 --no-document
+          bundle install
 
       - name: Setup App Store Connect API key
         env:
