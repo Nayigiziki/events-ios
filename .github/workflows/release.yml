@@ -1,4 +1,4 @@
-name: Release
+name: Release to TestFlight
 
 on:
   push:
@@ -6,10 +6,110 @@ on:
       - 'v*'
 
 jobs:
-  ios:
-    uses: Nayigiziki/deploy-workflows/.github/workflows/deploy-testflight.yml@main
-    with:
-      scheme: DateNight
-      bundle-id: com.tron.datenight
-      ios-directory: ios
-    secrets: inherit
+  testflight:
+    name: Build and Deploy to TestFlight
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Deploying version: ${VERSION}"
+
+      - name: Select Xcode
+        run: |
+          XCODE_APP=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          echo "Selected: $XCODE_APP"
+          xcodebuild -version
+
+      - name: Install Apple Distribution certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+          security create-keychain -p "actions" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "actions" $KEYCHAIN_PATH
+
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "actions" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          echo "Distribution certificate installed"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Install Fastlane dependencies
+        working-directory: ios
+        run: bundle install
+
+      - name: Setup App Store Connect API key
+        env:
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          echo "API key configured"
+
+      - name: Build and upload to TestFlight
+        id: testflight
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          FASTLANE_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_SKIP_UPDATE_CHECK: 'true'
+          FASTLANE_HIDE_CHANGELOG: 'true'
+        run: |
+          bundle exec fastlane beta
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-${{ steps.version.outputs.version }}
+          path: |
+            ios/build/*.ipa
+            ios/build/*.dSYM.zip
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf ~/.appstoreconnect/private_keys/*.p8
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db 2>/dev/null || true
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## TestFlight Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scheme:** DateNight" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bundle ID:** com.tron.datenight" >> $GITHUB_STEP_SUMMARY
