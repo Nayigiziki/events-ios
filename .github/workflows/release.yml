@@ -74,6 +74,19 @@ jobs:
           chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
           echo "API key configured"
 
+      - name: Create .env for Fastlane
+        working-directory: ios
+        run: |
+          cat > .env << EOF
+          APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}
+          APP_IDENTIFIER=com.tron.datenight
+          APP_NAME=DateNight
+          APP_STORE_CONNECT_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID=${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_FILEPATH=$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          ITC_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}
+          EOF
+
       - name: Build and upload to TestFlight
         id: testflight
         working-directory: ios
@@ -87,7 +100,7 @@ jobs:
           FASTLANE_SKIP_UPDATE_CHECK: 'true'
           FASTLANE_HIDE_CHANGELOG: 'true'
         run: |
-          bundle exec fastlane beta
+          bundle exec fastlane beta skip_wait:true
 
       - name: Upload build artifacts
         if: always()

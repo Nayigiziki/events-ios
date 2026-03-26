@@ -10,7 +10,7 @@ platform :ios do
   desc "Run tests"
   lane :test do
     run_tests(
-      scheme: "SwiftApp",
+      scheme: "DateNight",
       device: "iPhone 15 Pro"
     )
   end
@@ -18,7 +18,7 @@ platform :ios do
   desc "Build for development"
   lane :build do
     build_app(
-      scheme: "SwiftApp",
+      scheme: "DateNight",
       skip_archive: true,
       skip_codesigning: true
     )
@@ -51,12 +51,12 @@ platform :ios do
     UI.message("Running Priority Stack Evals (data layer tests)...")
 
     run_tests(
-      scheme: "SwiftApp",
-      device: "SwiftApp_Simulator",
+      scheme: "DateNight",
+      device: "DateNight_Simulator",
       only_testing: [
-        "SwiftAppTests/QuadrantAssignmentTests",
-        "SwiftAppTests/PriorityScoreTests",
-        "SwiftAppTests/OneThingConstraintTests"
+        "DateNightTests/QuadrantAssignmentTests",
+        "DateNightTests/PriorityScoreTests",
+        "DateNightTests/OneThingConstraintTests"
       ]
     )
   end
@@ -95,21 +95,21 @@ platform :ios do
 
     # Resolve package dependencies
     UI.message("Resolving Swift Package dependencies...")
-    sh("xcodebuild -resolvePackageDependencies -project '#{ios_dir}/SwiftApp.xcodeproj'")
+    sh("xcodebuild -resolvePackageDependencies -project '#{ios_dir}/DateNight.xcodeproj'")
 
     # Get absolute paths
     ios_dir = File.expand_path("..", __dir__)
     build_dir = File.join(ios_dir, "build")
-    archive_path = File.join(build_dir, "SwiftApp.xcarchive")
+    archive_path = File.join(build_dir, "DateNight.xcarchive")
     export_options_plist = File.join(build_dir, "ExportOptions.plist")
-    ipa_path = File.join(build_dir, "SwiftApp.ipa")
+    ipa_path = File.join(build_dir, "DateNight.ipa")
 
     # Ensure build directory exists
     FileUtils.mkdir_p(build_dir)
 
     # Build the app for device using xcodebuild directly
     UI.message("Building for device...")
-    sh("xcodebuild -scheme SwiftApp -project '#{ios_dir}/SwiftApp.xcodeproj' -configuration Debug -destination 'generic/platform=iOS' -archivePath '#{archive_path}' DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates clean archive")
+    sh("xcodebuild -scheme DateNight -project '#{ios_dir}/DateNight.xcodeproj' -configuration Debug -destination 'generic/platform=iOS' -archivePath '#{archive_path}' DEVELOPMENT_TEAM=#{team_id} -allowProvisioningUpdates clean archive")
 
     # Export IPA
     UI.message("Exporting IPA...")
@@ -136,7 +136,7 @@ platform :ios do
     UI.message("Installing on device #{device_id}...")
     sh("ios-deploy --id #{device_id} --bundle '#{ipa_path}' --no-wifi")
 
-    UI.success("Successfully deployed SwiftApp to device!")
+    UI.success("Successfully deployed DateNight to device!")
   end
 
   # =============================================================================
@@ -229,7 +229,7 @@ platform :ios do
     load_api_key
 
     bundle_id = ENV["APP_IDENTIFIER"] || "com.example.swiftapp"
-    app_name = ENV["APP_NAME"] || "SwiftApp"
+    app_name = ENV["APP_NAME"] || "DateNight"
     team_id = ENV["APPLE_TEAM_ID"]
     itc_team_id = ENV["ITC_TEAM_ID"] || team_id
 
@@ -261,7 +261,7 @@ platform :ios do
 
     # Get ios directory path (parent of fastlane dir)
     ios_dir = File.expand_path("..", __dir__)
-    xcodeproj_path = File.join(ios_dir, "SwiftApp.xcodeproj")
+    xcodeproj_path = File.join(ios_dir, "DateNight.xcodeproj")
 
     # Increment build number (use timestamp for uniqueness)
     increment_build_number(
@@ -278,7 +278,7 @@ platform :ios do
 
     # Build the app
     build_app(
-      scheme: "SwiftApp",
+      scheme: "DateNight",
       project: xcodeproj_path,
       configuration: "Release",
       export_method: "app-store",
@@ -345,7 +345,7 @@ platform :ios do
   desc "Print current version and build number"
   lane :version do
     ios_dir = File.expand_path("..", __dir__)
-    xcodeproj_path = File.join(ios_dir, "SwiftApp.xcodeproj")
+    xcodeproj_path = File.join(ios_dir, "DateNight.xcodeproj")
     version = get_version_number(xcodeproj: xcodeproj_path)
     build = get_build_number(xcodeproj: xcodeproj_path)
     UI.message("Version: #{version} (#{build})")
@@ -357,10 +357,10 @@ platform :ios do
 
     increment_version_number(
       bump_type: bump_type,
-      xcodeproj: "../SwiftApp.xcodeproj"
+      xcodeproj: "../DateNight.xcodeproj"
     )
 
-    version = get_version_number(xcodeproj: "../SwiftApp.xcodeproj")
+    version = get_version_number(xcodeproj: "../DateNight.xcodeproj")
     UI.success("Version bumped to #{version}")
   end
 end

@@ -3,7 +3,7 @@
 
 # Your App Store Connect Team ID (different from Developer Team ID)
 # Find at: App Store Connect > Users and Access > Team ID
-app_identifier ENV["APP_IDENTIFIER"] || "com.example.swiftapp"
+app_identifier ENV["APP_IDENTIFIER"] || "com.tron.datenight"
 apple_id ENV["APPLE_ID"]  # Your Apple ID email
 
 # Developer Portal Team ID
