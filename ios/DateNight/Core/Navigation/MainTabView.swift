@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab: Int = 0
+    @State private var showFeedback = false
 
     private let tabs: [(icon: String, labelKey: String)] = [
         ("house.fill", "tab_explore"),
@@ -66,6 +67,28 @@ struct MainTabView: View {
             .dnNeuRaised(intensity: .medium, cornerRadius: 0)
         }
         .ignoresSafeArea(edges: .bottom)
+        .overlay(alignment: .bottomTrailing) {
+            // Floating feedback button
+            Button {
+                showFeedback = true
+            } label: {
+                Image(systemName: "bubble.left.and.text.bubble.right.fill")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 56, height: 56)
+                    .background(
+                        Circle()
+                            .fill(Color.dnPrimary)
+                            .shadow(color: Color.dnPrimary.opacity(0.4), radius: 8, x: 0, y: 4)
+                    )
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, DNSpace.lg)
+            .padding(.bottom, 100)
+        }
+        .sheet(isPresented: $showFeedback) {
+            FeedbackChatView()
+        }
     }
 
     private var safeAreaBottomInset: CGFloat {
