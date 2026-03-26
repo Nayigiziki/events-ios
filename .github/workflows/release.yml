@@ -56,8 +56,9 @@ jobs:
       - name: Setup Ruby and install dependencies
         working-directory: ios
         run: |
-          gem install bundler -v 2.5.0 --no-document
-          bundle install
+          gem install bundler --no-document
+          gem install fastlane --no-document
+          gem install dotenv --no-document
 
       - name: Setup App Store Connect API key
         env:
@@ -95,7 +96,7 @@ jobs:
           FASTLANE_SKIP_UPDATE_CHECK: 'true'
           FASTLANE_HIDE_CHANGELOG: 'true'
         run: |
-          bundle exec fastlane beta skip_wait:true
+          fastlane beta skip_wait:true
 
       - name: Upload build artifacts
         if: always()
