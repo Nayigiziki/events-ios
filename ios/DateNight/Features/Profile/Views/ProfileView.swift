@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileViewModel()
+    @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showEditProfile = false
     @State private var showMatchPreferences = false
     @State private var showSettings = false
@@ -308,6 +309,39 @@ struct ProfileView: View {
 
     private var settingsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
+            // Language toggle
+            DNCard {
+                HStack {
+                    Image(systemName: "globe")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.dnPrimary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Language / Idioma")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.dnTextPrimary)
+                        Text(languageManager.displayName)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.dnTextSecondary)
+                    }
+                    Spacer()
+                    Button {
+                        withAnimation(.dnButtonPress) {
+                            languageManager.toggle()
+                        }
+                    } label: {
+                        Text(languageManager.isSpanish ? "EN" : "ES")
+                            .font(.system(size: 14, weight: .heavy))
+                            .foregroundColor(.white)
+                            .frame(width: 48, height: 32)
+                            .background(
+                                Capsule()
+                                    .fill(Color.dnPrimary)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
             VStack(spacing: DNSpace.sm) {
                 ForEach(settingsItems, id: \.self) { item in
                     Button {

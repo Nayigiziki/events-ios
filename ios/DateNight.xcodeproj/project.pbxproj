@@ -101,6 +101,7 @@
 		D1C6B8BD435C3E80E9477BB6 /* DateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B4A90BCDA494931B8AD102 /* DateRequest.swift */; };
 		D2FC3E803C83A68EBA98C8B4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C1549268D9B6400F29476A02 /* Preview Assets.xcassets */; };
 		D5F79625E804F4D0C94D61B4 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F370F2AB81BCAD22F19F127 /* ChatService.swift */; };
+		D6330CDB93D23C3FACAC199D /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577F2B9FBC01DA8095C25075 /* LanguageManager.swift */; };
 		D959ABB0550A6A6F25847705 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2194BE9D10155B96E1489B0A /* SettingsView.swift */; };
 		DE0CE1659090D500209F0386 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCFE64C7E5A8C22E1CCA0D8F /* ProfileSetupView.swift */; };
 		DEB108DAFAAAE843B17786C9 /* SwipeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6B4F9E34138C2020E67FE6 /* SwipeCardView.swift */; };
@@ -171,6 +172,7 @@
 		4A1F71915C15A8FDB67924E5 /* Match.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Match.swift; sourceTree = "<group>"; };
 		52B703FD3CEF1EA053087D5C /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		54E697462571705F9265F79F /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		577F2B9FBC01DA8095C25075 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
 		5825BF6B58B26FFFF79820CB /* InviteToDateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteToDateView.swift; sourceTree = "<group>"; };
 		5847D380459FF2CACB47C24D /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
 		591ED7DE21FADA48BF7D0E40 /* FriendsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsListView.swift; sourceTree = "<group>"; };
@@ -799,6 +801,7 @@
 				FB1BBAAE960EF230FFC1853E /* DateNightDesign+Colors.swift */,
 				B7D4AA13C3974085733F053E /* DateNightNeuModifiers.swift */,
 				7641C6946383AB2E181C1BE0 /* DateNightTypography.swift */,
+				577F2B9FBC01DA8095C25075 /* LanguageManager.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -1035,6 +1038,7 @@
 				2071A72B7B652C6FD318E022 /* HelpSupportView.swift in Sources */,
 				1EE4465E659F792AD38D9A45 /* InviteToDateView.swift in Sources */,
 				3D70D73ECA0CEB67605557D8 /* InviteToDateViewModel.swift in Sources */,
+				D6330CDB93D23C3FACAC199D /* LanguageManager.swift in Sources */,
 				88964993CECBB56F0467D454 /* Logger.swift in Sources */,
 				33A8618BB26B512769A15CD3 /* LoginView.swift in Sources */,
 				EAB1BF7D0B4C9DB0C8D32E3E /* MainTabView.swift in Sources */,
