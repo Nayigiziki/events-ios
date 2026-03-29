@@ -32,7 +32,7 @@ struct MyReviewsView: View {
                     }
 
                     // Reviews list
-                    if viewModel.reviews.isEmpty {
+                    if viewModel.reviews.isEmpty, !viewModel.isLoading {
                         emptyState
                     } else {
                         LazyVStack(spacing: DNSpace.lg) {
@@ -45,19 +45,24 @@ struct MyReviewsView: View {
                 .padding(DNSpace.lg)
             }
         }
+        .task {
+            await viewModel.loadReviews()
+        }
     }
 
-    private func reviewCard(_ review: MockReview) -> some View {
+    private func reviewCard(_ review: DateReview) -> some View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
                 HStack(spacing: DNSpace.md) {
-                    AvatarView(url: URL(string: review.reviewerAvatar), size: 40)
+                    AvatarView(url: URL(string: review.reviewer?.avatarUrl ?? ""), size: 40)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(review.reviewerName)
+                        Text(review.reviewer?.name ?? "Anonymous")
                             .dnH3()
-                        Text(review.date)
-                            .dnSmall()
+                        if let date = review.createdAt {
+                            Text(date, style: .date)
+                                .dnSmall()
+                        }
                     }
 
                     Spacer()

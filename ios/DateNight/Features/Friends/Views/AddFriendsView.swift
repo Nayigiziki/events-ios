@@ -16,7 +16,7 @@ struct AddFriendsView: View {
                 .padding(.horizontal, DNSpace.lg)
                 .padding(.top, DNSpace.md)
                 .onChange(of: friendsViewModel.addFriendSearchText) { _ in
-                    friendsViewModel.searchUsers()
+                    Task { await friendsViewModel.searchUsers() }
                 }
 
                 // Results
@@ -55,7 +55,7 @@ struct AddFriendsView: View {
         }
     }
 
-    private func userRow(_ user: FriendUser) -> some View {
+    private func userRow(_ user: UserProfile) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
                 AvatarView(url: URL(string: user.avatarUrl ?? ""), size: 48)
@@ -63,8 +63,10 @@ struct AddFriendsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(user.name)
                         .dnH3()
-                    Text(user.subtitle)
-                        .dnCaption()
+                    if let bio = user.bio {
+                        Text(bio)
+                            .dnCaption()
+                    }
                 }
 
                 Spacer()
@@ -75,7 +77,7 @@ struct AddFriendsView: View {
                         .foregroundColor(.dnSuccess)
                 } else {
                     CompactDNButton(title: "Add", variant: .primary) {
-                        friendsViewModel.addFriend(user)
+                        Task { await friendsViewModel.sendFriendRequest(to: user) }
                     }
                 }
             }

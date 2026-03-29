@@ -77,6 +77,22 @@ targets:
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
 
+  DateNightTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: DateNightTests
+        excludes:
+          - "**/.DS_Store"
+          - "**/*.disabled"
+    dependencies:
+      - target: DateNight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tron.datenight.tests
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+
 schemes:
   DateNight:
     build:
@@ -87,6 +103,10 @@ schemes:
       environmentVariables:
         # DeviceCheck bypass for iOS Simulator (required for AIProxy)
         AIPROXY_DEVICE_CHECK_BYPASS: $(AIPROXY_DEVICE_CHECK_BYPASS)
+    test:
+      config: Debug
+      targets:
+        - DateNightTests
     profile:
       config: Release
     archive:

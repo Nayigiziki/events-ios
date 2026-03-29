@@ -1,8 +1,14 @@
+import PhotosUI
 import SwiftUI
 
 struct AddEventView: View {
-    @StateObject private var viewModel = AddEventViewModel()
+    @StateObject private var viewModel: AddEventViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedPhotoItem: PhotosPickerItem?
+
+    init(event: Event? = nil) {
+        _viewModel = StateObject(wrappedValue: AddEventViewModel(event: event))
+    }
 
     var body: some View {
         NavigationStack {
@@ -15,6 +21,7 @@ struct AddEventView: View {
                             locationSection
                             imageSection
                             priceSection
+                            capacitySection
                             visibilitySection
                         }
                         .padding(.horizontal, DNSpace.lg)
@@ -25,7 +32,8 @@ struct AddEventView: View {
                     stickyCreateButton
                 }
             }
-            .navigationTitle("Create Event")
+            .navigationTitle(viewModel.isEditing ? "add_event_edit_title".localized() : "add_event_create_title"
+                .localized())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -46,18 +54,18 @@ struct AddEventView: View {
 
     private var eventDetailsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Event Details")
+            Text("add_event_details".localized())
                 .dnH3()
 
             DNTextField(
-                placeholder: "Event title",
+                placeholder: "add_event_title_placeholder".localized(),
                 text: $viewModel.title,
                 icon: "pencil"
             )
 
             descriptionField
 
-            Text("Category")
+            Text("add_event_category".localized())
                 .dnLabel()
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -91,7 +99,7 @@ struct AddEventView: View {
                 .dnNeuPressed(intensity: .medium, cornerRadius: DNRadius.md)
                 .overlay(alignment: .topLeading) {
                     if viewModel.description.isEmpty {
-                        Text("Describe your event...")
+                        Text("add_event_description_placeholder".localized())
                             .font(.system(size: 16, weight: .semibold))
                             .tracking(-0.47)
                             .foregroundColor(.dnTextTertiary)
@@ -107,7 +115,7 @@ struct AddEventView: View {
 
     private var dateTimeSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Date & Time")
+            Text("add_event_date_time".localized())
                 .dnH3()
 
             DNCard {
@@ -116,7 +124,7 @@ struct AddEventView: View {
                         Image(systemName: "calendar")
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.dnPrimary)
-                        Text("Date")
+                        Text("add_event_date".localized())
                             .dnBody()
                         Spacer()
                         DatePicker(
@@ -134,7 +142,7 @@ struct AddEventView: View {
                         Image(systemName: "clock")
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.dnPrimary)
-                        Text("Time")
+                        Text("add_event_time".localized())
                             .dnBody()
                         Spacer()
                         DatePicker(
@@ -154,17 +162,17 @@ struct AddEventView: View {
 
     private var locationSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Location")
+            Text("add_event_location".localized())
                 .dnH3()
 
             DNTextField(
-                placeholder: "Venue name",
+                placeholder: "add_event_venue_placeholder".localized(),
                 text: $viewModel.venue,
                 icon: "building.2"
             )
 
             DNTextField(
-                placeholder: "Address",
+                placeholder: "add_event_address_placeholder".localized(),
                 text: $viewModel.location,
                 icon: "mappin.and.ellipse"
             )
@@ -175,25 +183,37 @@ struct AddEventView: View {
 
     private var imageSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Image")
+            Text("add_event_image".localized())
                 .dnH3()
 
             DNCard {
                 if let image = viewModel.selectedImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 200)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                        )
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 200)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
+                            )
+
+                        Button {
+                            viewModel.selectedImage = nil
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.dnDestructive)
+                                .background(Circle().fill(Color.white))
+                        }
+                        .offset(x: -8, y: 8)
+                    }
                 } else {
-                    Button {} label: {
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                         VStack(spacing: DNSpace.md) {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 32))
                                 .foregroundColor(.dnTextTertiary)
-                            Text("Tap to add a photo")
+                            Text("add_event_tap_photo".localized())
                                 .dnBody()
                         }
                         .frame(maxWidth: .infinity)
@@ -207,6 +227,17 @@ struct AddEventView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .onChange(of: selectedPhotoItem) { _, newItem in
+                        guard let newItem else { return }
+                        Task {
+                            if let data = try? await newItem.loadTransferable(type: Data.self) {
+                                if let uiImage = UIImage(data: data) {
+                                    viewModel.selectedImage = uiImage
+                                }
+                            }
+                            selectedPhotoItem = nil
+                        }
+                    }
                 }
             }
         }
@@ -216,14 +247,33 @@ struct AddEventView: View {
 
     private var priceSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Price")
+            Text("add_event_price".localized())
                 .dnH3()
 
             DNTextField(
-                placeholder: "Free",
+                placeholder: "add_event_price_free".localized(),
                 text: $viewModel.price,
                 icon: "dollarsign"
             )
+        }
+    }
+
+    // MARK: - Capacity
+
+    private var capacitySection: some View {
+        VStack(alignment: .leading, spacing: DNSpace.md) {
+            Text("add_event_capacity".localized())
+                .dnH3()
+
+            DNTextField(
+                placeholder: "100",
+                text: $viewModel.totalSpots,
+                icon: "person.2"
+            )
+            .keyboardType(.numberPad)
+
+            Text("add_event_capacity_hint".localized())
+                .dnSmall()
         }
     }
 
@@ -231,7 +281,7 @@ struct AddEventView: View {
 
     private var visibilitySection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Visibility")
+            Text("add_event_visibility".localized())
                 .dnH3()
 
             DNCard {
@@ -241,7 +291,7 @@ struct AddEventView: View {
                             Image(systemName: viewModel.isPublic ? "globe" : "lock.fill")
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.dnPrimary)
-                            Text(viewModel.isPublic ? "Public" : "Private")
+                            Text(viewModel.isPublic ? "add_event_public".localized() : "add_event_private".localized())
                                 .dnBody()
                         }
                     }
@@ -249,8 +299,8 @@ struct AddEventView: View {
 
                     Text(
                         viewModel.isPublic
-                            ? "Anyone on DateNight can discover this event."
-                            : "Only people you invite can see this event."
+                            ? "add_event_public_desc".localized()
+                            : "add_event_private_desc".localized()
                     )
                     .dnSmall()
                 }
@@ -262,8 +312,11 @@ struct AddEventView: View {
 
     private var stickyCreateButton: some View {
         VStack(spacing: 0) {
-            DNButton("Create Event", variant: .primary) {
-                Task { await viewModel.createEvent() }
+            DNButton(
+                viewModel.isEditing ? "add_event_save".localized() : "add_event_create".localized(),
+                variant: .primary
+            ) {
+                Task { await viewModel.save() }
             }
             .padding(.horizontal, DNSpace.xl)
             .padding(.vertical, DNSpace.lg)

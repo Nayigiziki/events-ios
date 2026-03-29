@@ -44,51 +44,82 @@ struct EventComment: Identifiable, Hashable {
 final class EventDetailViewModel: ObservableObject {
     @Published var event: Event?
     @Published var showCreateDate = false
+    @Published var showShareSheet = false
     @Published var dateType: DateType = .solo
     @Published var groupSize = 2
     @Published var dateDescription = ""
     @Published var comments: [EventComment] = []
     @Published var newCommentText = ""
+    @Published var isAttending = false
+    @Published var errorMessage: String?
+    @Published var invitableUsers: [UserProfile] = []
+    @Published var invitedUserIds: Set<UUID> = []
 
     enum DateType: String, CaseIterable {
         case solo = "Solo"
         case group = "Group"
     }
 
-    init(event: Event) {
+    private let eventService: any EventServiceProtocol
+    private let friendService: any FriendServiceProtocol
+
+    init(
+        event: Event,
+        eventService: any EventServiceProtocol = SupabaseEventService(),
+        friendService: any FriendServiceProtocol = SupabaseFriendService()
+    ) {
         self.event = event
-        loadMockComments()
+        self.eventService = eventService
+        self.friendService = friendService
     }
 
-    func createDate() {
-        // Mock implementation - will connect to backend later
-        showCreateDate = false
-        dateDescription = ""
-        dateType = .solo
-        groupSize = 2
+    func loadInvitableUsers() async {
+        do {
+            invitableUsers = try await friendService.fetchFriends()
+        } catch {
+            // Non-critical — user can still create a date without invites
+        }
     }
 
-    func addComment() {
+    func toggleInvite(_ userId: UUID) {
+        if invitedUserIds.contains(userId) {
+            invitedUserIds.remove(userId)
+        } else {
+            invitedUserIds.insert(userId)
+        }
+    }
+
+    func loadComments() async {
+        guard let event else { return }
+        do {
+            comments = try await eventService.fetchComments(eventId: event.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func addComment() async {
+        guard let event else { return }
         let trimmed = newCommentText.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
-        let comment = EventComment(
-            userName: "You",
-            avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-            text: trimmed,
-            timestamp: "Just now",
-            upvotes: 0,
-            downvotes: 0
-        )
-        comments.insert(comment, at: 0)
-        newCommentText = ""
+
+        do {
+            let comment = try await eventService.addComment(
+                EventCommentCreateRequest(eventId: event.id, text: trimmed)
+            )
+            comments.insert(comment, at: 0)
+            newCommentText = ""
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    func vote(commentId: UUID, direction: EventComment.VoteDirection) {
+    func vote(commentId: UUID, direction: EventComment.VoteDirection) async {
         guard let index = comments.firstIndex(where: { $0.id == commentId }) else { return }
         let current = comments[index].userVote
 
+        // Optimistic update
         if current == direction {
-            // Undo vote
             if direction == .up {
                 comments[index].upvotes -= 1
             } else {
@@ -96,13 +127,11 @@ final class EventDetailViewModel: ObservableObject {
             }
             comments[index].userVote = nil
         } else {
-            // Remove previous vote if any
             if current == .up {
                 comments[index].upvotes -= 1
             } else if current == .down {
                 comments[index].downvotes -= 1
             }
-            // Apply new vote
             if direction == .up {
                 comments[index].upvotes += 1
             } else {
@@ -110,42 +139,60 @@ final class EventDetailViewModel: ObservableObject {
             }
             comments[index].userVote = direction
         }
+
+        // Persist to backend
+        do {
+            try await eventService.voteComment(
+                CommentVoteRequest(commentId: commentId, direction: direction)
+            )
+        } catch {
+            // Vote is optimistic — silently fail
+        }
     }
 
-    private func loadMockComments() {
-        comments = [
-            EventComment(
-                userName: "Emma",
-                avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-                text: "Can't wait for this! Anyone want to grab dinner before?",
-                timestamp: "2h ago",
-                upvotes: 5,
-                downvotes: 0
-            ),
-            EventComment(
-                userName: "Alex",
-                avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-                text: "Been to this venue before, the atmosphere is incredible. Highly recommend!",
-                timestamp: "4h ago",
-                upvotes: 8,
-                downvotes: 1
-            ),
-            EventComment(
-                userName: "Sarah",
-                avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop",
-                text: "Is there parking nearby?",
-                timestamp: "6h ago",
-                upvotes: 2,
-                downvotes: 0
-            ),
-            EventComment(
-                userName: "Michael",
-                avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-                text: "Just got my ticket! See everyone there.",
-                timestamp: "1d ago",
-                upvotes: 3,
-                downvotes: 0
-            )
-        ]
+    var shareText: String {
+        guard let event else { return "" }
+        return "Check out \(event.title) at \(event.venue) on \(event.date)!"
+    }
+
+    func rsvp() async {
+        guard let event else { return }
+        errorMessage = nil
+        do {
+            try await eventService.rsvpEvent(event.id)
+            isAttending = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func unrsvp() async {
+        guard let event else { return }
+        do {
+            try await eventService.unrsvpEvent(event.id)
+            isAttending = false
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func createDate() async {
+        guard let event else { return }
+        do {
+            try await eventService.createDate(DateCreateRequest(
+                eventId: event.id,
+                dateType: dateType.rawValue,
+                groupSize: groupSize,
+                description: dateDescription,
+                invitedUserIds: Array(invitedUserIds)
+            ))
+            showCreateDate = false
+            dateDescription = ""
+            dateType = .solo
+            groupSize = 2
+            invitedUserIds = []
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }

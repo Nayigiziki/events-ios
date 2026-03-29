@@ -19,7 +19,7 @@ struct MatchPreferencesView: View {
                 .padding(.bottom, DNSpace.xxl * 3)
             }
         }
-        .navigationTitle("Match Preferences")
+        .navigationTitle("prefs_title".localized())
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -29,7 +29,7 @@ struct MatchPreferencesView: View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
                 HStack {
-                    Text("AGE RANGE")
+                    Text("prefs_age_range".localized().uppercased())
                         .dnLabel()
                     Spacer()
                     Text("\(Int(viewModel.ageMin)) - \(Int(viewModel.ageMax))")
@@ -51,7 +51,7 @@ struct MatchPreferencesView: View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
                 HStack {
-                    Text("MAXIMUM DISTANCE")
+                    Text("prefs_max_distance".localized().uppercased())
                         .dnLabel()
                     Spacer()
                     Text("\(Int(viewModel.distance)) km")
@@ -69,7 +69,7 @@ struct MatchPreferencesView: View {
     private var relationshipTypeSection: some View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
-                Text("RELATIONSHIP TYPE")
+                Text("prefs_relationship_type".localized().uppercased())
                     .dnLabel()
 
                 FlowLayout(spacing: DNSpace.sm) {
@@ -92,7 +92,7 @@ struct MatchPreferencesView: View {
     private var interestsSection: some View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
-                Text("INTERESTS")
+                Text("prefs_interests".localized().uppercased())
                     .dnLabel()
 
                 FlowLayout(spacing: DNSpace.sm) {
@@ -113,7 +113,7 @@ struct MatchPreferencesView: View {
     // MARK: - Save
 
     private var saveButton: some View {
-        DNButton("Save", variant: .primary) {
+        DNButton("prefs_save".localized(), variant: .primary) {
             Task {
                 await viewModel.save()
                 dismiss()

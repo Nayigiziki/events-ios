@@ -5,12 +5,25 @@ import SwiftUI
 final class AuthViewModel: ObservableObject {
     @Published var isAuthenticated = false
     @Published var isLoading = false
+    @Published var isCheckingSession = false
     @Published var errorMessage: String?
     @Published var isFirstLaunch: Bool
+    @Published var showBiometricPrompt = false
+    @Published var profileComplete = false
 
+    private let authService: AuthServiceProtocol
+    private let profileService: any ProfileServiceProtocol
+    let biometricService: BiometricAuthServiceProtocol
     private let firstLaunchKey = "datenight_first_launch_completed"
 
-    init() {
+    init(
+        authService: AuthServiceProtocol = SupabaseAuthService(),
+        profileService: any ProfileServiceProtocol = ProfileService(),
+        biometricService: BiometricAuthServiceProtocol = BiometricAuthService()
+    ) {
+        self.authService = authService
+        self.profileService = profileService
+        self.biometricService = biometricService
         self.isFirstLaunch = !UserDefaults.standard.bool(forKey: firstLaunchKey)
     }
 
@@ -18,11 +31,15 @@ final class AuthViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        // Mock implementation — simulate network delay
-        try? await Task.sleep(nanoseconds: 800_000_000)
+        do {
+            let session = try await authService.signIn(email: email, password: password)
+            isAuthenticated = true
+            await checkProfileComplete(userId: session.user.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
-        isAuthenticated = true
     }
 
     func signUp(
@@ -35,41 +52,95 @@ final class AuthViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        // Mock implementation — simulate network delay
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        do {
+            _ = try await authService.signUp(email: email, password: password)
+            isAuthenticated = true
+            isFirstLaunch = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
-        isAuthenticated = true
-        isFirstLaunch = true
     }
 
     func signInWithGoogle() async {
         isLoading = true
         errorMessage = nil
 
-        try? await Task.sleep(nanoseconds: 800_000_000)
+        do {
+            _ = try await authService.signInWithGoogle()
+            isAuthenticated = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
-        isAuthenticated = true
     }
 
     func signInWithFacebook() async {
         isLoading = true
         errorMessage = nil
 
-        try? await Task.sleep(nanoseconds: 800_000_000)
+        do {
+            _ = try await authService.signInWithFacebook()
+            isAuthenticated = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
-        isAuthenticated = true
     }
 
-    func signOut() {
+    func signOut() async {
+        do {
+            try await authService.signOut()
+        } catch {
+            // Log but don't block UI
+        }
         isAuthenticated = false
     }
 
-    func checkSession() {
-        // Mock: no persisted session
-        isAuthenticated = false
+    func checkSession() async {
+        isCheckingSession = true
+
+        do {
+            if let session = try await authService.checkSession() {
+                if biometricService.isBiometricEnabled, biometricService.canUseBiometrics() {
+                    let authenticated = try await biometricService.authenticate(reason: "Unlock DateNight")
+                    isAuthenticated = authenticated
+                } else {
+                    isAuthenticated = true
+                }
+                if isAuthenticated {
+                    await checkProfileComplete(userId: session.user.id)
+                }
+            } else {
+                isAuthenticated = false
+            }
+        } catch {
+            isAuthenticated = false
+        }
+
+        isCheckingSession = false
+    }
+
+    func checkProfileComplete(userId: UUID) async {
+        do {
+            let profile = try await profileService.fetchProfile(userId: userId)
+            profileComplete = profile.photos.count >= 2
+                && profile.bio != nil && !(profile.bio?.isEmpty ?? true)
+                && profile.interests.count >= 3
+        } catch {
+            profileComplete = false
+        }
+    }
+
+    func enableBiometrics() {
+        biometricService.setBiometricEnabled(true)
+    }
+
+    func disableBiometrics() {
+        biometricService.setBiometricEnabled(false)
     }
 
     func completeOnboarding() {

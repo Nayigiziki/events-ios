@@ -6,6 +6,10 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var rememberMe = false
+    @State private var validationError: String?
+
+    private let validation = ValidationService()
+    private let rememberMeService = RememberMeService()
 
     var body: some View {
         ZStack {
@@ -29,6 +33,13 @@ struct LoginView: View {
                     .padding(.top, DNSpace.lg)
                     .padding(.bottom, DNSpace.xxl)
                 }
+            }
+        }
+        .onAppear {
+            let saved = rememberMeService.restore()
+            if saved.enabled {
+                email = saved.email
+                rememberMe = true
             }
         }
         .overlay {
@@ -143,14 +154,30 @@ struct LoginView: View {
                 }
             }
 
+            // Validation Error
+            if let validationError {
+                Text(validationError)
+                    .dnCaption()
+                    .foregroundColor(.dnDestructive)
+                    .multilineTextAlignment(.center)
+            }
+
             // Sign In Button
             DNButton(String(localized: "auth_sign_in"), variant: .primary) {
-                Task {
-                    await authViewModel.signIn(email: email, password: password)
+                validationError = nil
+                if !validation.isValidEmail(email) {
+                    validationError = "Please enter a valid email"
+                } else if !validation.isNonEmpty(password) {
+                    validationError = "Password is required"
+                } else {
+                    rememberMeService.save(email: email, enabled: rememberMe)
+                    Task {
+                        await authViewModel.signIn(email: email, password: password)
+                    }
                 }
             }
 
-            // Error
+            // Server Error
             if let error = authViewModel.errorMessage {
                 Text(error)
                     .dnCaption()

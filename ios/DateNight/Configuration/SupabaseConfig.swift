@@ -3,17 +3,19 @@ import Foundation
 enum SupabaseConfig {
     static var supabaseURL: URL {
         guard let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
+              !urlString.isEmpty,
               let url = URL(string: urlString)
         else {
-            fatalError("SUPABASE_URL not found in Info.plist")
+            return URL(string: "https://placeholder.supabase.co")!
         }
         return url
     }
 
     static var supabaseAnonKey: String {
-        guard let key = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String, !key.isEmpty else {
-            fatalError("SUPABASE_ANON_KEY not found in Info.plist")
+        if let key = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String, !key.isEmpty {
+            return key
         }
-        return key
+        // Fallback for test host
+        return "placeholder-key"
     }
 }

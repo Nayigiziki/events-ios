@@ -1,8 +1,11 @@
+import PhotosUI
 import SwiftUI
 
 struct ProfileSetupView: View {
+    @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileSetupViewModel()
-    @AppStorage("profileComplete") private var profileComplete = false
+    @State private var selectedItem: PhotosPickerItem?
 
     var body: some View {
         DNScreen {
@@ -47,10 +50,12 @@ struct ProfileSetupView: View {
                     .scaleEffect(1.5)
             }
         }
-        .onChange(of: profileComplete) { _, newValue in
-            // This triggers ContentView to re-evaluate auth gate
+        .onAppear {
+            viewModel.userId = authService.currentUser?.id
+        }
+        .onChange(of: viewModel.isComplete) { _, newValue in
             if newValue {
-                // Profile complete flag is already persisted via @AppStorage
+                authViewModel.profileComplete = true
             }
         }
     }
@@ -75,10 +80,10 @@ struct ProfileSetupView: View {
 
     private var photosStep: some View {
         VStack(spacing: DNSpace.xl) {
-            Text("Add Your Photos")
+            Text("setup_photos_title".localized())
                 .dnH2()
 
-            Text("Add at least 2 photos to continue")
+            Text("setup_photos_subtitle".localized())
                 .dnBody()
 
             LazyVGrid(
@@ -120,49 +125,64 @@ struct ProfileSetupView: View {
     }
 
     private var emptyPhotoSlot: some View {
-        Button {
-            viewModel.addPhoto()
-        } label: {
+        PhotosPicker(selection: $selectedItem, matching: .images) {
             RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
                 .strokeBorder(Color.dnBorder, style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
                 .frame(height: 140)
                 .overlay(
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.dnTextTertiary)
+                    Group {
+                        if viewModel.isUploadingPhoto {
+                            ProgressView()
+                                .tint(.dnPrimary)
+                        } else {
+                            Image(systemName: "plus")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.dnTextTertiary)
+                        }
+                    }
                 )
         }
         .buttonStyle(.plain)
+        .disabled(viewModel.isUploadingPhoto)
+        .onChange(of: selectedItem) { _, newItem in
+            guard let newItem else { return }
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self) {
+                    await viewModel.addPhotoData(data)
+                }
+                selectedItem = nil
+            }
+        }
     }
 
     // MARK: - Step 2: About You
 
     private var aboutStep: some View {
         VStack(spacing: DNSpace.xl) {
-            Text("Tell Us About You")
+            Text("setup_about_title".localized())
                 .dnH2()
 
             VStack(spacing: DNSpace.lg) {
                 // Bio (multiline)
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
-                    Text("BIO")
+                    Text("setup_bio".localized())
                         .dnLabel()
                         .textCase(.uppercase)
 
                     multilineTextField(
-                        placeholder: "Tell others about yourself...",
+                        placeholder: "setup_bio_placeholder".localized(),
                         text: $viewModel.bio
                     )
                 }
 
                 // Occupation
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
-                    Text("OCCUPATION")
+                    Text("setup_occupation".localized())
                         .dnLabel()
                         .textCase(.uppercase)
 
                     DNTextField(
-                        placeholder: "What do you do?",
+                        placeholder: "setup_occupation_placeholder".localized(),
                         text: $viewModel.occupation,
                         icon: "briefcase"
                     )
@@ -170,12 +190,12 @@ struct ProfileSetupView: View {
 
                 // Location
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
-                    Text("LOCATION")
+                    Text("setup_location".localized())
                         .dnLabel()
                         .textCase(.uppercase)
 
                     DNTextField(
-                        placeholder: "City, State",
+                        placeholder: "setup_location_placeholder".localized(),
                         text: $viewModel.location,
                         icon: "mappin.and.ellipse"
                     )
@@ -183,12 +203,12 @@ struct ProfileSetupView: View {
 
                 // Height
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
-                    Text("HEIGHT")
+                    Text("setup_height".localized())
                         .dnLabel()
                         .textCase(.uppercase)
 
                     DNTextField(
-                        placeholder: "Height in inches",
+                        placeholder: "setup_height_placeholder".localized(),
                         text: $viewModel.height,
                         icon: "ruler"
                     )
@@ -225,10 +245,10 @@ struct ProfileSetupView: View {
 
     private var interestsStep: some View {
         VStack(spacing: DNSpace.xl) {
-            Text("Pick Your Interests")
+            Text("setup_interests_title".localized())
                 .dnH2()
 
-            Text("Choose at least 3 interests")
+            Text("setup_interests_subtitle".localized())
                 .dnBody()
 
             FlowLayout(spacing: DNSpace.md) {
@@ -268,28 +288,36 @@ struct ProfileSetupView: View {
     // MARK: - Navigation Buttons
 
     private var navigationButtons: some View {
-        HStack(spacing: DNSpace.lg) {
-            if viewModel.currentStep > 0 {
-                DNButton("Back", variant: .secondary) {
-                    viewModel.previousStep()
-                }
+        VStack(spacing: DNSpace.sm) {
+            if let error = viewModel.errorMessage {
+                Text(error)
+                    .dnCaption()
+                    .foregroundColor(.dnDestructive)
+                    .multilineTextAlignment(.center)
             }
 
-            if viewModel.currentStep < ProfileSetupViewModel.totalSteps - 1 {
-                DNButton("Next", variant: .primary) {
-                    viewModel.nextStep()
-                }
-                .opacity(viewModel.canProceed ? 1.0 : 0.5)
-                .allowsHitTesting(viewModel.canProceed)
-            } else {
-                DNButton("Complete Setup", variant: .primary) {
-                    Task {
-                        await viewModel.completeSetup()
-                        profileComplete = true
+            HStack(spacing: DNSpace.lg) {
+                if viewModel.currentStep > 0 {
+                    DNButton("setup_back".localized(), variant: .secondary) {
+                        viewModel.previousStep()
                     }
                 }
-                .opacity(viewModel.canProceed ? 1.0 : 0.5)
-                .allowsHitTesting(viewModel.canProceed)
+
+                if viewModel.currentStep < ProfileSetupViewModel.totalSteps - 1 {
+                    DNButton("setup_next".localized(), variant: .primary) {
+                        viewModel.nextStep()
+                    }
+                    .opacity(viewModel.canProceed ? 1.0 : 0.5)
+                    .allowsHitTesting(viewModel.canProceed)
+                } else {
+                    DNButton("setup_complete".localized(), variant: .primary) {
+                        Task {
+                            await viewModel.completeSetup()
+                        }
+                    }
+                    .opacity(viewModel.canProceed ? 1.0 : 0.5)
+                    .allowsHitTesting(viewModel.canProceed)
+                }
             }
         }
     }

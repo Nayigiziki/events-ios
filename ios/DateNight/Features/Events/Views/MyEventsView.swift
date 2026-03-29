@@ -3,6 +3,8 @@ import SwiftUI
 struct MyEventsView: View {
     @StateObject private var viewModel = MyEventsViewModel()
     @State private var showAddEvent = false
+    @State private var eventToDelete: Event?
+    @State private var eventToEdit: Event?
 
     var body: some View {
         NavigationStack {
@@ -10,12 +12,43 @@ struct MyEventsView: View {
                 VStack(spacing: 0) {
                     header
                     tabPicker
-                    eventsList
+
+                    if viewModel.isLoading {
+                        Spacer()
+                        ProgressView()
+                            .tint(.dnPrimary)
+                        Spacer()
+                    } else {
+                        eventsList
+                    }
                 }
             }
         }
         .sheet(isPresented: $showAddEvent) {
             AddEventView()
+        }
+        .sheet(item: $eventToEdit) { event in
+            AddEventView(event: event)
+        }
+        .alert("delete_event_confirm_title".localized(), isPresented: Binding(
+            get: { eventToDelete != nil },
+            set: { if !$0 { eventToDelete = nil } }
+        )) {
+            Button("cancel".localized(), role: .cancel) { eventToDelete = nil }
+            Button("delete".localized(), role: .destructive) {
+                if let event = eventToDelete {
+                    Task { await viewModel.deleteEvent(event) }
+                    eventToDelete = nil
+                }
+            }
+        } message: {
+            Text("delete_event_confirm_message".localized())
+        }
+        .task {
+            await viewModel.loadEvents()
+        }
+        .refreshable {
+            await viewModel.loadEvents()
         }
     }
 
@@ -23,7 +56,7 @@ struct MyEventsView: View {
 
     private var header: some View {
         HStack {
-            Text("My Events")
+            Text("my_events_title".localized())
                 .dnH2()
             Spacer()
             Button { showAddEvent = true } label: {
@@ -44,7 +77,7 @@ struct MyEventsView: View {
         HStack(spacing: DNSpace.sm) {
             ForEach(MyEventsViewModel.Tab.allCases, id: \.self) { tab in
                 FilterChip(
-                    title: tab.rawValue,
+                    title: tab.localizedTitle,
                     isActive: Binding(
                         get: { viewModel.selectedTab == tab },
                         set: { active in
@@ -64,6 +97,12 @@ struct MyEventsView: View {
     private var eventsList: some View {
         ScrollView {
             LazyVStack(spacing: DNSpace.lg) {
+                if let error = viewModel.errorMessage {
+                    Text(error)
+                        .dnCaption()
+                        .foregroundColor(.dnDestructive)
+                }
+
                 let events = viewModel.selectedTab == .created
                     ? viewModel.createdEvents
                     : viewModel.attendingEvents
@@ -118,7 +157,7 @@ struct MyEventsView: View {
                 Image(systemName: "person.2.fill")
                     .font(.system(size: 12))
                     .foregroundColor(.dnPrimary)
-                Text("\(event.attendees?.count ?? 0) attending")
+                Text("\(event.attendees?.count ?? 0) " + "my_events_attending".localized())
                     .dnSmall()
             }
         }
@@ -126,7 +165,7 @@ struct MyEventsView: View {
 
     private func eventActions(_ event: Event) -> some View {
         VStack(spacing: DNSpace.md) {
-            Button { viewModel.editEvent(event) } label: {
+            Button { eventToEdit = event } label: {
                 Image(systemName: "pencil")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.dnPrimary)
@@ -135,7 +174,7 @@ struct MyEventsView: View {
             }
             .buttonStyle(.plain)
 
-            Button { viewModel.deleteEvent(event) } label: {
+            Button { eventToDelete = event } label: {
                 Image(systemName: "trash")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.dnDestructive)
@@ -186,9 +225,9 @@ struct MyEventsView: View {
             Image(systemName: "calendar.badge.plus")
                 .font(.system(size: 48))
                 .foregroundColor(.dnTextTertiary)
-            Text("Create your first event")
+            Text("my_events_empty_title".localized())
                 .dnH3()
-            Text("Tap the + button to get started")
+            Text("my_events_empty_subtitle".localized())
                 .dnBody()
             Spacer()
         }

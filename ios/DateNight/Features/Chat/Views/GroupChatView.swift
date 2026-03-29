@@ -5,8 +5,11 @@ struct GroupChatView: View {
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isInputFocused: Bool
 
-    init(groupName: String = "Jazz Club Date") {
-        _viewModel = StateObject(wrappedValue: GroupChatViewModel(groupName: groupName))
+    init(conversationId: UUID, groupName: String = "Group Chat") {
+        _viewModel = StateObject(wrappedValue: GroupChatViewModel(
+            conversationId: conversationId,
+            groupName: groupName
+        ))
     }
 
     var body: some View {
@@ -40,6 +43,12 @@ struct GroupChatView: View {
         }
         .background(Color.dnBackground)
         .navigationBarHidden(true)
+        .task {
+            await viewModel.loadMessages()
+        }
+        .onDisappear {
+            viewModel.cleanup()
+        }
     }
 
     // MARK: - Navigation Bar
@@ -47,7 +56,6 @@ struct GroupChatView: View {
     private var chatNavigationBar: some View {
         VStack(spacing: 0) {
             HStack(spacing: DNSpace.md) {
-                // Back button
                 Button { dismiss() } label: {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
@@ -58,8 +66,8 @@ struct GroupChatView: View {
 
                 // Avatar stack
                 HStack(spacing: -8) {
-                    ForEach(viewModel.participants.prefix(3), id: \.id) { participant in
-                        AvatarView(url: URL(string: participant.avatar), size: 28)
+                    ForEach(viewModel.participants.prefix(3)) { participant in
+                        AvatarView(url: URL(string: participant.avatarUrl ?? ""), size: 28)
                     }
                 }
 
@@ -93,7 +101,6 @@ struct GroupChatView: View {
             .padding(.horizontal, DNSpace.lg)
             .padding(.vertical, DNSpace.md)
 
-            // Expandable participant list
             if viewModel.showParticipants {
                 participantList
             }
@@ -105,21 +112,15 @@ struct GroupChatView: View {
 
     private var participantList: some View {
         VStack(spacing: DNSpace.sm) {
-            ForEach(viewModel.participants, id: \.id) { participant in
+            ForEach(viewModel.participants) { participant in
                 HStack(spacing: DNSpace.md) {
-                    AvatarView(url: URL(string: participant.avatar), size: 32)
+                    AvatarView(url: URL(string: participant.avatarUrl ?? ""), size: 32)
 
                     Text(participant.name)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.dnTextPrimary)
 
                     Spacer()
-
-                    if participant.isOnline {
-                        Circle()
-                            .fill(Color.dnSuccess)
-                            .frame(width: 8, height: 8)
-                    }
                 }
                 .padding(.horizontal, DNSpace.lg)
             }
@@ -130,29 +131,23 @@ struct GroupChatView: View {
 
     // MARK: - Group Message Bubble
 
-    private func groupMessageBubble(_ message: GroupMessage) -> some View {
-        HStack(alignment: .top) {
-            if message.isSent {
+    private func groupMessageBubble(_ message: Message) -> some View {
+        let isSent = message.senderId == viewModel.currentUserId
+
+        return HStack(alignment: .top) {
+            if isSent {
                 Spacer(minLength: UIScreen.main.bounds.width * 0.2)
-            } else {
-                AvatarView(url: URL(string: message.senderAvatar), size: 28)
             }
 
-            VStack(alignment: message.isSent ? .trailing : .leading, spacing: DNSpace.xs) {
-                if !message.isSent {
-                    Text(message.senderName)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.dnPrimary)
-                }
-
-                Text(message.text)
+            VStack(alignment: isSent ? .trailing : .leading, spacing: DNSpace.xs) {
+                Text(message.content)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(message.isSent ? .white : .dnTextPrimary)
+                    .foregroundColor(isSent ? .white : .dnTextPrimary)
                     .padding(.horizontal, DNSpace.lg)
                     .padding(.vertical, DNSpace.md)
                     .background(
                         Group {
-                            if message.isSent {
+                            if isSent {
                                 RoundedRectangle(cornerRadius: DNRadius.lg, style: .continuous)
                                     .fill(Color.dnPrimary)
                                     .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.lg)
@@ -168,12 +163,14 @@ struct GroupChatView: View {
                         }
                     )
 
-                Text(message.timestamp)
-                    .dnSmall()
-                    .padding(.horizontal, DNSpace.xs)
+                if let date = message.createdAt {
+                    Text(date, style: .time)
+                        .dnSmall()
+                        .padding(.horizontal, DNSpace.xs)
+                }
             }
 
-            if !message.isSent {
+            if !isSent {
                 Spacer(minLength: UIScreen.main.bounds.width * 0.2)
             }
         }
@@ -206,7 +203,7 @@ struct GroupChatView: View {
 
             if !viewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Button {
-                    viewModel.sendMessage()
+                    Task { await viewModel.sendMessage() }
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 18))

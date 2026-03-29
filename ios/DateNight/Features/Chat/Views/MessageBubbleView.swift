@@ -1,23 +1,24 @@
 import SwiftUI
 
 struct MessageBubbleView: View {
-    let message: MockMessage
+    let message: Message
+    let isSent: Bool
 
     var body: some View {
         HStack {
-            if message.isSent {
+            if isSent {
                 Spacer(minLength: UIScreen.main.bounds.width * 0.25)
             }
 
-            VStack(alignment: message.isSent ? .trailing : .leading, spacing: DNSpace.xs) {
-                Text(message.text)
+            VStack(alignment: isSent ? .trailing : .leading, spacing: DNSpace.xs) {
+                Text(message.content)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(message.isSent ? .white : .dnTextPrimary)
+                    .foregroundColor(isSent ? .white : .dnTextPrimary)
                     .padding(.horizontal, DNSpace.lg)
                     .padding(.vertical, DNSpace.md)
                     .background(
                         Group {
-                            if message.isSent {
+                            if isSent {
                                 RoundedRectangle(cornerRadius: DNRadius.lg, style: .continuous)
                                     .fill(Color.dnPrimary)
                                     .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.lg)
@@ -33,12 +34,14 @@ struct MessageBubbleView: View {
                         }
                     )
 
-                Text(message.timestamp)
-                    .dnSmall()
-                    .padding(.horizontal, DNSpace.xs)
+                if let date = message.createdAt {
+                    Text(date, style: .time)
+                        .dnSmall()
+                        .padding(.horizontal, DNSpace.xs)
+                }
             }
 
-            if !message.isSent {
+            if !isSent {
                 Spacer(minLength: UIScreen.main.bounds.width * 0.25)
             }
         }

@@ -4,7 +4,7 @@ struct RateMatchView: View {
     @StateObject private var viewModel: RateMatchViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(ratedUser: MockUser) {
+    init(ratedUser: UserProfile) {
         _viewModel = StateObject(wrappedValue: RateMatchViewModel(ratedUser: ratedUser))
     }
 
@@ -15,7 +15,7 @@ struct RateMatchView: View {
                     Spacer().frame(height: DNSpace.lg)
 
                     AvatarView(
-                        url: URL(string: viewModel.ratedUser.avatar),
+                        url: URL(string: viewModel.ratedUser.avatarUrl ?? ""),
                         size: 96
                     )
 
@@ -77,11 +77,13 @@ struct RateMatchView: View {
                         DNButton("Submit Rating", variant: .primary) {
                             Task {
                                 await viewModel.submitRating()
-                                dismiss()
+                                if viewModel.didSubmit {
+                                    dismiss()
+                                }
                             }
                         }
-                        .opacity(viewModel.rating > 0 ? 1.0 : 0.5)
-                        .disabled(viewModel.rating == 0)
+                        .opacity(viewModel.canSubmit ? 1.0 : 0.5)
+                        .disabled(!viewModel.canSubmit)
 
                         DNButton("Skip", variant: .secondary) {
                             dismiss()
@@ -93,8 +95,4 @@ struct RateMatchView: View {
             }
         }
     }
-}
-
-#Preview {
-    RateMatchView(ratedUser: MockData.users[0])
 }

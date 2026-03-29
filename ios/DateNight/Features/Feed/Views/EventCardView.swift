@@ -53,7 +53,7 @@ struct EventCardView: View {
                     .lineLimit(2)
 
                 NavigationLink(value: event) {
-                    Text("Ver Detalles")
+                    Text("event_card_view_details".localized())
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(.white)
                         .textCase(.uppercase)

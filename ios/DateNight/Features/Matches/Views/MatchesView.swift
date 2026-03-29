@@ -11,30 +11,33 @@ struct MatchesView: View {
                     VStack(spacing: DNSpace.lg) {
                         // Header
                         VStack(alignment: .leading, spacing: DNSpace.xs) {
-                            Text("TUS CITAS")
+                            Text("matches_title".localized())
                                 .font(.system(size: 28, weight: .black))
                                 .tracking(-0.6)
                                 .foregroundColor(.dnTextPrimary)
                                 .textCase(.uppercase)
 
-                            Text("Encuentra personas para ir a eventos juntos")
+                            Text("matches_subtitle".localized())
                                 .dnCaption()
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, DNSpace.lg)
                         .padding(.top, DNSpace.md)
 
-                        // Segmented picker — full-width pill toggle
+                        // Segmented picker
                         HStack(spacing: 0) {
-                            tabButton(title: "CITAS DISPONIBLES", index: 0)
-                            tabButton(title: "TUS CITAS", index: 1)
+                            tabButton(title: "matches_available_dates".localized(), index: 0)
+                            tabButton(title: "matches_your_dates".localized(), index: 1)
                         }
                         .padding(4)
                         .dnNeuRaised(cornerRadius: DNRadius.xl)
                         .padding(.horizontal, DNSpace.lg)
 
                         // Content
-                        if viewModel.selectedTab == 0 {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding(.top, 60)
+                        } else if viewModel.selectedTab == 0 {
                             availableDatesContent
                         } else {
                             yourDatesContent
@@ -45,7 +48,7 @@ struct MatchesView: View {
                             } label: {
                                 DNCard {
                                     HStack {
-                                        Text("Ver Todas Mis Citas")
+                                        Text("matches_view_all_dates".localized())
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundColor(.dnPrimary)
                                         Spacer()
@@ -65,7 +68,13 @@ struct MatchesView: View {
                     }
                     .padding(.bottom, DNSpace.xxl * 3)
                 }
+                .refreshable {
+                    await viewModel.loadDates()
+                }
             }
+        }
+        .task {
+            await viewModel.loadDates()
         }
     }
 
@@ -108,7 +117,7 @@ struct MatchesView: View {
                 DateRequestCard(
                     dateRequest: dateReq,
                     onJoin: {
-                        viewModel.joinDate(requestId: dateReq.id)
+                        Task { await viewModel.joinDate(requestId: dateReq.id) }
                     }
                 )
                 .padding(.horizontal, DNSpace.lg)
@@ -157,19 +166,19 @@ struct MatchesView: View {
                         .foregroundColor(.dnPrimary)
                 }
 
-                Text("CREA TU PROPIA CITA")
+                Text("matches_create_date".localized())
                     .font(.system(size: 18, weight: .black))
                     .foregroundColor(.dnTextPrimary)
                     .multilineTextAlignment(.center)
 
-                Text("Organiza una cita para un evento que te guste")
+                Text("matches_create_date_subtitle".localized())
                     .dnCaption()
                     .multilineTextAlignment(.center)
 
                 NavigationLink {
                     EventSwipeView()
                 } label: {
-                    Text("NAVEGA POR EVENTOS")
+                    Text("matches_browse_events".localized())
                         .font(.system(size: 16, weight: .bold))
                         .tracking(-0.47)
                         .foregroundColor(.dnTextPrimary)
@@ -197,10 +206,10 @@ struct MatchesView: View {
                 .frame(width: 80, height: 80)
                 .dnNeuRaised(cornerRadius: DNRadius.full)
 
-            Text("No tienes citas aún")
+            Text("matches_no_dates_yet".localized())
                 .dnH3()
 
-            Text("Explora eventos y crea una cita para empezar")
+            Text("matches_explore_events".localized())
                 .dnCaption()
                 .multilineTextAlignment(.center)
         }

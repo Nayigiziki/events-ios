@@ -10,11 +10,23 @@ struct MyDatesView: View {
                     VStack(spacing: DNSpace.lg) {
                         header
                         segmentedPicker
-                        datesList
+
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding(.top, 60)
+                        } else {
+                            datesList
+                        }
                     }
                     .padding(.bottom, DNSpace.xxl * 3)
                 }
+                .refreshable {
+                    await viewModel.loadDates()
+                }
             }
+        }
+        .task {
+            await viewModel.loadDates()
         }
     }
 
@@ -22,13 +34,13 @@ struct MyDatesView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: DNSpace.xs) {
-            Text("MY DATES")
+            Text("dates_my_dates".localized())
                 .font(.system(size: 28, weight: .black))
                 .tracking(-0.6)
                 .foregroundColor(.dnTextPrimary)
                 .textCase(.uppercase)
 
-            Text("Manage your upcoming and past dates")
+            Text("dates_manage_dates".localized())
                 .dnCaption()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -40,9 +52,9 @@ struct MyDatesView: View {
 
     private var segmentedPicker: some View {
         HStack(spacing: 0) {
-            tabButton(title: "Upcoming", index: 0)
-            tabButton(title: "Past", index: 1)
-            tabButton(title: "Cancelled", index: 2)
+            tabButton(title: "dates_upcoming".localized(), index: 0)
+            tabButton(title: "dates_past".localized(), index: 1)
+            tabButton(title: "dates_cancelled".localized(), index: 2)
         }
         .padding(4)
         .dnNeuRaised(cornerRadius: DNRadius.xl)
@@ -128,7 +140,7 @@ struct MyDatesView: View {
 
     private func dateCardInfo(_ dateRequest: DateRequest) -> some View {
         VStack(alignment: .leading, spacing: DNSpace.xs) {
-            Text(dateRequest.event?.title ?? "Untitled")
+            Text(dateRequest.event?.title ?? "dates_untitled".localized())
                 .font(.system(size: 15, weight: .bold))
                 .foregroundColor(.dnTextPrimary)
                 .lineLimit(1)
@@ -185,7 +197,7 @@ struct MyDatesView: View {
             Text(message)
                 .dnH3()
 
-            Text("Explore events and create a date to get started")
+            Text("dates_explore_to_start".localized())
                 .dnCaption()
                 .multilineTextAlignment(.center)
         }
@@ -195,10 +207,10 @@ struct MyDatesView: View {
 
     private var emptyStateContent: (String, String) {
         switch viewModel.selectedTab {
-        case 0: ("calendar.badge.plus", "No upcoming dates")
-        case 1: ("clock.arrow.circlepath", "No past dates")
-        case 2: ("calendar.badge.minus", "No cancelled dates")
-        default: ("calendar", "No dates")
+        case 0: ("calendar.badge.plus", "dates_no_upcoming".localized())
+        case 1: ("clock.arrow.circlepath", "dates_no_past".localized())
+        case 2: ("calendar.badge.minus", "dates_no_cancelled".localized())
+        default: ("calendar", "dates_no_dates".localized())
         }
     }
 }

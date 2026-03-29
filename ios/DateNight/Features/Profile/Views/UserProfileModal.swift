@@ -1,10 +1,22 @@
 import SwiftUI
 
 struct UserProfileModal: View {
-    let user: MockUser
+    let user: UserProfile
     @Environment(\.dismiss) private var dismiss
     @State private var currentPhotoIndex: Int = 0
     @State private var appeared = false
+    @State private var showReportSheet = false
+
+    var onLike: (() -> Void)?
+    var onPass: (() -> Void)?
+    var onMessage: (() -> Void)?
+
+    private var photos: [String] {
+        if user.photos.isEmpty, let avatar = user.avatarUrl {
+            return [avatar]
+        }
+        return user.photos
+    }
 
     var body: some View {
         ZStack {
@@ -12,7 +24,7 @@ struct UserProfileModal: View {
 
             // Photo gallery
             TabView(selection: $currentPhotoIndex) {
-                ForEach(Array(user.photos.enumerated()), id: \.offset) { index, photo in
+                ForEach(Array(photos.enumerated()), id: \.offset) { index, photo in
                     GeometryReader { geo in
                         DNAsyncImage(
                             url: URL(string: photo),
@@ -44,7 +56,7 @@ struct UserProfileModal: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         withAnimation(.easeInOut(duration: 0.2)) {
-                            currentPhotoIndex = min(user.photos.count - 1, currentPhotoIndex + 1)
+                            currentPhotoIndex = min(photos.count - 1, currentPhotoIndex + 1)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -53,16 +65,18 @@ struct UserProfileModal: View {
             // Overlays
             VStack {
                 // Photo indicator bar
-                HStack(spacing: 6) {
-                    ForEach(0 ..< user.photos.count, id: \.self) { index in
-                        Capsule()
-                            .fill(index == currentPhotoIndex ? Color.dnPrimary : Color.white.opacity(0.3))
-                            .frame(height: 3)
-                            .animation(.easeInOut(duration: 0.2), value: currentPhotoIndex)
+                if photos.count > 1 {
+                    HStack(spacing: 6) {
+                        ForEach(0 ..< photos.count, id: \.self) { index in
+                            Capsule()
+                                .fill(index == currentPhotoIndex ? Color.dnPrimary : Color.white.opacity(0.3))
+                                .frame(height: 3)
+                                .animation(.easeInOut(duration: 0.2), value: currentPhotoIndex)
+                        }
                     }
+                    .padding(.horizontal, DNSpace.lg)
+                    .padding(.top, 60)
                 }
-                .padding(.horizontal, DNSpace.lg)
-                .padding(.top, 60)
 
                 Spacer()
 
@@ -73,15 +87,17 @@ struct UserProfileModal: View {
 
                     VStack(alignment: .leading, spacing: DNSpace.md) {
                         // Name + age
-                        Text("\(user.name), \(user.age)")
+                        Text("\(user.name), \(user.age ?? 0)")
                             .font(.system(size: 30, weight: .heavy))
                             .tracking(-0.6)
                             .foregroundColor(.white)
 
                         // Bio
-                        Text(user.bio)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.9))
+                        if let bio = user.bio {
+                            Text(bio)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
 
                         // Interests
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -92,10 +108,13 @@ struct UserProfileModal: View {
                             }
                         }
 
-                        // Action buttons
+                        // Action buttons (#75)
                         HStack(spacing: DNSpace.lg) {
                             // Pass
-                            Button {} label: {
+                            Button {
+                                onPass?()
+                                dismiss()
+                            } label: {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.dnDestructive)
@@ -106,7 +125,10 @@ struct UserProfileModal: View {
                             Spacer()
 
                             // Like
-                            Button {} label: {
+                            Button {
+                                onLike?()
+                                dismiss()
+                            } label: {
                                 Image(systemName: "heart.fill")
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.dnAccentPink)
@@ -117,7 +139,10 @@ struct UserProfileModal: View {
                             Spacer()
 
                             // Message
-                            Button {} label: {
+                            Button {
+                                onMessage?()
+                                dismiss()
+                            } label: {
                                 Image(systemName: "message.fill")
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundColor(.dnInfo)
@@ -126,6 +151,21 @@ struct UserProfileModal: View {
                             }
                         }
                         .padding(.horizontal, DNSpace.xl)
+
+                        // Report/Block (#75)
+                        Button {
+                            showReportSheet = true
+                        } label: {
+                            HStack(spacing: DNSpace.sm) {
+                                Image(systemName: "exclamationmark.shield")
+                                    .font(.system(size: 14, weight: .semibold))
+                                Text("profile_report_block".localized())
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .foregroundColor(.white.opacity(0.6))
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding(.top, DNSpace.sm)
                     }
                     .padding(.horizontal, DNSpace.lg)
                     .padding(.bottom, DNSpace.xxl * 2)
@@ -157,6 +197,9 @@ struct UserProfileModal: View {
             withAnimation(.dnModalPresent) {
                 appeared = true
             }
+        }
+        .sheet(isPresented: $showReportSheet) {
+            ReportUserView(reportedUser: user)
         }
     }
 }

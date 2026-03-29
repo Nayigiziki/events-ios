@@ -4,51 +4,67 @@ struct ConversationChatView: View {
     @StateObject private var viewModel: ConversationChatViewModel
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isInputFocused: Bool
+    @State private var showCallComingSoon = false
 
-    init(partner: MockUser) {
-        _viewModel = StateObject(wrappedValue: ConversationChatViewModel(partner: partner))
+    init(conversationId: UUID, partner: UserProfile?) {
+        _viewModel = StateObject(wrappedValue: ConversationChatViewModel(
+            conversationId: conversationId,
+            partner: partner
+        ))
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Custom Navigation Bar
             chatNavigationBar
-
-            // Messages
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: DNSpace.md) {
-                        ForEach(viewModel.messages) { message in
-                            MessageBubbleView(message: message)
-                                .id(message.id)
-                        }
-                    }
-                    .padding(.horizontal, DNSpace.lg)
-                    .padding(.vertical, DNSpace.md)
-                }
-                .onAppear {
-                    scrollToBottom(proxy: proxy)
-                }
-                .onChange(of: viewModel.messages.count) { _, _ in
-                    withAnimation {
-                        scrollToBottom(proxy: proxy)
-                    }
-                }
-            }
-            .background(Color.dnBackground)
-
-            // Input Bar
+            messagesScrollView
             inputBar
         }
         .background(Color.dnBackground)
         .navigationBarHidden(true)
+        .task {
+            await viewModel.loadMessages()
+        }
+        .onDisappear {
+            viewModel.cleanup()
+        }
+        .alert("Coming Soon", isPresented: $showCallComingSoon) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Voice and video calls are coming in a future update.")
+        }
+    }
+
+    private var messagesScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: DNSpace.md) {
+                    ForEach(viewModel.messages) { message in
+                        MessageBubbleView(
+                            message: message,
+                            isSent: message.senderId == viewModel.currentUserId
+                        )
+                        .id(message.id)
+                    }
+                }
+                .padding(.horizontal, DNSpace.lg)
+                .padding(.vertical, DNSpace.md)
+            }
+            .onAppear {
+                scrollToBottom(proxy: proxy)
+            }
+            .onChange(of: viewModel.messages.count) { _, _ in
+                withAnimation {
+                    scrollToBottom(proxy: proxy)
+                }
+            }
+        }
+        .background(Color.dnBackground)
     }
 
     // MARK: - Navigation Bar
 
     private var chatNavigationBar: some View {
         HStack(spacing: DNSpace.md) {
-            // Back button
             Button {
                 dismiss()
             } label: {
@@ -59,35 +75,23 @@ struct ConversationChatView: View {
                     .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
             }
 
-            // User info
             AvatarView(
-                url: URL(string: viewModel.conversationPartner.avatar),
+                url: URL(string: viewModel.partner?.avatarUrl ?? ""),
                 size: 32
             )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(viewModel.conversationPartner.name)
+                Text(viewModel.partner?.name ?? "Chat")
                     .dnH4()
 
-                HStack(spacing: 4) {
-                    if viewModel.conversationPartner.isOnline {
-                        Circle()
-                            .fill(Color.dnSuccess)
-                            .frame(width: 8, height: 8)
-                        Text("Online")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.dnSuccess)
-                    } else {
-                        Text("Offline")
-                            .dnSmall()
-                    }
+                if viewModel.partnerIsTyping {
+                    TypingIndicator()
                 }
             }
 
             Spacer()
 
-            // Action buttons
-            Button {} label: {
+            Button { showCallComingSoon = true } label: {
                 Image(systemName: "phone.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.dnPrimary)
@@ -95,7 +99,7 @@ struct ConversationChatView: View {
                     .dnNeuRaised(intensity: .light, cornerRadius: DNRadius.full)
             }
 
-            Button {} label: {
+            Button { showCallComingSoon = true } label: {
                 Image(systemName: "video.fill")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.dnPrimary)
@@ -126,6 +130,9 @@ struct ConversationChatView: View {
                 .padding(.horizontal, DNSpace.md)
                 .padding(.vertical, DNSpace.sm)
                 .dnNeuPressed(intensity: .light, cornerRadius: DNRadius.md)
+                .onChange(of: viewModel.messageText) { _, newValue in
+                    viewModel.sendTypingIndicator(!newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
 
             Button {} label: {
                 Image(systemName: "photo")
@@ -135,7 +142,7 @@ struct ConversationChatView: View {
 
             if !viewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Button {
-                    viewModel.sendMessage()
+                    Task { await viewModel.sendMessage() }
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 18))

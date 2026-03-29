@@ -9,59 +9,69 @@ struct SettingsView: View {
         DNScreen {
             ScrollView {
                 VStack(spacing: DNSpace.xl) {
-                    Text("SETTINGS")
+                    Text("settings_title".localized().uppercased())
                         .dnH2()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Account
-                    sectionHeader("ACCOUNT")
+                    sectionHeader("settings_account".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            settingsRow(icon: "person.circle", title: "Edit Profile", showChevron: true)
+                            settingsRow(
+                                icon: "person.circle",
+                                title: "settings_edit_profile".localized(),
+                                showChevron: true
+                            )
                             divider
-                            settingsRow(icon: "lock", title: "Change Password", showChevron: true)
+                            settingsRow(icon: "lock", title: "settings_change_password".localized(), showChevron: true)
                             divider
-                            settingsRow(icon: "envelope", title: "Email", showChevron: true)
+                            settingsRow(icon: "envelope", title: "settings_email".localized(), showChevron: true)
                         }
                     }
 
                     // Notifications
-                    sectionHeader("NOTIFICATIONS")
+                    sectionHeader("settings_notifications".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            toggleRow(title: "Matches", isOn: $viewModel.notifyMatches)
+                            toggleRow(title: "settings_matches".localized(), isOn: $viewModel.notifyMatches)
                             divider
-                            toggleRow(title: "Messages", isOn: $viewModel.notifyMessages)
+                            toggleRow(title: "settings_messages".localized(), isOn: $viewModel.notifyMessages)
                             divider
-                            toggleRow(title: "Events", isOn: $viewModel.notifyEvents)
+                            toggleRow(title: "settings_events".localized(), isOn: $viewModel.notifyEvents)
                             divider
-                            toggleRow(title: "Date Reminders", isOn: $viewModel.notifyDateReminders)
+                            toggleRow(
+                                title: "settings_date_reminders".localized(),
+                                isOn: $viewModel.notifyDateReminders
+                            )
                             divider
-                            toggleRow(title: "Friend Requests", isOn: $viewModel.notifyFriendRequests)
+                            toggleRow(
+                                title: "settings_friend_requests".localized(),
+                                isOn: $viewModel.notifyFriendRequests
+                            )
                         }
                     }
 
                     // Privacy
-                    sectionHeader("PRIVACY")
+                    sectionHeader("settings_privacy".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            toggleRow(title: "Show Profile", isOn: $viewModel.showProfile)
+                            toggleRow(title: "settings_show_profile".localized(), isOn: $viewModel.showProfile)
                             divider
-                            toggleRow(title: "Show Distance", isOn: $viewModel.showDistance)
+                            toggleRow(title: "settings_show_distance".localized(), isOn: $viewModel.showDistance)
                             divider
-                            toggleRow(title: "Show Online Status", isOn: $viewModel.showOnlineStatus)
+                            toggleRow(title: "settings_show_online".localized(), isOn: $viewModel.showOnlineStatus)
                         }
                     }
 
                     // Preferences
-                    sectionHeader("PREFERENCES")
+                    sectionHeader("settings_preferences".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
                             HStack {
-                                Text("Language")
+                                Text("settings_language".localized())
                                     .dnBody()
                                 Spacer()
-                                Picker("Language", selection: $viewModel.selectedLanguage) {
+                                Picker("settings_language".localized(), selection: $viewModel.selectedLanguage) {
                                     ForEach(viewModel.languages, id: \.self) { lang in
                                         Text(lang).tag(lang)
                                     }
@@ -69,26 +79,38 @@ struct SettingsView: View {
                                 .tint(.dnPrimary)
                             }
                             divider
-                            toggleRow(title: "Dark Mode", isOn: $viewModel.darkModeEnabled)
+                            toggleRow(title: "settings_dark_mode".localized(), isOn: $viewModel.darkModeEnabled)
                         }
                     }
 
                     // Support
-                    sectionHeader("SUPPORT")
+                    sectionHeader("settings_support".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            settingsRow(icon: "questionmark.circle", title: "Help Center", showChevron: true)
+                            settingsRow(
+                                icon: "questionmark.circle",
+                                title: "settings_help_center".localized(),
+                                showChevron: true
+                            )
                             divider
-                            settingsRow(icon: "exclamationmark.bubble", title: "Report a Problem", showChevron: true)
+                            settingsRow(
+                                icon: "exclamationmark.bubble",
+                                title: "settings_report_problem".localized(),
+                                showChevron: true
+                            )
                             divider
-                            settingsRow(icon: "doc.text", title: "Terms of Service", showChevron: true)
+                            settingsRow(icon: "doc.text", title: "settings_terms".localized(), showChevron: true)
                             divider
-                            settingsRow(icon: "hand.raised", title: "Privacy Policy", showChevron: true)
+                            settingsRow(
+                                icon: "hand.raised",
+                                title: "settings_privacy_policy".localized(),
+                                showChevron: true
+                            )
                         }
                     }
 
                     // Danger Zone
-                    sectionHeader("DANGER ZONE")
+                    sectionHeader("settings_danger_zone".localized().uppercased())
                     DNCard {
                         Button {
                             showDeleteConfirmation = true
@@ -96,7 +118,7 @@ struct SettingsView: View {
                             HStack {
                                 Image(systemName: "trash")
                                     .foregroundColor(.dnDestructive)
-                                Text("Delete Account")
+                                Text("settings_delete_account".localized())
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.dnDestructive)
                                 Spacer()
@@ -105,8 +127,8 @@ struct SettingsView: View {
                     }
 
                     // Log Out
-                    DNButton("Log Out", variant: .secondary) {
-                        authViewModel.signOut()
+                    DNButton("settings_log_out".localized(), variant: .secondary) {
+                        Task { await authViewModel.signOut() }
                     }
 
                     Spacer().frame(height: DNSpace.xxl)
@@ -114,13 +136,13 @@ struct SettingsView: View {
                 .padding(DNSpace.lg)
             }
         }
-        .alert("Delete Account", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
+        .alert("settings_delete_confirm_title".localized(), isPresented: $showDeleteConfirmation) {
+            Button("button_cancel".localized(), role: .cancel) {}
+            Button("button_delete".localized(), role: .destructive) {
                 viewModel.deleteAccount()
             }
         } message: {
-            Text("Are you sure you want to delete your account? This action cannot be undone.")
+            Text("settings_delete_confirm_message".localized())
         }
     }
 

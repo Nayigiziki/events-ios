@@ -7,24 +7,71 @@ class EventAgreementViewModel: ObservableObject {
     @Published var proposedByThem: Event?
     @Published var agreedEvent: Event?
     @Published var showConfirmation = false
+    @Published var isLoading = false
+    @Published var errorMessage: String?
 
-    init() {
-        loadMockData()
+    private let service: any EventAgreementServiceProtocol
+    private var proposals: [EventProposal] = []
+    var matchId: UUID?
+    private var currentUserId: UUID?
+
+    init(service: any EventAgreementServiceProtocol = SupabaseEventAgreementService(), matchId: UUID? = nil) {
+        self.service = service
+        self.matchId = matchId
     }
 
-    func proposeEvent(_ event: Event) {
-        proposedByMe = event
-        checkAgreement()
+    func loadData() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            availableEvents = try await service.fetchAvailableEvents()
+
+            if let matchId {
+                proposals = try await service.fetchProposals(matchId: matchId)
+                updateProposalState()
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
-    func acceptProposal() {
-        guard let proposed = proposedByThem else { return }
-        agreedEvent = proposed
-        withAnimationTrigger()
+    func proposeEvent(_ event: Event) async {
+        guard let matchId else { return }
+        errorMessage = nil
+        do {
+            let proposal = try await service.proposeEvent(matchId: matchId, eventId: event.id)
+            proposals.append(proposal)
+            proposedByMe = event
+            checkAgreement()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    func rejectProposal() {
-        proposedByThem = nil
+    func acceptProposal() async {
+        guard let theirProposal = proposals.first(where: { $0.proposerId != currentUserId && $0.status == .pending })
+        else { return }
+        errorMessage = nil
+        do {
+            try await service.acceptProposal(proposalId: theirProposal.id)
+            agreedEvent = proposedByThem
+            withAnimationTrigger()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func rejectProposal() async {
+        guard let theirProposal = proposals.first(where: { $0.proposerId != currentUserId && $0.status == .pending })
+        else { return }
+        errorMessage = nil
+        do {
+            try await service.rejectProposal(proposalId: theirProposal.id)
+            proposedByThem = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     func confirmDate() {
@@ -32,6 +79,21 @@ class EventAgreementViewModel: ObservableObject {
     }
 
     // MARK: - Private
+
+    private func updateProposalState() {
+        for proposal in proposals where proposal.status == .pending {
+            if proposal.proposerId == currentUserId {
+                proposedByMe = availableEvents.first { $0.id == proposal.eventId }
+            } else {
+                proposedByThem = availableEvents.first { $0.id == proposal.eventId }
+            }
+        }
+
+        // Check for accepted proposals
+        if let accepted = proposals.first(where: { $0.status == .accepted }) {
+            agreedEvent = availableEvents.first { $0.id == accepted.eventId }
+        }
+    }
 
     private func checkAgreement() {
         if let mine = proposedByMe, let theirs = proposedByThem, mine.id == theirs.id {
@@ -42,64 +104,5 @@ class EventAgreementViewModel: ObservableObject {
 
     private func withAnimationTrigger() {
         showConfirmation = true
-    }
-
-    private func loadMockData() {
-        availableEvents = Self.mockAvailableEvents
-        // Mock: the other person proposed the second event
-        proposedByThem = availableEvents[1]
-    }
-
-    private static var mockAvailableEvents: [Event] {
-        [
-            Event(
-                title: "Jazz at Lincoln Center",
-                category: "Music",
-                imageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800&h=600&fit=crop",
-                date: "April 5, 2026",
-                time: "8:00 PM",
-                venue: "Lincoln Center",
-                location: "New York, NY",
-                price: "$45",
-                description: "World-class jazz performances",
-                totalSpots: 6
-            ),
-            Event(
-                title: "Wine & Paint Night",
-                category: "Art",
-                imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop",
-                date: "April 8, 2026",
-                time: "7:00 PM",
-                venue: "Artisan Studio",
-                location: "Brooklyn, NY",
-                price: "$35",
-                description: "Create art while enjoying fine wine",
-                totalSpots: 4
-            ),
-            Event(
-                title: "Rooftop Comedy Show",
-                category: "Comedy",
-                imageUrl: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800&h=600&fit=crop",
-                date: "April 10, 2026",
-                time: "9:00 PM",
-                venue: "SkyBar Lounge",
-                location: "Manhattan, NY",
-                price: "$25",
-                description: "Stand-up comedy under the stars",
-                totalSpots: 8
-            ),
-            Event(
-                title: "Farm-to-Table Dinner",
-                category: "Food",
-                imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
-                date: "April 12, 2026",
-                time: "6:30 PM",
-                venue: "Green Table",
-                location: "Chelsea, NY",
-                price: "$65",
-                description: "Seasonal tasting menu experience",
-                totalSpots: 4
-            )
-        ]
     }
 }

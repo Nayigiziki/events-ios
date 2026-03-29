@@ -90,11 +90,11 @@ struct DateRequestCard: View {
 
                     // Join button
                     if dateRequest.status == .open {
-                        DNButton("ÚNETE A ESTA CITA", variant: .primary) {
+                        DNButton("matches_join_date".localized(), variant: .primary) {
                             onJoin?()
                         }
                     } else if dateRequest.status == .full {
-                        Text("Esta cita está llena")
+                        Text("matches_date_full".localized())
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.dnTextSecondary)
                             .frame(maxWidth: .infinity)

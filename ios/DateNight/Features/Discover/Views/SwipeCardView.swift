@@ -5,8 +5,11 @@ struct SwipeCardView: View {
     var isTopCard: Bool = true
     var onSwipeLeft: (() -> Void)?
     var onSwipeRight: (() -> Void)?
+    var onInfoTapped: (() -> Void)?
+    var distanceText: String?
 
     @State private var offset: CGSize = .zero
+    @State private var currentPhotoIndex: Int = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var likeOpacity: Double {
@@ -17,17 +20,47 @@ struct SwipeCardView: View {
         max(0, Double(-offset.width) / 150.0)
     }
 
+    private var photos: [String] {
+        if user.photos.isEmpty, let avatar = user.avatarUrl {
+            return [avatar]
+        }
+        return user.photos
+    }
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
-                // Photo
-                DNAsyncImage(
-                    url: URL(string: user.photos.first ?? user.avatarUrl ?? ""),
-                    height: geometry.size.height,
-                    cornerRadius: 0
-                )
+                // Photo carousel (#50)
+                TabView(selection: $currentPhotoIndex) {
+                    ForEach(Array(photos.enumerated()), id: \.offset) { index, photo in
+                        DNAsyncImage(
+                            url: URL(string: photo),
+                            height: geometry.size.height,
+                            cornerRadius: 0
+                        )
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
 
-                // Gradient overlay: from #101828 at bottom to clear at top
+                // Photo indicator bar
+                if photos.count > 1 {
+                    VStack {
+                        HStack(spacing: 4) {
+                            ForEach(0 ..< photos.count, id: \.self) { index in
+                                Capsule()
+                                    .fill(index == currentPhotoIndex ? Color.white : Color.white.opacity(0.4))
+                                    .frame(height: 3)
+                            }
+                        }
+                        .padding(.horizontal, DNSpace.lg)
+                        .padding(.top, DNSpace.md)
+
+                        Spacer()
+                    }
+                }
+
+                // Gradient overlay
                 LinearGradient(
                     stops: [
                         .init(color: Color(hex: "101828").opacity(0.85), location: 0),
@@ -66,13 +99,11 @@ struct SwipeCardView: View {
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading, spacing: DNSpace.xs) {
-                            // Name: 30px black weight
                             Text("\(user.name), \(user.age ?? 0)")
                                 .font(.system(size: 30, weight: .black))
                                 .tracking(-0.2)
                                 .foregroundColor(.white)
 
-                            // Occupation line
                             if let bio = user.bio {
                                 HStack(spacing: DNSpace.sm) {
                                     Image(systemName: "briefcase.fill")
@@ -86,12 +117,12 @@ struct SwipeCardView: View {
                                 }
                             }
 
-                            // Distance line
+                            // Distance line (#48 + #54 localization)
                             HStack(spacing: DNSpace.sm) {
                                 Image(systemName: "location.fill")
                                     .font(.system(size: 16))
                                     .foregroundColor(.white.opacity(0.8))
-                                Text("A 2 km de distancia")
+                                Text(distanceText ?? "discover_distance_unknown".localized())
                                     .font(.system(size: 16, weight: .semibold))
                                     .tracking(-0.47)
                                     .foregroundColor(.white.opacity(0.8))
@@ -99,8 +130,10 @@ struct SwipeCardView: View {
                         }
                         Spacer()
 
-                        // Info button: 48pt circle
-                        Button {} label: {
+                        // Info button (#49)
+                        Button {
+                            onInfoTapped?()
+                        } label: {
                             Image(systemName: "info")
                                 .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.white)
@@ -129,7 +162,6 @@ struct SwipeCardView: View {
                 .padding(DNSpace.lg)
             }
             .clipShape(RoundedRectangle(cornerRadius: DNRadius.xl, style: .continuous))
-            // Standard drop shadow, NOT neumorphic
             .shadow(color: Color.black.opacity(0.25), radius: 25, x: 0, y: 25)
             .rotationEffect(.degrees(Double(offset.width) / 20))
             .offset(x: offset.width, y: offset.height)

@@ -11,6 +11,12 @@ final class ProfileSetupViewModel: ObservableObject {
     @Published var height: String = ""
     @Published var selectedInterests: Set<String> = []
     @Published var isLoading: Bool = false
+    @Published var isUploadingPhoto: Bool = false
+    @Published var isComplete: Bool = false
+    @Published var errorMessage: String?
+
+    private let profileService: any ProfileServiceProtocol
+    var userId: UUID?
 
     static let allInterests = [
         "Music", "Art", "Food", "Comedy", "Wine", "Wellness",
@@ -22,6 +28,14 @@ final class ProfileSetupViewModel: ObservableObject {
     static let minPhotos = 2
     static let minInterests = 3
     static let totalSteps = 3
+
+    init(
+        profileService: any ProfileServiceProtocol = ProfileService(),
+        userId: UUID? = nil
+    ) {
+        self.profileService = profileService
+        self.userId = userId
+    }
 
     var canProceed: Bool {
         switch currentStep {
@@ -38,9 +52,28 @@ final class ProfileSetupViewModel: ObservableObject {
 
     func addPhoto() {
         guard photos.count < Self.maxPhotos else { return }
-        // Mock: add a placeholder photo URL
         let placeholderURL = "https://picsum.photos/seed/\(UUID().uuidString.prefix(8))/400/400"
         photos.append(placeholderURL)
+    }
+
+    func addPhotoData(_ data: Data) async {
+        guard photos.count < Self.maxPhotos else { return }
+        guard let userId else {
+            errorMessage = "No user session found"
+            return
+        }
+
+        isUploadingPhoto = true
+        errorMessage = nil
+
+        do {
+            let url = try await profileService.uploadPhoto(data: data, userId: userId)
+            photos.append(url)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isUploadingPhoto = false
     }
 
     func removePhoto(at index: Int) {
@@ -67,23 +100,33 @@ final class ProfileSetupViewModel: ObservableObject {
     }
 
     func completeSetup() async {
+        guard let userId else {
+            errorMessage = "No user session found"
+            return
+        }
+
         isLoading = true
+        errorMessage = nil
 
-        // Mock implementation — simulate network delay
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        let request = ProfileUpdateRequest(
+            name: nil,
+            bio: bio.isEmpty ? nil : bio,
+            occupation: occupation.isEmpty ? nil : occupation,
+            height: Int(height),
+            photos: photos,
+            interests: Array(selectedInterests),
+            readyToMingle: true,
+            availableFrom: nil,
+            availableUntil: nil
+        )
 
-        // FUTURE: Save profile to Supabase when backend is ready
-        print("[ProfileSetupViewModel] Profile setup complete")
-        print("  Photos: \(photos.count)")
-        print("  Bio: \(bio)")
-        print("  Occupation: \(occupation)")
-        print("  Location: \(location)")
-        print("  Height: \(height)")
-        print("  Interests: \(selectedInterests)")
+        do {
+            try await profileService.updateProfile(request, userId: userId)
+            isComplete = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
 
         isLoading = false
-
-        // Mark profile as complete
-        UserDefaults.standard.set(true, forKey: "profileComplete")
     }
 }

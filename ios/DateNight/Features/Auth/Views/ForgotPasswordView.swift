@@ -21,10 +21,10 @@ struct ForgotPasswordView: View {
                             )
                             .dnNeuCTAButton(cornerRadius: DNRadius.lg)
 
-                        Text("Reset Password")
+                        Text("forgot_password_title".localized())
                             .dnH2()
 
-                        Text("Enter your email and we'll send you a reset link")
+                        Text("forgot_password_subtitle".localized())
                             .dnBody()
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, DNSpace.lg)
@@ -75,7 +75,7 @@ struct ForgotPasswordView: View {
         VStack(spacing: DNSpace.lg) {
             // Email field
             VStack(alignment: .leading, spacing: DNSpace.sm) {
-                Text("EMAIL")
+                Text("forgot_password_email".localized())
                     .dnLabel()
                     .textCase(.uppercase)
 
@@ -103,7 +103,7 @@ struct ForgotPasswordView: View {
             }
 
             // Send Reset Link button
-            DNButton("Send Reset Link", variant: .primary) {
+            DNButton("forgot_password_send".localized(), variant: .primary) {
                 Task {
                     await viewModel.sendResetLink()
                 }
@@ -120,15 +120,15 @@ struct ForgotPasswordView: View {
                 .font(.system(size: 56, weight: .medium))
                 .foregroundColor(.dnSuccess)
 
-            Text("Check your email")
+            Text("forgot_password_check_email".localized())
                 .dnH3()
 
-            Text("We've sent a password reset link to \(viewModel.email)")
+            Text(String(format: "forgot_password_sent_message".localized(), viewModel.email))
                 .dnBody()
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, DNSpace.lg)
 
-            DNButton("Back to Login", variant: .secondary) {
+            DNButton("forgot_password_back_to_login".localized(), variant: .secondary) {
                 dismiss()
             }
             .padding(.top, DNSpace.md)

@@ -4,17 +4,43 @@ import Foundation
 class DateDetailViewModel: ObservableObject {
     @Published var dateRequest: DateRequest
     @Published var showChat = false
+    @Published var showCancelConfirmation = false
+    @Published var isLoading = false
+    @Published var errorMessage: String?
 
-    init(dateRequest: DateRequest) {
+    private let dateRequestService: any DateRequestServiceProtocol
+
+    init(dateRequest: DateRequest, dateRequestService: any DateRequestServiceProtocol = SupabaseDateRequestService()) {
         self.dateRequest = dateRequest
+        self.dateRequestService = dateRequestService
     }
 
-    func confirm() {
-        dateRequest.status = .confirmed
+    func confirm() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await dateRequestService.confirmDate(requestId: dateRequest.id)
+            dateRequest.status = .confirmed
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
-    func cancel() {
-        dateRequest.status = .cancelled
+    func requestCancel() {
+        showCancelConfirmation = true
+    }
+
+    func confirmCancel() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await dateRequestService.cancelDate(requestId: dateRequest.id)
+            dateRequest.status = .cancelled
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
     func openChat() {
@@ -25,72 +51,14 @@ class DateDetailViewModel: ObservableObject {
 
     var statusDisplay: String {
         switch dateRequest.status {
-        case .open: "Pending"
-        case .full: "Pending"
-        case .confirmed: "Confirmed"
-        case .cancelled: "Cancelled"
+        case .open: "status_open".localized()
+        case .full: "status_full".localized()
+        case .confirmed: "status_confirmed".localized()
+        case .cancelled: "status_cancelled".localized()
         }
     }
 
     var isCompleted: Bool {
-        // In a real app, check if the event date has passed
         false
     }
-
-    // MARK: - Mock Data
-
-    static let mockDateRequest: DateRequest = {
-        let organizer = UserProfile(
-            id: UUID(),
-            name: "Emma",
-            age: 26,
-            bio: "Jazz enthusiast and foodie",
-            avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-            interests: ["Music", "Food", "Wine"]
-        )
-
-        let attendees = [
-            organizer,
-            UserProfile(
-                id: UUID(),
-                name: "Alex",
-                age: 27,
-                avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-                interests: ["Music", "Outdoors"]
-            ),
-            UserProfile(
-                id: UUID(),
-                name: "Sarah",
-                age: 29,
-                avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop",
-                interests: ["Art", "Comedy"]
-            )
-        ]
-
-        let event = Event(
-            title: "Jazz at Lincoln Center",
-            category: "Music",
-            imageUrl: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800&h=600&fit=crop",
-            date: "April 5, 2026",
-            time: "8:00 PM",
-            venue: "Lincoln Center",
-            location: "New York, NY",
-            price: "$45",
-            description: "An evening of world-class jazz performances",
-            totalSpots: 6
-        )
-
-        return DateRequest(
-            id: UUID(),
-            eventId: event.id,
-            organizerId: organizer.id,
-            maxPeople: 6,
-            description: "Looking for jazz lovers to enjoy a great night out!",
-            dateType: .group,
-            status: .confirmed,
-            organizer: organizer,
-            event: event,
-            attendees: attendees
-        )
-    }()
 }

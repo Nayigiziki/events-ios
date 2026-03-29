@@ -4,39 +4,26 @@ struct HelpSupportView: View {
     @State private var showReportSheet = false
     @State private var reportDescription = ""
 
-    private let faqs: [(question: String, answer: String)] = [
-        (
-            "How do I create a date?",
-            "Browse events or matches, then tap 'Invite to Date' on any profile or event. Choose a time, add a message, and send the invitation. Your match will receive a notification to accept or decline."
-        ),
-        (
-            "How does matching work?",
-            "We match you based on shared event interests and preferences. Swipe right on profiles you like. When both people swipe right, it's a match! You can then chat and plan dates together."
-        ),
-        (
-            "How do I add friends?",
-            "Go to the Friends tab and tap the '+' button. You can search for people by name or invite friends using their email address. Friends can see your events and join group dates."
-        ),
-        (
-            "How do I report someone?",
-            "Open the user's profile and tap the '...' menu in the top-right corner. Select 'Report User' and choose a reason. Our safety team reviews all reports within 24 hours."
-        ),
-        (
-            "How do I delete my account?",
-            "Go to Settings > Danger Zone > Delete Account. This will permanently remove your profile, matches, messages, and all associated data. This action cannot be undone."
-        )
-    ]
+    private var faqs: [(question: String, answer: String)] {
+        [
+            ("help_faq_create_date_q".localized(), "help_faq_create_date_a".localized()),
+            ("help_faq_matching_q".localized(), "help_faq_matching_a".localized()),
+            ("help_faq_friends_q".localized(), "help_faq_friends_a".localized()),
+            ("help_faq_report_q".localized(), "help_faq_report_a".localized()),
+            ("help_faq_delete_q".localized(), "help_faq_delete_a".localized())
+        ]
+    }
 
     var body: some View {
         DNScreen {
             ScrollView {
                 VStack(spacing: DNSpace.xl) {
-                    Text("HELP & SUPPORT")
+                    Text("help_title".localized().uppercased())
                         .dnH2()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     // FAQ Section
-                    Text("FAQ")
+                    Text("help_faq".localized().uppercased())
                         .dnLabel()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -58,7 +45,7 @@ struct HelpSupportView: View {
                     }
 
                     // Contact Us
-                    Text("CONTACT US")
+                    Text("help_contact_us".localized())
                         .dnLabel()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -76,12 +63,12 @@ struct HelpSupportView: View {
                     }
 
                     // Report a Problem
-                    DNButton("Report a Problem", variant: .secondary) {
+                    DNButton("help_report".localized(), variant: .secondary) {
                         showReportSheet = true
                     }
 
                     // App version
-                    Text("DateNight v1.0")
+                    Text(String(format: "help_version".localized(), "1.1.0"))
                         .dnSmall()
                         .padding(.top, DNSpace.lg)
 
@@ -98,7 +85,7 @@ struct HelpSupportView: View {
     private var reportProblemSheet: some View {
         DNScreen {
             VStack(spacing: DNSpace.xl) {
-                Text("REPORT A PROBLEM")
+                Text("help_report_title".localized().uppercased())
                     .dnH2()
                     .padding(.top, DNSpace.xl)
 
@@ -113,7 +100,7 @@ struct HelpSupportView: View {
                     .dnNeuPressed(intensity: .medium, cornerRadius: DNRadius.md)
                     .overlay(alignment: .topLeading) {
                         if reportDescription.isEmpty {
-                            Text("Describe the problem...")
+                            Text("help_report_placeholder".localized())
                                 .font(.system(size: 16, weight: .semibold))
                                 .tracking(-0.47)
                                 .foregroundColor(.dnTextTertiary)
@@ -123,7 +110,7 @@ struct HelpSupportView: View {
                         }
                     }
 
-                DNButton("Submit", variant: .primary) {
+                DNButton("help_report_submit".localized(), variant: .primary) {
                     showReportSheet = false
                     reportDescription = ""
                 }

@@ -4,11 +4,13 @@ struct MatchDetailView: View {
     @StateObject var viewModel: MatchDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
+    var currentUser: UserProfile?
     let onSendMessage: () -> Void
     let onKeepSwiping: () -> Void
 
     @State private var showConfetti = false
     @State private var avatarsAppeared = false
+    @State private var showChat = false
 
     var body: some View {
         DNScreen {
@@ -19,14 +21,14 @@ struct MatchDetailView: View {
                 confettiSection
 
                 // Heading
-                Text("It's a Match!")
+                Text("match_its_a_match".localized())
                     .font(.system(size: 42, weight: .black))
                     .tracking(-0.85)
                     .foregroundColor(.dnPrimary)
                     .opacity(avatarsAppeared ? 1 : 0)
                     .offset(y: avatarsAppeared ? 0 : 20)
 
-                // Overlapping avatars
+                // Overlapping avatars (#53 - use real current user)
                 overlappingAvatars
                     .padding(.vertical, DNSpace.md)
 
@@ -51,16 +53,21 @@ struct MatchDetailView: View {
 
                 // Action buttons
                 VStack(spacing: DNSpace.md) {
-                    DNButton("Send Message", variant: .primary) {
-                        onSendMessage()
+                    DNButton("match_send_message".localized(), variant: .primary) {
+                        showChat = true
                     }
 
-                    DNButton("Keep Swiping", variant: .secondary) {
+                    DNButton("match_keep_swiping".localized(), variant: .secondary) {
                         onKeepSwiping()
                     }
                 }
                 .padding(.horizontal, DNSpace.lg)
                 .padding(.bottom, DNSpace.xxl)
+            }
+        }
+        .fullScreenCover(isPresented: $showChat) {
+            NavigationStack {
+                ConversationChatView(conversationId: UUID(), partner: viewModel.matchedUser)
             }
         }
         .onAppear {
@@ -90,9 +97,9 @@ struct MatchDetailView: View {
 
     private var overlappingAvatars: some View {
         HStack(spacing: -24) {
-            // Current user avatar
+            // Current user avatar (#53)
             AvatarView(
-                url: URL(string: MockData.currentUser.avatar),
+                url: URL(string: currentUser?.avatarUrl ?? MockData.currentUser.avatar),
                 size: 96
             )
             .overlay(
@@ -119,7 +126,7 @@ struct MatchDetailView: View {
 
     private var sharedInterestsSection: some View {
         VStack(spacing: DNSpace.sm) {
-            Text("SHARED INTERESTS")
+            Text("match_shared_interests".localized())
                 .dnLabel()
 
             HStack(spacing: DNSpace.sm) {
@@ -135,6 +142,22 @@ struct MatchDetailView: View {
             }
         }
         .opacity(avatarsAppeared ? 1 : 0)
+    }
+}
+
+// MARK: - UserProfile -> MockUser bridge (temporary until chat is migrated)
+
+extension UserProfile {
+    func toMockUser() -> MockUser {
+        MockUser(
+            id: id.uuidString,
+            name: name,
+            age: age ?? 0,
+            avatar: avatarUrl ?? "",
+            photos: photos,
+            bio: bio ?? "",
+            interests: interests
+        )
     }
 }
 

@@ -50,6 +50,10 @@ struct FriendsListView: View {
         .navigationDestination(isPresented: $showAddFriends) {
             AddFriendsView(friendsViewModel: viewModel)
         }
+        .task {
+            await viewModel.loadFriends()
+            await viewModel.loadFriendRequests()
+        }
     }
 
     // MARK: - Segmented Control
@@ -117,7 +121,7 @@ struct FriendsListView: View {
         }
     }
 
-    private func friendRow(_ friend: FriendUser) -> some View {
+    private func friendRow(_ friend: UserProfile) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
                 AvatarView(url: URL(string: friend.avatarUrl ?? ""), size: 48)
@@ -125,14 +129,16 @@ struct FriendsListView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(friend.name)
                         .dnH3()
-                    Text(friend.subtitle)
-                        .dnCaption()
+                    if let bio = friend.bio {
+                        Text(bio)
+                            .dnCaption()
+                    }
                 }
 
                 Spacer()
 
                 Button {
-                    viewModel.removeFriend(friend)
+                    Task { await viewModel.removeFriend(friend) }
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 12, weight: .bold))
@@ -163,26 +169,28 @@ struct FriendsListView: View {
         }
     }
 
-    private func requestRow(_ request: FriendRequest) -> some View {
+    private func requestRow(_ request: FriendRelationship) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
-                AvatarView(url: URL(string: request.user.avatarUrl ?? ""), size: 48)
+                AvatarView(url: nil, size: 48)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(request.user.name)
+                    Text("Friend Request")
                         .dnH3()
-                    Text(request.sentAt)
-                        .dnCaption()
+                    if let date = request.createdAt {
+                        Text(date, style: .relative)
+                            .dnCaption()
+                    }
                 }
 
                 Spacer()
 
                 HStack(spacing: DNSpace.sm) {
                     CompactDNButton(title: "Accept", variant: .primary) {
-                        viewModel.acceptRequest(request)
+                        Task { await viewModel.acceptRequest(request) }
                     }
                     CompactDNButton(title: "Decline", variant: .secondary) {
-                        viewModel.declineRequest(request)
+                        Task { await viewModel.declineRequest(request) }
                     }
                 }
             }

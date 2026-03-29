@@ -1,150 +1,73 @@
 import Foundation
 
-struct GroupMessage: Identifiable, Hashable {
-    let id: String
-    let senderId: String
-    let senderName: String
-    let senderAvatar: String
-    let isSent: Bool
-    let text: String
-    let timestamp: String
-}
-
 @MainActor
 class GroupChatViewModel: ObservableObject {
-    @Published var messages: [GroupMessage] = []
-    @Published var participants: [MockUser] = []
+    @Published var messages: [Message] = []
+    @Published var participants: [UserProfile] = []
     @Published var groupName: String
     @Published var messageText: String = ""
     @Published var showParticipants = false
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published private(set) var currentUserId: UUID?
 
-    init(groupName: String = "Jazz Club Date") {
+    let conversationId: UUID
+    private let chatService: any ChatServiceProtocol
+
+    init(
+        conversationId: UUID,
+        groupName: String = "Group Chat",
+        chatService: any ChatServiceProtocol = SupabaseChatService()
+    ) {
+        self.conversationId = conversationId
         self.groupName = groupName
-        loadMockData()
+        self.chatService = chatService
     }
 
-    func sendMessage() {
+    func loadMessages() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            currentUserId = try await chatService.currentUserId()
+            messages = try await chatService.fetchMessages(conversationId: conversationId)
+            await chatService.subscribeToMessages(conversationId: conversationId) { [weak self] message in
+                Task { @MainActor in
+                    self?.handleIncomingMessage(message)
+                }
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    func sendMessage() async {
         let trimmed = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        let timestamp = formatter.string(from: Date())
-
-        let newMessage = GroupMessage(
-            id: UUID().uuidString,
-            senderId: MockData.currentUser.id,
-            senderName: MockData.currentUser.name,
-            senderAvatar: MockData.currentUser.avatar,
-            isSent: true,
-            text: trimmed,
-            timestamp: timestamp
-        )
-        messages.append(newMessage)
         messageText = ""
-    }
-
-    func addParticipant(_ user: MockUser) {
-        guard !participants.contains(where: { $0.id == user.id }) else { return }
-        participants.append(user)
-    }
-
-    // MARK: - Mock Data
-
-    private func loadMockData() {
-        let emma = MockData.users[0]
-        let sarah = MockData.users[1]
-        let alex = MockData.users[2]
-        participants = [emma, sarah, alex]
-        messages = Self.mockMessages(emma: emma, sarah: sarah, alex: alex)
-    }
-
-    private static func mockMessages(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
-        mockMessagesPartOne(emma: emma, sarah: sarah, alex: alex)
-            + mockMessagesPartTwo(emma: emma, sarah: sarah, alex: alex)
-    }
-
-    private static func mockMessagesPartOne(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
-        let me = MockData.currentUser
-        return [
-            GroupMessage(
-                id: "g1",
-                senderId: emma.id,
-                senderName: emma.name,
-                senderAvatar: emma.avatar,
-                isSent: false,
-                text: "Hey everyone! Excited for the jazz night!",
-                timestamp: "14:00"
-            ),
-            GroupMessage(
-                id: "g2",
-                senderId: me.id,
-                senderName: "You",
-                senderAvatar: me.avatar,
-                isSent: true,
-                text: "Me too! I've been looking forward to this all week",
-                timestamp: "14:02"
-            ),
-            GroupMessage(
-                id: "g3",
-                senderId: sarah.id,
-                senderName: sarah.name,
-                senderAvatar: sarah.avatar,
-                isSent: false,
-                text: "Should we grab dinner before the show?",
-                timestamp: "14:05"
-            ),
-            GroupMessage(
-                id: "g4",
-                senderId: alex.id,
-                senderName: alex.name,
-                senderAvatar: alex.avatar,
-                isSent: false,
-                text: "Great idea! I know a place nearby",
-                timestamp: "14:06"
+        do {
+            let sent = try await chatService.sendMessage(
+                conversationId: conversationId,
+                content: trimmed,
+                messageType: .text
             )
-        ]
+            if !messages.contains(where: { $0.id == sent.id }) {
+                messages.append(sent)
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    private static func mockMessagesPartTwo(emma: MockUser, sarah: MockUser, alex: MockUser) -> [GroupMessage] {
-        let me = MockData.currentUser
-        return [
-            GroupMessage(
-                id: "g5",
-                senderId: me.id,
-                senderName: "You",
-                senderAvatar: me.avatar,
-                isSent: true,
-                text: "That sounds perfect! What time should we meet?",
-                timestamp: "14:08"
-            ),
-            GroupMessage(
-                id: "g6",
-                senderId: emma.id,
-                senderName: emma.name,
-                senderAvatar: emma.avatar,
-                isSent: false,
-                text: "How about 6:30? That gives us plenty of time",
-                timestamp: "14:10"
-            ),
-            GroupMessage(
-                id: "g7",
-                senderId: sarah.id,
-                senderName: sarah.name,
-                senderAvatar: sarah.avatar,
-                isSent: false,
-                text: "6:30 works for me!",
-                timestamp: "14:11"
-            ),
-            GroupMessage(
-                id: "g8",
-                senderId: alex.id,
-                senderName: alex.name,
-                senderAvatar: alex.avatar,
-                isSent: false,
-                text: "Perfect, see you all there!",
-                timestamp: "14:12"
-            )
-        ]
+    func cleanup() {
+        Task {
+            await chatService.unsubscribe()
+        }
+    }
+
+    private func handleIncomingMessage(_ message: Message) {
+        guard !messages.contains(where: { $0.id == message.id }) else { return }
+        messages.append(message)
     }
 }

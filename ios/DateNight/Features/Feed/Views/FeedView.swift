@@ -7,8 +7,18 @@ struct FeedView: View {
         DNScreen {
             ScrollView {
                 VStack(spacing: DNSpace.xl) {
+                    searchBar
                     filterChips
-                    eventList
+
+                    if viewModel.isLoading, viewModel.events.isEmpty {
+                        Spacer().frame(height: 60)
+                        ProgressView()
+                            .tint(.dnPrimary)
+                    } else if viewModel.isEmpty {
+                        emptyState
+                    } else {
+                        eventList
+                    }
                 }
                 .padding(.bottom, DNSpace.xxl)
             }
@@ -20,6 +30,27 @@ struct FeedView: View {
         .navigationDestination(for: Event.self) { event in
             EventDetailView(event: event)
         }
+        .task {
+            await viewModel.loadEvents()
+        }
+    }
+
+    // MARK: - Search Bar
+
+    private var searchBar: some View {
+        HStack(spacing: DNSpace.sm) {
+            DNTextField(
+                placeholder: "Search events...",
+                text: $viewModel.searchText,
+                icon: "magnifyingglass"
+            )
+            .submitLabel(.search)
+            .onSubmit {
+                Task { await viewModel.searchEvents() }
+            }
+        }
+        .padding(.horizontal, DNSpace.lg)
+        .padding(.top, DNSpace.lg)
     }
 
     // MARK: - Filter Chips
@@ -58,6 +89,23 @@ struct FeedView: View {
         }
     }
 
+    // MARK: - Empty State
+
+    private var emptyState: some View {
+        VStack(spacing: DNSpace.md) {
+            Spacer().frame(height: 60)
+            Image(systemName: "calendar.badge.plus")
+                .font(.system(size: 48))
+                .foregroundColor(.dnTextTertiary)
+            Text("No events found")
+                .dnH3()
+            Text("Try a different search or category")
+                .dnBody()
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     // MARK: - Event List
 
     private var eventList: some View {
@@ -71,6 +119,17 @@ struct FeedView: View {
                     }
                 )
                 .modifier(StaggeredEntryModifier(index: index))
+                .onAppear {
+                    if event.id == viewModel.filteredEvents.last?.id {
+                        Task { await viewModel.loadMore() }
+                    }
+                }
+            }
+
+            if viewModel.isLoading, !viewModel.events.isEmpty {
+                ProgressView()
+                    .tint(.dnPrimary)
+                    .padding(.vertical, DNSpace.lg)
             }
         }
         .padding(.horizontal, DNSpace.lg)

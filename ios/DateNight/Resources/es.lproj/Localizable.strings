@@ -115,14 +115,322 @@
 
 /* Profile */
 "profile_edit" = "Editar Perfil";
-"profile_settings" = "Configuración";
+"profile_settings" = "Configuracion";
 "profile_favorites" = "Favoritos";
 "profile_history" = "Historial";
 "profile_notifications" = "Notificaciones";
 "profile_privacy" = "Privacidad";
 "profile_help" = "Ayuda y Soporte";
+"profile_stat_matches" = "Matches";
+"profile_stat_dates" = "Citas";
+"profile_stat_events" = "Eventos";
+"profile_recent_activity" = "Actividad Reciente";
+"profile_sign_out" = "Cerrar Sesion";
+"profile_settings_tutorial" = "Ver Tutorial de Inicio";
+"profile_settings_account" = "Configuracion de Cuenta";
+"profile_settings_preferences" = "Preferencias";
+"profile_settings_notifications" = "Notificaciones";
+"profile_settings_privacy" = "Privacidad y Seguridad";
+"profile_settings_help" = "Ayuda y Soporte";
+"profile_settings_reviews" = "Mis Resenas";
+"profile_settings_friends" = "Mis Amigos";
+"profile_settings_events" = "Mis Eventos";
+
+/* Profile Edit */
+"profile_edit_photos_title" = "Tus Fotos";
+"profile_edit_photos_hint" = "Minimo 2 fotos, maximo 6";
+"profile_edit_photos_add" = "Agregar";
+"profile_edit_basic_info" = "Informacion Basica";
+"profile_edit_name" = "Nombre";
+"profile_edit_name_placeholder" = "Tu nombre";
+"profile_edit_bio" = "Bio";
+"profile_edit_bio_placeholder" = "Cuentanos sobre ti...";
+"profile_edit_occupation" = "Ocupacion";
+"profile_edit_occupation_placeholder" = "Tu ocupacion";
+"profile_edit_height" = "Altura (cm)";
+"profile_edit_height_placeholder" = "Altura en cm";
+"profile_edit_interests" = "Intereses";
+"profile_edit_add_interest" = "Agregar interes...";
+"profile_edit_ready_to_mingle" = "Listo para Conocer Gente";
+"profile_edit_ready_subtitle" = "Estas buscando conocer personas?";
+"profile_edit_available_from" = "Desde";
+"profile_edit_available_until" = "Hasta";
+"profile_edit_save" = "Guardar Cambios";
+
+/* Match Preferences */
+"prefs_title" = "Preferencias de Match";
+"prefs_age_range" = "Rango de Edad";
+"prefs_max_distance" = "Distancia Maxima";
+"prefs_relationship_type" = "Tipo de Relacion";
+"prefs_interests" = "Intereses";
+"prefs_gender_preference" = "Preferencia de Genero";
+"prefs_gender_any" = "Cualquiera";
+"prefs_save" = "Guardar";
+
+/* Settings */
+"settings_title" = "Configuracion";
+"settings_account" = "Cuenta";
+"settings_edit_profile" = "Editar Perfil";
+"settings_change_password" = "Cambiar Contrasena";
+"settings_email" = "Correo Electronico";
+"settings_notifications" = "Notificaciones";
+"settings_matches" = "Matches";
+"settings_messages" = "Mensajes";
+"settings_events" = "Eventos";
+"settings_date_reminders" = "Recordatorios de Citas";
+"settings_friend_requests" = "Solicitudes de Amistad";
+"settings_privacy" = "Privacidad";
+"settings_show_profile" = "Mostrar Perfil";
+"settings_show_distance" = "Mostrar Distancia";
+"settings_show_online" = "Mostrar Estado en Linea";
+"settings_preferences" = "Preferencias";
+"settings_language" = "Idioma";
+"settings_dark_mode" = "Modo Oscuro";
+"settings_support" = "Soporte";
+"settings_help_center" = "Centro de Ayuda";
+"settings_report_problem" = "Reportar un Problema";
+"settings_terms" = "Terminos de Servicio";
+"settings_privacy_policy" = "Politica de Privacidad";
+"settings_danger_zone" = "Zona de Peligro";
+"settings_delete_account" = "Eliminar Cuenta";
+"settings_delete_confirm_title" = "Eliminar Cuenta";
+"settings_delete_confirm_message" = "Estas seguro de que quieres eliminar tu cuenta? Esta accion no se puede deshacer.";
+"settings_log_out" = "Cerrar Sesion";
+
+/* Help & Support */
+"help_title" = "Ayuda y Soporte";
+"help_faq" = "Preguntas Frecuentes";
+"help_contact" = "Contactanos";
+"help_report" = "Reportar un Problema";
+"help_report_title" = "Reportar un Problema";
+"help_report_placeholder" = "Describe el problema...";
+"help_report_submit" = "Enviar";
+"help_version" = "DateNight v%@";
 
 /* Status */
 "status_open" = "Abierto";
 "status_full" = "Lleno";
 "status_confirmed" = "Confirmado";
+"status_cancelled" = "Cancelado";
+
+/* Discover Screen */
+"discover_title" = "Descubrir";
+"discover_people_nearby" = "%d personas cerca";
+"discover_no_more_people" = "No hay mas personas";
+"discover_come_back_later" = "Vuelve mas tarde para ver nuevos perfiles";
+"discover_distance_unknown" = "Distancia desconocida";
+"discover_distance_format" = "A %@ km de distancia";
+
+/* Filters */
+"filter_title" = "Filtros";
+"filter_age" = "Edad";
+"filter_min" = "Min";
+"filter_max" = "Max";
+"filter_distance" = "Distancia";
+"filter_interests" = "Intereses";
+"filter_gender_preference" = "Preferencia de Genero";
+"filter_gender_all" = "Todos";
+
+/* Match Detail */
+"match_its_a_match" = "Es un Match!";
+"match_send_message" = "Enviar Mensaje";
+"match_keep_swiping" = "Seguir Deslizando";
+"match_shared_interests" = "INTERESES EN COMUN";
+
+/* Profile Modal */
+"profile_report_block" = "Reportar o Bloquear";
+
+/* Matches Screen */
+"matches_title" = "TUS CITAS";
+"matches_subtitle" = "Encuentra personas para ir a eventos juntos";
+"matches_available_dates" = "CITAS DISPONIBLES";
+"matches_your_dates" = "TUS CITAS";
+"matches_view_all_dates" = "Ver Todas Mis Citas";
+"matches_create_date" = "CREA TU PROPIA CITA";
+"matches_create_date_subtitle" = "Organiza una cita para un evento que te guste";
+"matches_browse_events" = "NAVEGA POR EVENTOS";
+"matches_no_dates_yet" = "No tienes citas aun";
+"matches_explore_events" = "Explora eventos y crea una cita para empezar";
+"matches_join_date" = "UNETE A ESTA CITA";
+"matches_date_full" = "Esta cita esta llena";
+
+/* My Dates Screen */
+"dates_my_dates" = "MIS CITAS";
+"dates_manage_dates" = "Gestiona tus citas futuras y pasadas";
+"dates_upcoming" = "Proximas";
+"dates_past" = "Pasadas";
+"dates_cancelled" = "Canceladas";
+"dates_no_upcoming" = "No hay citas proximas";
+"dates_no_past" = "No hay citas pasadas";
+"dates_no_cancelled" = "No hay citas canceladas";
+"dates_no_dates" = "No hay citas";
+"dates_explore_to_start" = "Explora eventos y crea una cita para empezar";
+"dates_untitled" = "Sin titulo";
+
+/* Date Detail */
+"dates_date_info" = "Info de la Cita";
+"dates_solo" = "Individual";
+"dates_group" = "Grupal";
+"dates_organizer" = "Organizador";
+"dates_attendees" = "Asistentes";
+"dates_event_details" = "Detalles del Evento";
+"dates_open_chat" = "Abrir Chat";
+"dates_rate_date" = "Califica tu Cita";
+"dates_cancel_date" = "CANCELAR CITA";
+"dates_cancel_confirmation_title" = "Cancelar Cita";
+"dates_cancel_confirmation_message" = "Estas seguro de que quieres cancelar esta cita? Esta accion no se puede deshacer.";
+"dates_confirm_cancel" = "Si, Cancelar";
+
+/* Invite */
+"invite_title" = "Invitar Amigos";
+"invite_subtitle" = "Elige personas para unirse a tu cita";
+"invite_selected" = "Seleccionados (%d)";
+"invite_from_matches" = "De Matches";
+"invite_from_friends" = "De Amigos";
+"invite_invited" = "Invitado";
+"invite_select_people" = "Selecciona Personas para Invitar";
+"invite_send_count" = "Enviar Invitaciones (%d)";
+
+/* Event Agreement */
+"agreement_choose_event" = "Elige un Evento";
+"agreement_subtitle" = "Propone un evento y acuerda con tu match";
+"agreement_proposed_events" = "Eventos Propuestos";
+"agreement_you" = "Tu";
+"agreement_your_match" = "Tu Match";
+"agreement_proposed_by" = "Propuesto por %@";
+"agreement_no_proposals" = "Sin propuestas aun. Explora los eventos abajo y propone uno!";
+"agreement_accept" = "Aceptar";
+"agreement_reject" = "Rechazar";
+"agreement_available_events" = "Eventos Disponibles";
+"agreement_propose" = "Proponer";
+"agreement_proposed" = "Propuesto";
+"agreement_confirm_date" = "Confirmar Cita";
+"agreement_event_confirmed" = "Evento Confirmado!";
+
+/* Event Detail */
+"event_detail_date" = "FECHA";
+"event_detail_time" = "HORA";
+"event_detail_venue" = "LUGAR";
+"event_detail_price" = "PRECIO";
+"event_detail_about" = "Acerca de";
+"event_detail_whos_going" = "Quienes Van";
+"event_detail_interested" = "%d interesados";
+"event_detail_comments" = "Comentarios";
+"event_detail_add_comment" = "Agregar un comentario...";
+"event_detail_create_date" = "Crear Cita";
+
+/* Report */
+"report_title" = "REPORTAR USUARIO";
+"report_reason" = "RAZON";
+"report_additional_details" = "DETALLES ADICIONALES";
+"report_details_placeholder" = "Proporciona mas detalles...";
+"report_block_and_report" = "BLOQUEAR Y REPORTAR";
+
+/* Help FAQ */
+"help_faq_create_date_q" = "Como creo una cita?";
+"help_faq_create_date_a" = "Explora eventos o matches, luego toca 'Invitar a una Cita' en cualquier perfil o evento. Elige una hora, agrega un mensaje y envia la invitacion. Tu match recibira una notificacion para aceptar o rechazar.";
+"help_faq_matching_q" = "Como funciona el matching?";
+"help_faq_matching_a" = "Te emparejamos basandonos en intereses y preferencias de eventos compartidos. Desliza a la derecha en los perfiles que te gusten. Cuando ambos deslicen a la derecha, es un match! Luego pueden chatear y planificar citas juntos.";
+"help_faq_friends_q" = "Como agrego amigos?";
+"help_faq_friends_a" = "Ve a la pestana de Amigos y toca el boton '+'. Puedes buscar personas por nombre o invitar amigos usando su correo electronico. Los amigos pueden ver tus eventos y unirse a citas grupales.";
+"help_faq_report_q" = "Como reporto a alguien?";
+"help_faq_report_a" = "Abre el perfil del usuario y toca el menu '...' en la esquina superior derecha. Selecciona 'Reportar Usuario' y elige una razon. Nuestro equipo de seguridad revisa todos los reportes en 24 horas.";
+"help_faq_delete_q" = "Como elimino mi cuenta?";
+"help_faq_delete_a" = "Ve a Configuracion > Zona de Peligro > Eliminar Cuenta. Esto eliminara permanentemente tu perfil, matches, mensajes y todos los datos asociados. Esta accion no se puede deshacer.";
+"help_contact_us" = "CONTACTANOS";
+
+/* My Events */
+"my_events_title" = "Mis Eventos";
+"my_events_attending" = "asistiendo";
+"my_events_attending_count" = "Asistiendo:";
+"my_events_empty_title" = "Crea tu primer evento";
+"my_events_empty_subtitle" = "Toca el boton + para comenzar";
+"delete_event_confirm_title" = "Eliminar Evento";
+"delete_event_confirm_message" = "Estas seguro de que quieres eliminar este evento? No se puede deshacer.";
+"cancel" = "Cancelar";
+"delete" = "Eliminar";
+
+/* Notifications */
+"notifications_title" = "NOTIFICACIONES";
+"notifications_mark_all_read" = "Marcar todo leido";
+"notifications_empty" = "Sin notificaciones";
+
+/* Forgot Password */
+"forgot_password_title" = "Restablecer Contrasena";
+"forgot_password_subtitle" = "Ingresa tu correo y te enviaremos un enlace para restablecer";
+"forgot_password_email" = "CORREO";
+"forgot_password_send" = "Enviar Enlace";
+"forgot_password_check_email" = "Revisa tu correo";
+"forgot_password_sent_message" = "Hemos enviado un enlace para restablecer tu contrasena a %@";
+"forgot_password_back_to_login" = "Volver al Inicio de Sesion";
+
+/* Profile Setup */
+"setup_photos_title" = "Agrega Tus Fotos";
+"setup_photos_subtitle" = "Agrega al menos 2 fotos para continuar";
+"setup_about_title" = "Cuentanos Sobre Ti";
+"setup_bio" = "BIO";
+"setup_bio_placeholder" = "Cuentale a otros sobre ti...";
+"setup_occupation" = "OCUPACION";
+"setup_occupation_placeholder" = "A que te dedicas?";
+"setup_location" = "UBICACION";
+"setup_location_placeholder" = "Ciudad, Estado";
+"setup_height" = "ALTURA";
+"setup_height_placeholder" = "Altura en pulgadas";
+"setup_interests_title" = "Elige Tus Intereses";
+"setup_interests_subtitle" = "Elige al menos 3 intereses";
+"setup_back" = "Atras";
+"setup_next" = "Siguiente";
+"setup_complete" = "Completar Perfil";
+
+/* Event Card */
+"event_card_view_details" = "Ver Detalles";
+
+/* Event Swipe */
+"swipe_title" = "Eventos";
+"swipe_events_to_explore" = "%d eventos por explorar";
+"swipe_no_more" = "No hay mas eventos";
+"swipe_come_back" = "Vuelve mas tarde para nuevos eventos";
+
+/* Add Event */
+"add_event_details" = "Detalles del Evento";
+"add_event_title_placeholder" = "Titulo del evento";
+"add_event_description_placeholder" = "Describe tu evento...";
+"add_event_category" = "Categoria";
+"add_event_date_time" = "Fecha y Hora";
+"add_event_date" = "Fecha";
+"add_event_time" = "Hora";
+"add_event_location" = "Ubicacion";
+"add_event_venue_placeholder" = "Nombre del lugar";
+"add_event_address_placeholder" = "Direccion";
+"add_event_image" = "Imagen";
+"add_event_tap_photo" = "Toca para agregar una foto";
+"add_event_price" = "Precio";
+"add_event_capacity" = "Capacidad";
+"add_event_capacity_hint" = "Numero maximo de asistentes";
+"add_event_visibility" = "Visibilidad";
+"add_event_public" = "Publico";
+"add_event_private" = "Privado";
+"add_event_create" = "Crear Evento";
+"add_event_create_title" = "Crear Evento";
+"add_event_edit_title" = "Editar Evento";
+"add_event_save" = "Guardar Cambios";
+"add_event_price_free" = "Gratis";
+"add_event_public_desc" = "Cualquier persona en DateNight puede descubrir este evento.";
+"add_event_private_desc" = "Solo las personas que invites pueden ver este evento.";
+
+/* My Events Tabs */
+"my_events_tab_created" = "Creados";
+"my_events_tab_attending" = "Asistiendo";
+
+/* Create Date Sheet */
+"create_date_title" = "Crear una Cita";
+"create_date_solo" = "Cita Individual";
+"create_date_group" = "Cita Grupal";
+"create_date_solo_desc" = "Conoce a alguien especial en este evento";
+"create_date_group_desc" = "Trae amigos o conoce a varias personas";
+"create_date_group_size" = "Cuantas personas? (incluyendote)";
+"create_date_invite_friends" = "Invitar Amigos";
+"create_date_no_friends" = "Agrega amigos para invitarlos a citas";
+"create_date_description" = "Descripcion";
+"create_date_button" = "Crear Cita";
+"create_date_cancel" = "Cancelar";

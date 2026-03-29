@@ -12,8 +12,14 @@ struct InviteToDateView: View {
                         VStack(spacing: DNSpace.xl) {
                             header
                             selectedInviteesSection
-                            matchesSection
-                            friendsSection
+
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .padding(.top, DNSpace.xxl)
+                            } else {
+                                matchesSection
+                                friendsSection
+                            }
                         }
                         .padding(.horizontal, DNSpace.lg)
                         .padding(.bottom, 120)
@@ -23,6 +29,9 @@ struct InviteToDateView: View {
                 }
                 .navigationBarHidden(true)
             }
+        }
+        .task {
+            await viewModel.loadData()
         }
     }
 
@@ -41,13 +50,13 @@ struct InviteToDateView: View {
                 Spacer()
             }
 
-            Text("Invite Friends")
+            Text("invite_title".localized())
                 .font(.system(size: 28, weight: .black))
                 .tracking(-0.6)
                 .foregroundColor(.dnTextPrimary)
                 .padding(.top, DNSpace.sm)
 
-            Text("Choose people to join your date")
+            Text("invite_subtitle".localized())
                 .dnCaption()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -60,7 +69,7 @@ struct InviteToDateView: View {
         Group {
             if !viewModel.selectedInvitees.isEmpty {
                 VStack(alignment: .leading, spacing: DNSpace.md) {
-                    Text("Selected (\(viewModel.selectedInvitees.count))")
+                    Text(String(format: "invite_selected".localized(), viewModel.selectedInvitees.count))
                         .dnLabel()
 
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -75,9 +84,9 @@ struct InviteToDateView: View {
         }
     }
 
-    private func selectedChip(user: MockUser) -> some View {
+    private func selectedChip(user: UserProfile) -> some View {
         HStack(spacing: DNSpace.sm) {
-            AvatarView(url: URL(string: user.avatar), size: 24)
+            AvatarView(url: URL(string: user.avatarUrl ?? ""), size: 24)
 
             Text(user.name)
                 .font(.system(size: 13, weight: .bold))
@@ -104,7 +113,7 @@ struct InviteToDateView: View {
 
     private var matchesSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("From Matches")
+            Text("invite_from_matches".localized())
                 .dnH3()
 
             ForEach(viewModel.matches, id: \.id) { user in
@@ -117,7 +126,7 @@ struct InviteToDateView: View {
 
     private var friendsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("From Friends")
+            Text("invite_from_friends".localized())
                 .dnH3()
 
             ForEach(viewModel.friends, id: \.id) { user in
@@ -126,18 +135,18 @@ struct InviteToDateView: View {
         }
     }
 
-    private func inviteeRow(user: MockUser) -> some View {
+    private func inviteeRow(user: UserProfile) -> some View {
         let isSelected = viewModel.isSelected(user)
 
         return DNCard {
             HStack(spacing: DNSpace.md) {
-                AvatarView(url: URL(string: user.avatar), size: 48)
+                AvatarView(url: URL(string: user.avatarUrl ?? ""), size: 48)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(user.name)
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.dnTextPrimary)
-                    Text(user.bio)
+                    Text(user.bio ?? "")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.dnTextSecondary)
                         .lineLimit(1)
@@ -150,7 +159,7 @@ struct InviteToDateView: View {
                         viewModel.toggleInvitee(user)
                     }
                 } label: {
-                    Text(isSelected ? "Invited" : "Invite")
+                    Text(isSelected ? "invite_invited".localized() : "button_invite".localized())
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(isSelected ? .white : .dnPrimary)
                         .padding(.horizontal, DNSpace.lg)
@@ -172,16 +181,21 @@ struct InviteToDateView: View {
 
     private var sendButton: some View {
         VStack {
-            DNButton(
-                viewModel.selectedInvitees.isEmpty
-                    ? "Select People to Invite"
-                    : "Send Invitations (\(viewModel.selectedInvitees.count))",
-                variant: .primary
-            ) {
-                viewModel.sendInvitations()
+            if viewModel.isSending {
+                ProgressView()
+                    .padding()
+            } else {
+                DNButton(
+                    viewModel.selectedInvitees.isEmpty
+                        ? "invite_select_people".localized()
+                        : String(format: "invite_send_count".localized(), viewModel.selectedInvitees.count),
+                    variant: .primary
+                ) {
+                    Task { await viewModel.sendInvitations() }
+                }
+                .opacity(viewModel.selectedInvitees.isEmpty ? 0.5 : 1.0)
+                .allowsHitTesting(!viewModel.selectedInvitees.isEmpty)
             }
-            .opacity(viewModel.selectedInvitees.isEmpty ? 0.5 : 1.0)
-            .allowsHitTesting(!viewModel.selectedInvitees.isEmpty)
         }
         .padding(.horizontal, DNSpace.xl)
         .padding(.vertical, DNSpace.lg)

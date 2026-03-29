@@ -1,7 +1,6 @@
 import Foundation
 import Supabase
 
-@MainActor
 final class EventService {
     private var client: SupabaseClient { SupabaseService.shared.client }
 

@@ -3,7 +3,7 @@ import SwiftUI
 struct EventDetailView: View {
     @StateObject private var viewModel: EventDetailViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedUser: MockUser?
+    @State private var selectedUser: UserProfile?
     @State private var showUserProfile = false
 
     init(event: Event) {
@@ -33,6 +33,14 @@ struct EventDetailView: View {
                 if let user = selectedUser {
                     UserProfileModal(user: user)
                 }
+            }
+            .sheet(isPresented: $viewModel.showShareSheet) {
+                if let event = viewModel.event {
+                    ShareSheet(items: [viewModel.shareText])
+                }
+            }
+            .task {
+                await viewModel.loadComments()
             }
         }
     }
@@ -80,7 +88,7 @@ struct EventDetailView: View {
                 heroCircleButton(icon: "chevron.left")
             }
             Spacer()
-            Button {} label: {
+            Button { viewModel.showShareSheet = true } label: {
                 heroCircleButton(icon: "square.and.arrow.up")
             }
         }
@@ -150,25 +158,25 @@ struct EventDetailView: View {
             ], spacing: DNSpace.lg) {
                 DNStatCard(
                     icon: "calendar",
-                    label: "DATE",
+                    label: "event_detail_date".localized(),
                     value: event.date,
                     accentColor: .dnAccentPink
                 )
                 DNStatCard(
                     icon: "clock",
-                    label: "TIME",
+                    label: "event_detail_time".localized(),
                     value: event.time,
                     accentColor: .dnPrimary
                 )
                 DNStatCard(
                     icon: "building.2",
-                    label: "VENUE",
+                    label: "event_detail_venue".localized(),
                     value: event.venue,
                     accentColor: .dnInfo
                 )
                 DNStatCard(
                     icon: "dollarsign.circle",
-                    label: "PRICE",
+                    label: "event_detail_price".localized(),
                     value: event.price,
                     accentColor: .dnSuccess
                 )
@@ -176,7 +184,7 @@ struct EventDetailView: View {
 
             // Description
             VStack(alignment: .leading, spacing: DNSpace.md) {
-                Text("About")
+                Text("event_detail_about".localized())
                     .dnH3()
                 Text(event.description)
                     .font(.system(size: 15, weight: .semibold))
@@ -198,13 +206,13 @@ struct EventDetailView: View {
     private func attendeesSection(event: Event) -> some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
             HStack {
-                Text("Who's Going")
+                Text("event_detail_whos_going".localized())
                     .dnH3()
                 Spacer()
                 HStack(spacing: DNSpace.xs) {
                     Image(systemName: "person.2.fill")
                         .font(.system(size: 14, weight: .bold))
-                    Text("\(event.attendees?.count ?? 0) interested")
+                    Text(String(format: "event_detail_interested".localized(), event.attendees?.count ?? 0))
                         .font(.system(size: 14, weight: .bold))
                 }
                 .foregroundColor(.dnPrimary)
@@ -214,15 +222,7 @@ struct EventDetailView: View {
                 HStack(spacing: DNSpace.md) {
                     ForEach(event.attendees ?? []) { user in
                         Button {
-                            selectedUser = MockUser(
-                                id: user.id.uuidString,
-                                name: user.name,
-                                age: user.age ?? 0,
-                                avatar: user.avatarUrl ?? "",
-                                photos: user.photos,
-                                bio: user.bio ?? "",
-                                interests: user.interests
-                            )
+                            selectedUser = user
                             showUserProfile = true
                         } label: {
                             VStack(spacing: DNSpace.sm) {
@@ -250,7 +250,7 @@ struct EventDetailView: View {
     private var commentsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
             HStack {
-                Text("Comments")
+                Text("event_detail_comments".localized())
                     .dnH3()
                 Spacer()
                 HStack(spacing: DNSpace.xs) {
@@ -265,12 +265,12 @@ struct EventDetailView: View {
             // Comment input
             HStack(spacing: DNSpace.sm) {
                 DNTextField(
-                    placeholder: "Add a comment...",
+                    placeholder: "event_detail_add_comment".localized(),
                     text: $viewModel.newCommentText,
                     icon: "text.bubble"
                 )
 
-                Button { viewModel.addComment() } label: {
+                Button { Task { await viewModel.addComment() } } label: {
                     Image(systemName: "paperplane.fill")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
@@ -321,7 +321,7 @@ struct EventDetailView: View {
     private func commentVoteButtons(_ comment: EventComment) -> some View {
         HStack(spacing: DNSpace.lg) {
             Button {
-                viewModel.vote(commentId: comment.id, direction: .up)
+                Task { await viewModel.vote(commentId: comment.id, direction: .up) }
             } label: {
                 HStack(spacing: DNSpace.xs) {
                     Image(systemName: "arrow.up")
@@ -334,7 +334,7 @@ struct EventDetailView: View {
             .buttonStyle(.plain)
 
             Button {
-                viewModel.vote(commentId: comment.id, direction: .down)
+                Task { await viewModel.vote(commentId: comment.id, direction: .down) }
             } label: {
                 HStack(spacing: DNSpace.xs) {
                     Image(systemName: "arrow.down")
@@ -357,17 +357,36 @@ struct EventDetailView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: DNSpace.xs) {
-                    Text("Price")
+                    Text("event_detail_price".localized())
                         .dnCaption()
                     Text(event.price)
                         .font(.system(size: 22, weight: .heavy))
                         .foregroundColor(.dnTextPrimary)
                 }
                 Spacer()
-                DNButton("Create Date", variant: .primary) {
+
+                Button {
+                    Task {
+                        if viewModel.isAttending {
+                            await viewModel.unrsvp()
+                        } else {
+                            await viewModel.rsvp()
+                        }
+                    }
+                } label: {
+                    Image(systemName: viewModel.isAttending ? "heart.fill" : "heart")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(viewModel.isAttending ? .dnAccentPink : .dnTextSecondary)
+                        .frame(width: 52, height: 52)
+                        .background(Circle().fill(Color.dnBackground))
+                        .dnNeuRaised(intensity: .medium, cornerRadius: DNRadius.full)
+                }
+                .buttonStyle(.plain)
+
+                DNButton("event_detail_create_date".localized(), variant: .primary) {
                     viewModel.showCreateDate = true
                 }
-                .frame(maxWidth: 200)
+                .frame(maxWidth: 180)
             }
             .padding(.horizontal, DNSpace.xl)
             .padding(.vertical, DNSpace.lg)

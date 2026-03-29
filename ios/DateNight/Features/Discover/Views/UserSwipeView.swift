@@ -2,7 +2,9 @@ import SwiftUI
 
 struct UserSwipeView: View {
     @StateObject private var viewModel = DiscoverViewModel()
+    @EnvironmentObject private var authService: AuthService
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var selectedProfileUser: UserProfile?
 
     var body: some View {
         DNScreen {
@@ -10,9 +12,9 @@ struct UserSwipeView: View {
                 // Header
                 HStack {
                     VStack(alignment: .leading, spacing: DNSpace.xs) {
-                        Text("Discover")
+                        Text("discover_title".localized())
                             .dnH2()
-                        Text("\(viewModel.users.count - viewModel.currentIndex) people nearby")
+                        Text(String(format: "discover_people_nearby".localized(), viewModel.remainingCount))
                             .dnCaption()
                     }
                     Spacer()
@@ -32,11 +34,22 @@ struct UserSwipeView: View {
                 .padding(.vertical, DNSpace.md)
 
                 if viewModel.showFilters {
-                    SwipeFiltersView(showFilters: $viewModel.showFilters)
-                        .zIndex(10)
+                    SwipeFiltersView(
+                        showFilters: $viewModel.showFilters,
+                        filters: $viewModel.filters,
+                        onApply: {
+                            Task { await viewModel.loadUsers() }
+                        }
+                    )
+                    .zIndex(10)
                 }
 
-                if let currentUser = viewModel.currentUser {
+                if viewModel.isLoading {
+                    Spacer()
+                    ProgressView()
+                        .scaleEffect(1.5)
+                    Spacer()
+                } else if let currentUser = viewModel.currentUser {
                     // Card deck
                     ZStack {
                         // Next card (behind)
@@ -54,10 +67,13 @@ struct UserSwipeView: View {
                             user: currentUser,
                             isTopCard: true,
                             onSwipeLeft: {
-                                viewModel.swipeLeft(userId: currentUser.id)
+                                Task { await viewModel.swipeLeft(userId: currentUser.id) }
                             },
                             onSwipeRight: {
-                                viewModel.swipeRight(userId: currentUser.id)
+                                Task { await viewModel.swipeRight(userId: currentUser.id) }
+                            },
+                            onInfoTapped: {
+                                selectedProfileUser = currentUser
                             }
                         )
                         .id(viewModel.currentIndex)
@@ -71,7 +87,7 @@ struct UserSwipeView: View {
                     HStack(spacing: DNSpace.xxl) {
                         // Pass button
                         Button {
-                            viewModel.swipeLeft(userId: currentUser.id)
+                            Task { await viewModel.swipeLeft(userId: currentUser.id) }
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 24, weight: .bold))
@@ -83,7 +99,7 @@ struct UserSwipeView: View {
 
                         // Like button — larger and purple
                         Button {
-                            viewModel.swipeRight(userId: currentUser.id)
+                            Task { await viewModel.swipeRight(userId: currentUser.id) }
                         } label: {
                             Image(systemName: "heart.fill")
                                 .font(.system(size: 32, weight: .bold))
@@ -105,9 +121,9 @@ struct UserSwipeView: View {
                         Image(systemName: "person.2.slash")
                             .font(.system(size: 48))
                             .foregroundColor(.dnTextTertiary)
-                        Text("No more people")
+                        Text("discover_no_more_people".localized())
                             .dnH3()
-                        Text("Come back later to see new profiles")
+                        Text("discover_come_back_later".localized())
                             .dnCaption()
                     }
                     Spacer()
@@ -117,7 +133,11 @@ struct UserSwipeView: View {
         .fullScreenCover(isPresented: $viewModel.showMatchDetail) {
             if let matched = viewModel.matchedUser {
                 MatchDetailView(
-                    viewModel: MatchDetailViewModel(matchedUser: matched),
+                    viewModel: MatchDetailViewModel(
+                        matchedUser: matched,
+                        currentUserInterests: authService.currentUser?.interests ?? []
+                    ),
+                    currentUser: authService.currentUser,
                     onSendMessage: {
                         viewModel.dismissMatch()
                     },
@@ -126,6 +146,20 @@ struct UserSwipeView: View {
                     }
                 )
             }
+        }
+        .fullScreenCover(item: $selectedProfileUser) { user in
+            UserProfileModal(
+                user: user,
+                onLike: {
+                    Task { await viewModel.swipeRight(userId: user.id) }
+                },
+                onPass: {
+                    Task { await viewModel.swipeLeft(userId: user.id) }
+                }
+            )
+        }
+        .task {
+            await viewModel.loadUsers()
         }
     }
 }

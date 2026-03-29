@@ -2,11 +2,14 @@ import SwiftUI
 
 struct SwipeFiltersView: View {
     @Binding var showFilters: Bool
+    @Binding var filters: DiscoverFilters
+    var onApply: (() -> Void)?
 
-    @State private var minAge: Double = 21
-    @State private var maxAge: Double = 40
-    @State private var distance: Double = 25
-    @State private var selectedInterests: Set<String> = []
+    @State private var minAge: Double
+    @State private var maxAge: Double
+    @State private var distance: Double
+    @State private var selectedInterests: Set<String>
+    @State private var genderPreference: String?
 
     private let allInterests = [
         "Music", "Art", "Food", "Comedy",
@@ -14,11 +17,29 @@ struct SwipeFiltersView: View {
         "Theater", "Travel", "Dining", "Yoga"
     ]
 
+    private let genderOptions = [
+        ("filter_gender_all".localized(), nil as String?),
+        ("auth_gender_male".localized(), Optional("male")),
+        ("auth_gender_female".localized(), Optional("female")),
+        ("auth_gender_nonbinary".localized(), Optional("non-binary"))
+    ]
+
+    init(showFilters: Binding<Bool>, filters: Binding<DiscoverFilters>, onApply: (() -> Void)? = nil) {
+        _showFilters = showFilters
+        _filters = filters
+        _minAge = State(initialValue: Double(filters.wrappedValue.minAge))
+        _maxAge = State(initialValue: Double(filters.wrappedValue.maxAge))
+        _distance = State(initialValue: Double(filters.wrappedValue.maxDistance))
+        _selectedInterests = State(initialValue: filters.wrappedValue.interests)
+        _genderPreference = State(initialValue: filters.wrappedValue.genderPreference)
+        self.onApply = onApply
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
-                Text("Filters")
+                Text("filter_title".localized())
                     .dnH3()
                 Spacer()
                 Button {
@@ -37,7 +58,7 @@ struct SwipeFiltersView: View {
             DNCard {
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
                     HStack {
-                        Text("Age")
+                        Text("filter_age".localized())
                             .dnCaption()
                         Spacer()
                         Text("\(Int(minAge)) - \(Int(maxAge))")
@@ -47,13 +68,13 @@ struct SwipeFiltersView: View {
 
                     VStack(spacing: DNSpace.xs) {
                         HStack {
-                            Text("Min")
+                            Text("filter_min".localized())
                                 .dnSmall()
                             Slider(value: $minAge, in: 18 ... 60, step: 1)
                                 .tint(.dnPrimary)
                         }
                         HStack {
-                            Text("Max")
+                            Text("filter_max".localized())
                                 .dnSmall()
                             Slider(value: $maxAge, in: 18 ... 60, step: 1)
                                 .tint(.dnPrimary)
@@ -67,7 +88,7 @@ struct SwipeFiltersView: View {
             DNCard {
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
                     HStack {
-                        Text("Distance")
+                        Text("filter_distance".localized())
                             .dnCaption()
                         Spacer()
                         Text("\(Int(distance)) km")
@@ -81,10 +102,41 @@ struct SwipeFiltersView: View {
             }
             .padding(.bottom, DNSpace.md)
 
+            // Gender Preference (#52)
+            DNCard {
+                VStack(alignment: .leading, spacing: DNSpace.sm) {
+                    Text("filter_gender_preference".localized())
+                        .dnCaption()
+
+                    FlowLayout(spacing: DNSpace.sm) {
+                        ForEach(genderOptions, id: \.0) { label, value in
+                            let isActive = genderPreference == value
+                            Button {
+                                genderPreference = value
+                            } label: {
+                                Text(label)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(isActive ? .dnPrimary : .dnTextSecondary)
+                                    .padding(.horizontal, DNSpace.lg)
+                                    .padding(.vertical, DNSpace.sm)
+                            }
+                            .buttonStyle(.plain)
+                            .if(isActive) { view in
+                                view.dnNeuPressed(cornerRadius: DNRadius.full)
+                            }
+                            .if(!isActive) { view in
+                                view.dnNeuRaised(cornerRadius: DNRadius.full)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.bottom, DNSpace.md)
+
             // Interests
             DNCard {
                 VStack(alignment: .leading, spacing: DNSpace.sm) {
-                    Text("Interests")
+                    Text("filter_interests".localized())
                         .dnCaption()
 
                     FlowLayout(spacing: DNSpace.sm) {
@@ -117,10 +169,18 @@ struct SwipeFiltersView: View {
             .padding(.bottom, DNSpace.lg)
 
             // Apply button
-            DNButton("Apply", variant: .primary) {
+            DNButton("button_apply".localized(), variant: .primary) {
+                filters = DiscoverFilters(
+                    minAge: Int(minAge),
+                    maxAge: Int(maxAge),
+                    maxDistance: Int(distance),
+                    interests: selectedInterests,
+                    genderPreference: genderPreference
+                )
                 withAnimation(.dnModalPresent) {
                     showFilters = false
                 }
+                onApply?()
             }
         }
         .padding(DNSpace.lg)
@@ -131,8 +191,6 @@ struct SwipeFiltersView: View {
         .transition(.move(edge: .top).combined(with: .opacity))
     }
 }
-
-// FlowLayout is defined in ProfileView.swift
 
 // MARK: - Conditional Modifier
 

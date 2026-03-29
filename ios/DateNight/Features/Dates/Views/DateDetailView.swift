@@ -27,15 +27,26 @@ struct DateDetailView: View {
                 }
                 .navigationBarHidden(true)
                 .sheet(isPresented: $viewModel.showChat) {
-                    if let event = viewModel.dateRequest.event {
-                        GroupChatView(groupName: event.title)
-                    }
+                    GroupChatView(
+                        conversationId: viewModel.dateRequest.id,
+                        groupName: viewModel.dateRequest.event?.title ?? "dates_untitled".localized()
+                    )
                 }
                 .sheet(isPresented: $showRateMatch) {
-                    RateMatchView(ratedUser: MockData.users.first!)
+                    if let organizer = viewModel.dateRequest.organizer {
+                        RateMatchView(ratedUser: organizer)
+                    }
                 }
                 .sheet(isPresented: $showInvite) {
                     InviteToDateView()
+                }
+                .alert("dates_cancel_confirmation_title".localized(), isPresented: $viewModel.showCancelConfirmation) {
+                    Button("button_cancel".localized(), role: .cancel) {}
+                    Button("dates_confirm_cancel".localized(), role: .destructive) {
+                        Task { await viewModel.confirmCancel() }
+                    }
+                } message: {
+                    Text("dates_cancel_confirmation_message".localized())
                 }
             }
         }
@@ -119,14 +130,14 @@ struct DateDetailView: View {
     private var dateInfoCard: some View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
-                Text("Date Info")
+                Text("dates_date_info".localized())
                     .dnH3()
 
                 HStack(spacing: DNSpace.md) {
-                    // Type badge
-                    StatusBadge(status: viewModel.dateRequest.dateType == .solo ? "Solo" : "Group")
-
-                    // Status
+                    StatusBadge(
+                        status: viewModel.dateRequest.dateType == .solo ? "dates_solo".localized() : "dates_group"
+                            .localized()
+                    )
                     StatusBadge(status: viewModel.statusDisplay)
                 }
 
@@ -138,7 +149,7 @@ struct DateDetailView: View {
                             size: 40
                         )
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Organizer")
+                            Text("dates_organizer".localized())
                                 .dnSmall()
                             Text(organizer.name)
                                 .font(.system(size: 15, weight: .bold))
@@ -157,7 +168,7 @@ struct DateDetailView: View {
     private var attendeesSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
             HStack {
-                Text("Attendees")
+                Text("dates_attendees".localized())
                     .dnH3()
                 Spacer()
                 if viewModel.dateRequest.dateType == .group {
@@ -167,7 +178,7 @@ struct DateDetailView: View {
                         HStack(spacing: DNSpace.xs) {
                             Image(systemName: "plus.circle.fill")
                                 .font(.system(size: 16, weight: .bold))
-                            Text("Invite")
+                            Text("button_invite".localized())
                                 .font(.system(size: 14, weight: .bold))
                         }
                         .foregroundColor(.dnPrimary)
@@ -190,7 +201,7 @@ struct DateDetailView: View {
     private var eventDetailsCard: some View {
         DNCard {
             VStack(alignment: .leading, spacing: DNSpace.md) {
-                Text("Event Details")
+                Text("dates_event_details".localized())
                     .dnH3()
 
                 if let event = viewModel.dateRequest.event {
@@ -208,40 +219,45 @@ struct DateDetailView: View {
 
     private var actionButtons: some View {
         VStack(spacing: DNSpace.md) {
-            switch viewModel.dateRequest.status {
-            case .open, .full:
-                DNButton("Confirm", variant: .primary) {
-                    viewModel.confirm()
-                }
-                DNButton("Cancel", variant: .secondary) {
-                    viewModel.cancel()
-                }
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding()
+            } else {
+                switch viewModel.dateRequest.status {
+                case .open, .full:
+                    DNButton("button_confirm".localized(), variant: .primary) {
+                        Task { await viewModel.confirm() }
+                    }
+                    DNButton("button_cancel".localized(), variant: .secondary) {
+                        viewModel.requestCancel()
+                    }
 
-            case .confirmed:
-                DNButton("Open Chat", variant: .primary) {
-                    viewModel.openChat()
-                }
-                DNButton("Rate Your Date", variant: .accent) {
-                    showRateMatch = true
-                }
-                Button {
-                    viewModel.cancel()
-                } label: {
-                    Text("CANCEL DATE")
-                        .font(.system(size: 16, weight: .bold))
-                        .tracking(-0.47)
-                        .foregroundColor(.dnDestructive)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(
-                            RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
-                                .fill(Color.dnBackground)
-                        )
-                        .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.md)
-                }
+                case .confirmed:
+                    DNButton("dates_open_chat".localized(), variant: .primary) {
+                        viewModel.openChat()
+                    }
+                    DNButton("dates_rate_date".localized(), variant: .accent) {
+                        showRateMatch = true
+                    }
+                    Button {
+                        viewModel.requestCancel()
+                    } label: {
+                        Text("dates_cancel_date".localized())
+                            .font(.system(size: 16, weight: .bold))
+                            .tracking(-0.47)
+                            .foregroundColor(.dnDestructive)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                RoundedRectangle(cornerRadius: DNRadius.md, style: .continuous)
+                                    .fill(Color.dnBackground)
+                            )
+                            .dnNeuRaised(intensity: .heavy, cornerRadius: DNRadius.md)
+                    }
 
-            case .cancelled:
-                EmptyView()
+                case .cancelled:
+                    EmptyView()
+                }
             }
         }
         .padding(.horizontal, DNSpace.xl)

@@ -10,7 +10,7 @@ struct CreateDateSheet: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: DNSpace.xl) {
                         // Header
-                        Text("Create a Date")
+                        Text("create_date_title".localized())
                             .dnH2()
                             .padding(.top, DNSpace.lg)
 
@@ -22,9 +22,12 @@ struct CreateDateSheet: View {
                             groupSizePicker
                         }
 
+                        // Invite Friends
+                        inviteFriendsSection
+
                         // Description
                         VStack(alignment: .leading, spacing: DNSpace.sm) {
-                            Text("Description")
+                            Text("create_date_description".localized())
                                 .dnCaption()
                             TextEditor(text: $viewModel.dateDescription)
                                 .font(.system(size: 16, weight: .medium))
@@ -37,12 +40,14 @@ struct CreateDateSheet: View {
 
                         // Buttons
                         VStack(spacing: DNSpace.md) {
-                            DNButton("Create Date", variant: .primary) {
-                                viewModel.createDate()
-                                dismiss()
+                            DNButton("create_date_button".localized(), variant: .primary) {
+                                Task {
+                                    await viewModel.createDate()
+                                    dismiss()
+                                }
                             }
 
-                            DNButton("Cancel", variant: .secondary) {
+                            DNButton("create_date_cancel".localized(), variant: .secondary) {
                                 dismiss()
                             }
                         }
@@ -55,6 +60,63 @@ struct CreateDateSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .task {
+            await viewModel.loadInvitableUsers()
+        }
+    }
+
+    // MARK: - Invite Friends
+
+    private var inviteFriendsSection: some View {
+        VStack(alignment: .leading, spacing: DNSpace.md) {
+            Text("create_date_invite_friends".localized())
+                .font(.system(size: 13, weight: .bold))
+                .textCase(.uppercase)
+                .tracking(0.5)
+                .foregroundColor(.dnTextSecondary)
+
+            if viewModel.invitableUsers.isEmpty {
+                Text("create_date_no_friends".localized())
+                    .dnCaption()
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: DNSpace.md) {
+                        ForEach(viewModel.invitableUsers) { user in
+                            let isInvited = viewModel.invitedUserIds.contains(user.id)
+                            Button {
+                                withAnimation(.dnButtonPress) {
+                                    viewModel.toggleInvite(user.id)
+                                }
+                            } label: {
+                                VStack(spacing: DNSpace.xs) {
+                                    ZStack(alignment: .bottomTrailing) {
+                                        AvatarView(
+                                            url: URL(string: user.avatarUrl ?? ""),
+                                            size: 48
+                                        )
+                                        if isInvited {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundColor(.dnSuccess)
+                                                .background(Circle().fill(Color.dnBackground).frame(
+                                                    width: 18,
+                                                    height: 18
+                                                ))
+                                        }
+                                    }
+                                    Text(user.name)
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(isInvited ? .dnPrimary : .dnTextSecondary)
+                                        .lineLimit(1)
+                                        .frame(width: 56)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Date Type Picker
@@ -79,12 +141,12 @@ struct CreateDateSheet: View {
                         }
 
                         VStack(alignment: .leading, spacing: DNSpace.xs) {
-                            Text(type == .solo ? "Solo Date" : "Group Date")
+                            Text(type == .solo ? "create_date_solo".localized() : "create_date_group".localized())
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.dnTextPrimary)
                             Text(type == .solo
-                                ? "Meet someone special at this event"
-                                : "Bring friends or meet multiple people")
+                                ? "create_date_solo_desc".localized()
+                                : "create_date_group_desc".localized())
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(.dnTextSecondary)
                         }
@@ -103,7 +165,7 @@ struct CreateDateSheet: View {
 
     private var groupSizePicker: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("How many people? (including you)")
+            Text("create_date_group_size".localized())
                 .font(.system(size: 13, weight: .bold))
                 .textCase(.uppercase)
                 .tracking(0.5)

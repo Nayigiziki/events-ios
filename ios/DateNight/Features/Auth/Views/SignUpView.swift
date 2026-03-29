@@ -11,7 +11,9 @@ struct SignUpView: View {
     @State private var birthdate = Calendar.current.date(byAdding: .year, value: -18, to: Date()) ?? Date()
     @State private var selectedGender = ""
     @State private var agreedToTerms = false
+    @State private var validationError: String?
 
+    private let validation = ValidationService()
     private let genderOptions: [(key: String, value: String)] = [
         ("male", "auth_gender_male"),
         ("female", "auth_gender_female"),
@@ -155,22 +157,41 @@ struct SignUpView: View {
                         )
                         .padding(.vertical, DNSpace.xs)
 
+                        // Validation Error
+                        if let validationError {
+                            Text(validationError)
+                                .dnCaption()
+                                .foregroundColor(.dnDestructive)
+                                .multilineTextAlignment(.center)
+                        }
+
                         // Sign Up Button
                         DNButton(String(localized: "auth_sign_up"), variant: .primary) {
-                            Task {
-                                await authViewModel.signUp(
-                                    email: email,
-                                    password: password,
-                                    name: name,
-                                    birthdate: birthdate,
-                                    gender: selectedGender.isEmpty ? nil : selectedGender
-                                )
+                            validationError = nil
+                            if !validation.isNonEmpty(name) {
+                                validationError = "Name is required"
+                            } else if !validation.isValidEmail(email) {
+                                validationError = "Please enter a valid email"
+                            } else if !validation.isStrongPassword(password) {
+                                validationError = "Password must be at least 8 characters with a letter and a number"
+                            } else if !validation.passwordsMatch(password, confirmPassword) {
+                                validationError = "Passwords do not match"
+                            } else {
+                                Task {
+                                    await authViewModel.signUp(
+                                        email: email,
+                                        password: password,
+                                        name: name,
+                                        birthdate: birthdate,
+                                        gender: selectedGender.isEmpty ? nil : selectedGender
+                                    )
+                                }
                             }
                         }
                         .opacity(agreedToTerms ? 1.0 : 0.5)
                         .allowsHitTesting(agreedToTerms)
 
-                        // Error
+                        // Server Error
                         if let error = authViewModel.errorMessage {
                             Text(error)
                                 .dnCaption()

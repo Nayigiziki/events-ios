@@ -10,9 +10,15 @@ struct EventAgreementView: View {
                 ScrollView {
                     VStack(spacing: DNSpace.xl) {
                         header
-                        proposedEventsSection
-                        availableEventsSection
-                        confirmButton
+
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .padding(.top, DNSpace.xxl)
+                        } else {
+                            proposedEventsSection
+                            availableEventsSection
+                            confirmButton
+                        }
                     }
                     .padding(.horizontal, DNSpace.lg)
                     .padding(.bottom, DNSpace.xxl * 3)
@@ -24,6 +30,9 @@ struct EventAgreementView: View {
                     }
                 }
             }
+        }
+        .task {
+            await viewModel.loadData()
         }
     }
 
@@ -42,13 +51,13 @@ struct EventAgreementView: View {
                 Spacer()
             }
 
-            Text("Choose an Event")
+            Text("agreement_choose_event".localized())
                 .font(.system(size: 28, weight: .black))
                 .tracking(-0.6)
                 .foregroundColor(.dnTextPrimary)
                 .padding(.top, DNSpace.sm)
 
-            Text("Propose an event and agree with your match")
+            Text("agreement_subtitle".localized())
                 .dnCaption()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -59,19 +68,19 @@ struct EventAgreementView: View {
 
     private var proposedEventsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Proposed Events")
+            Text("agreement_proposed_events".localized())
                 .dnH3()
 
             if let myProposal = viewModel.proposedByMe {
-                proposalCard(event: myProposal, proposedBy: "You", isOwn: true)
+                proposalCard(event: myProposal, proposedBy: "agreement_you".localized(), isOwn: true)
             }
 
             if let theirProposal = viewModel.proposedByThem {
-                proposalCard(event: theirProposal, proposedBy: "Your Match", isOwn: false)
+                proposalCard(event: theirProposal, proposedBy: "agreement_your_match".localized(), isOwn: false)
             }
 
             if viewModel.proposedByMe == nil, viewModel.proposedByThem == nil {
-                Text("No proposals yet. Browse events below and propose one!")
+                Text("agreement_no_proposals".localized())
                     .dnCaption()
                     .frame(maxWidth: .infinity)
                     .padding(DNSpace.xl)
@@ -95,7 +104,7 @@ struct EventAgreementView: View {
                         Text(event.title)
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.dnTextPrimary)
-                        Text("Proposed by \(proposedBy)")
+                        Text(String(format: "agreement_proposed_by".localized(), proposedBy))
                             .dnSmall()
                     }
 
@@ -104,11 +113,11 @@ struct EventAgreementView: View {
 
                 if !isOwn {
                     HStack(spacing: DNSpace.md) {
-                        DNButton("Accept", variant: .primary) {
-                            viewModel.acceptProposal()
+                        DNButton("agreement_accept".localized(), variant: .primary) {
+                            Task { await viewModel.acceptProposal() }
                         }
-                        DNButton("Reject", variant: .secondary) {
-                            viewModel.rejectProposal()
+                        DNButton("agreement_reject".localized(), variant: .secondary) {
+                            Task { await viewModel.rejectProposal() }
                         }
                     }
                 }
@@ -120,7 +129,7 @@ struct EventAgreementView: View {
 
     private var availableEventsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Available Events")
+            Text("agreement_available_events".localized())
                 .dnH3()
 
             ForEach(viewModel.availableEvents) { event in
@@ -161,9 +170,12 @@ struct EventAgreementView: View {
                 Spacer()
 
                 let isAlreadyProposed = viewModel.proposedByMe?.id == event.id
-                DNButton(isAlreadyProposed ? "Proposed" : "Propose", variant: .secondary) {
+                DNButton(
+                    isAlreadyProposed ? "agreement_proposed".localized() : "agreement_propose".localized(),
+                    variant: .secondary
+                ) {
                     if !isAlreadyProposed {
-                        viewModel.proposeEvent(event)
+                        Task { await viewModel.proposeEvent(event) }
                     }
                 }
                 .frame(maxWidth: 110)
@@ -177,11 +189,11 @@ struct EventAgreementView: View {
     private var confirmButton: some View {
         Group {
             if viewModel.agreedEvent != nil {
-                DNButton("Confirm Date", variant: .primary) {
+                DNButton("agreement_confirm_date".localized(), variant: .primary) {
                     viewModel.confirmDate()
                 }
             } else {
-                DNButton("Confirm Date", variant: .secondary) {}
+                DNButton("agreement_confirm_date".localized(), variant: .secondary) {}
                     .opacity(0.5)
                     .allowsHitTesting(false)
             }
@@ -203,7 +215,7 @@ struct EventAgreementView: View {
                     .scaleEffect(viewModel.showConfirmation ? 1.0 : 0.3)
                     .animation(.spring(response: 0.5, dampingFraction: 0.6), value: viewModel.showConfirmation)
 
-                Text("Event Confirmed!")
+                Text("agreement_event_confirmed".localized())
                     .font(.system(size: 24, weight: .black))
                     .foregroundColor(.white)
 
@@ -213,7 +225,7 @@ struct EventAgreementView: View {
                         .foregroundColor(.white.opacity(0.8))
                 }
 
-                DNButton("Continue", variant: .primary) {
+                DNButton("button_continue".localized(), variant: .primary) {
                     viewModel.showConfirmation = false
                 }
                 .frame(maxWidth: 200)

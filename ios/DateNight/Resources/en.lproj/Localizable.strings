@@ -121,8 +121,316 @@
 "profile_notifications" = "Notifications";
 "profile_privacy" = "Privacy";
 "profile_help" = "Help & Support";
+"profile_stat_matches" = "Matches";
+"profile_stat_dates" = "Dates";
+"profile_stat_events" = "Events";
+"profile_recent_activity" = "Recent Activity";
+"profile_sign_out" = "Sign Out";
+"profile_settings_tutorial" = "View Onboarding Tutorial";
+"profile_settings_account" = "Account Settings";
+"profile_settings_preferences" = "Preferences";
+"profile_settings_notifications" = "Notifications";
+"profile_settings_privacy" = "Privacy & Security";
+"profile_settings_help" = "Help & Support";
+"profile_settings_reviews" = "My Reviews";
+"profile_settings_friends" = "My Friends";
+"profile_settings_events" = "My Events";
+
+/* Profile Edit */
+"profile_edit_photos_title" = "Your Photos";
+"profile_edit_photos_hint" = "Min 2 photos, max 6";
+"profile_edit_photos_add" = "Add";
+"profile_edit_basic_info" = "Basic Info";
+"profile_edit_name" = "Name";
+"profile_edit_name_placeholder" = "Your name";
+"profile_edit_bio" = "Bio";
+"profile_edit_bio_placeholder" = "Tell us about yourself...";
+"profile_edit_occupation" = "Occupation";
+"profile_edit_occupation_placeholder" = "Your occupation";
+"profile_edit_height" = "Height (cm)";
+"profile_edit_height_placeholder" = "Height in cm";
+"profile_edit_interests" = "Interests";
+"profile_edit_add_interest" = "Add interest...";
+"profile_edit_ready_to_mingle" = "Ready to Mingle";
+"profile_edit_ready_subtitle" = "Are you looking to meet people?";
+"profile_edit_available_from" = "From";
+"profile_edit_available_until" = "Until";
+"profile_edit_save" = "Save Changes";
+
+/* Match Preferences */
+"prefs_title" = "Match Preferences";
+"prefs_age_range" = "Age Range";
+"prefs_max_distance" = "Maximum Distance";
+"prefs_relationship_type" = "Relationship Type";
+"prefs_interests" = "Interests";
+"prefs_gender_preference" = "Gender Preference";
+"prefs_gender_any" = "Any";
+"prefs_save" = "Save";
+
+/* Settings */
+"settings_title" = "Settings";
+"settings_account" = "Account";
+"settings_edit_profile" = "Edit Profile";
+"settings_change_password" = "Change Password";
+"settings_email" = "Email";
+"settings_notifications" = "Notifications";
+"settings_matches" = "Matches";
+"settings_messages" = "Messages";
+"settings_events" = "Events";
+"settings_date_reminders" = "Date Reminders";
+"settings_friend_requests" = "Friend Requests";
+"settings_privacy" = "Privacy";
+"settings_show_profile" = "Show Profile";
+"settings_show_distance" = "Show Distance";
+"settings_show_online" = "Show Online Status";
+"settings_preferences" = "Preferences";
+"settings_language" = "Language";
+"settings_dark_mode" = "Dark Mode";
+"settings_support" = "Support";
+"settings_help_center" = "Help Center";
+"settings_report_problem" = "Report a Problem";
+"settings_terms" = "Terms of Service";
+"settings_privacy_policy" = "Privacy Policy";
+"settings_danger_zone" = "Danger Zone";
+"settings_delete_account" = "Delete Account";
+"settings_delete_confirm_title" = "Delete Account";
+"settings_delete_confirm_message" = "Are you sure you want to delete your account? This action cannot be undone.";
+"settings_log_out" = "Log Out";
+
+/* Help & Support */
+"help_title" = "Help & Support";
+"help_faq" = "FAQ";
+"help_contact" = "Contact Us";
+"help_report" = "Report a Problem";
+"help_report_title" = "Report a Problem";
+"help_report_placeholder" = "Describe the problem...";
+"help_report_submit" = "Submit";
+"help_version" = "DateNight v%@";
 
 /* Status */
 "status_open" = "Open";
 "status_full" = "Full";
 "status_confirmed" = "Confirmed";
+"status_cancelled" = "Cancelled";
+
+/* Discover Screen */
+"discover_title" = "Discover";
+"discover_people_nearby" = "%d people nearby";
+"discover_no_more_people" = "No more people";
+"discover_come_back_later" = "Come back later to see new profiles";
+"discover_distance_unknown" = "Distance unknown";
+"discover_distance_format" = "%@ km away";
+
+/* Filters */
+"filter_title" = "Filters";
+"filter_age" = "Age";
+"filter_min" = "Min";
+"filter_max" = "Max";
+"filter_distance" = "Distance";
+"filter_interests" = "Interests";
+"filter_gender_preference" = "Gender Preference";
+"filter_gender_all" = "All";
+
+/* Match Detail */
+"match_its_a_match" = "It's a Match!";
+"match_send_message" = "Send Message";
+"match_keep_swiping" = "Keep Swiping";
+"match_shared_interests" = "SHARED INTERESTS";
+
+/* Profile Modal */
+"profile_report_block" = "Report or Block";
+
+/* Matches Screen */
+"matches_title" = "YOUR DATES";
+"matches_subtitle" = "Find people to attend events together";
+"matches_available_dates" = "AVAILABLE DATES";
+"matches_your_dates" = "YOUR DATES";
+"matches_view_all_dates" = "View All My Dates";
+"matches_create_date" = "CREATE YOUR OWN DATE";
+"matches_create_date_subtitle" = "Organize a date for an event you like";
+"matches_browse_events" = "BROWSE EVENTS";
+"matches_no_dates_yet" = "No dates yet";
+"matches_explore_events" = "Explore events and create a date to get started";
+"matches_join_date" = "JOIN THIS DATE";
+"matches_date_full" = "This date is full";
+
+/* My Dates Screen */
+"dates_my_dates" = "MY DATES";
+"dates_manage_dates" = "Manage your upcoming and past dates";
+"dates_upcoming" = "Upcoming";
+"dates_past" = "Past";
+"dates_cancelled" = "Cancelled";
+"dates_no_upcoming" = "No upcoming dates";
+"dates_no_past" = "No past dates";
+"dates_no_cancelled" = "No cancelled dates";
+"dates_no_dates" = "No dates";
+"dates_explore_to_start" = "Explore events and create a date to get started";
+"dates_untitled" = "Untitled";
+
+/* Date Detail */
+"dates_date_info" = "Date Info";
+"dates_solo" = "Solo";
+"dates_group" = "Group";
+"dates_organizer" = "Organizer";
+"dates_attendees" = "Attendees";
+"dates_event_details" = "Event Details";
+"dates_open_chat" = "Open Chat";
+"dates_rate_date" = "Rate Your Date";
+"dates_cancel_date" = "CANCEL DATE";
+"dates_cancel_confirmation_title" = "Cancel Date";
+"dates_cancel_confirmation_message" = "Are you sure you want to cancel this date? This action cannot be undone.";
+"dates_confirm_cancel" = "Yes, Cancel";
+
+/* Invite */
+"invite_title" = "Invite Friends";
+"invite_subtitle" = "Choose people to join your date";
+"invite_selected" = "Selected (%d)";
+"invite_from_matches" = "From Matches";
+"invite_from_friends" = "From Friends";
+"invite_invited" = "Invited";
+"invite_select_people" = "Select People to Invite";
+"invite_send_count" = "Send Invitations (%d)";
+
+/* Event Agreement */
+"agreement_choose_event" = "Choose an Event";
+"agreement_subtitle" = "Propose an event and agree with your match";
+"agreement_proposed_events" = "Proposed Events";
+"agreement_you" = "You";
+"agreement_your_match" = "Your Match";
+"agreement_proposed_by" = "Proposed by %@";
+"agreement_no_proposals" = "No proposals yet. Browse events below and propose one!";
+"agreement_accept" = "Accept";
+"agreement_reject" = "Reject";
+"agreement_available_events" = "Available Events";
+"agreement_propose" = "Propose";
+"agreement_proposed" = "Proposed";
+"agreement_confirm_date" = "Confirm Date";
+"agreement_event_confirmed" = "Event Confirmed!";
+
+/* Event Detail */
+"event_detail_date" = "DATE";
+"event_detail_time" = "TIME";
+"event_detail_venue" = "VENUE";
+"event_detail_price" = "PRICE";
+"event_detail_about" = "About";
+"event_detail_whos_going" = "Who's Going";
+"event_detail_interested" = "%d interested";
+"event_detail_comments" = "Comments";
+"event_detail_add_comment" = "Add a comment...";
+"event_detail_create_date" = "Create Date";
+
+/* Report */
+"report_title" = "REPORT USER";
+"report_reason" = "REASON";
+"report_additional_details" = "ADDITIONAL DETAILS";
+"report_details_placeholder" = "Provide more details...";
+"report_block_and_report" = "BLOCK & REPORT";
+
+/* Help FAQ */
+"help_faq_create_date_q" = "How do I create a date?";
+"help_faq_create_date_a" = "Browse events or matches, then tap 'Invite to Date' on any profile or event. Choose a time, add a message, and send the invitation. Your match will receive a notification to accept or decline.";
+"help_faq_matching_q" = "How does matching work?";
+"help_faq_matching_a" = "We match you based on shared event interests and preferences. Swipe right on profiles you like. When both people swipe right, it's a match! You can then chat and plan dates together.";
+"help_faq_friends_q" = "How do I add friends?";
+"help_faq_friends_a" = "Go to the Friends tab and tap the '+' button. You can search for people by name or invite friends using their email address. Friends can see your events and join group dates.";
+"help_faq_report_q" = "How do I report someone?";
+"help_faq_report_a" = "Open the user's profile and tap the '...' menu in the top-right corner. Select 'Report User' and choose a reason. Our safety team reviews all reports within 24 hours.";
+"help_faq_delete_q" = "How do I delete my account?";
+"help_faq_delete_a" = "Go to Settings > Danger Zone > Delete Account. This will permanently remove your profile, matches, messages, and all associated data. This action cannot be undone.";
+"help_contact_us" = "CONTACT US";
+
+/* My Events */
+"my_events_title" = "My Events";
+"my_events_attending" = "attending";
+"my_events_attending_count" = "Attending:";
+"my_events_empty_title" = "Create your first event";
+"my_events_empty_subtitle" = "Tap the + button to get started";
+"delete_event_confirm_title" = "Delete Event";
+"delete_event_confirm_message" = "Are you sure you want to delete this event? This cannot be undone.";
+"cancel" = "Cancel";
+"delete" = "Delete";
+
+/* Notifications */
+"notifications_title" = "NOTIFICATIONS";
+"notifications_mark_all_read" = "Mark all read";
+"notifications_empty" = "No notifications";
+
+/* Forgot Password */
+"forgot_password_title" = "Reset Password";
+"forgot_password_subtitle" = "Enter your email and we'll send you a reset link";
+"forgot_password_email" = "EMAIL";
+"forgot_password_send" = "Send Reset Link";
+"forgot_password_check_email" = "Check your email";
+"forgot_password_sent_message" = "We've sent a password reset link to %@";
+"forgot_password_back_to_login" = "Back to Login";
+
+/* Profile Setup */
+"setup_photos_title" = "Add Your Photos";
+"setup_photos_subtitle" = "Add at least 2 photos to continue";
+"setup_about_title" = "Tell Us About You";
+"setup_bio" = "BIO";
+"setup_bio_placeholder" = "Tell others about yourself...";
+"setup_occupation" = "OCCUPATION";
+"setup_occupation_placeholder" = "What do you do?";
+"setup_location" = "LOCATION";
+"setup_location_placeholder" = "City, State";
+"setup_height" = "HEIGHT";
+"setup_height_placeholder" = "Height in inches";
+"setup_interests_title" = "Pick Your Interests";
+"setup_interests_subtitle" = "Choose at least 3 interests";
+"setup_back" = "Back";
+"setup_next" = "Next";
+"setup_complete" = "Complete Setup";
+
+/* Event Card */
+"event_card_view_details" = "View Details";
+
+/* Event Swipe */
+"swipe_title" = "Events";
+"swipe_events_to_explore" = "%d events to explore";
+"swipe_no_more" = "No more events";
+"swipe_come_back" = "Come back later for new events";
+
+/* Add Event */
+"add_event_details" = "Event Details";
+"add_event_title_placeholder" = "Event title";
+"add_event_description_placeholder" = "Describe your event...";
+"add_event_category" = "Category";
+"add_event_date_time" = "Date & Time";
+"add_event_date" = "Date";
+"add_event_time" = "Time";
+"add_event_location" = "Location";
+"add_event_venue_placeholder" = "Venue name";
+"add_event_address_placeholder" = "Address";
+"add_event_image" = "Image";
+"add_event_tap_photo" = "Tap to add a photo";
+"add_event_price" = "Price";
+"add_event_capacity" = "Capacity";
+"add_event_capacity_hint" = "Maximum number of attendees";
+"add_event_visibility" = "Visibility";
+"add_event_public" = "Public";
+"add_event_private" = "Private";
+"add_event_create" = "Create Event";
+"add_event_create_title" = "Create Event";
+"add_event_edit_title" = "Edit Event";
+"add_event_save" = "Save Changes";
+"add_event_price_free" = "Free";
+"add_event_public_desc" = "Anyone on DateNight can discover this event.";
+"add_event_private_desc" = "Only people you invite can see this event.";
+
+/* My Events Tabs */
+"my_events_tab_created" = "Created";
+"my_events_tab_attending" = "Attending";
+
+/* Create Date Sheet */
+"create_date_title" = "Create a Date";
+"create_date_solo" = "Solo Date";
+"create_date_group" = "Group Date";
+"create_date_solo_desc" = "Meet someone special at this event";
+"create_date_group_desc" = "Bring friends or meet multiple people";
+"create_date_group_size" = "How many people? (including you)";
+"create_date_invite_friends" = "Invite Friends";
+"create_date_no_friends" = "Add friends to invite them to dates";
+"create_date_description" = "Description";
+"create_date_button" = "Create Date";
+"create_date_cancel" = "Cancel";

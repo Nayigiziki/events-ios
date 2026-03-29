@@ -13,9 +13,9 @@ struct NotificationsView: View {
 
                     Spacer()
 
-                    if notifications.contains(where: { !$0.isRead }) {
+                    if viewModel.unreadCount > 0 {
                         Button {
-                            viewModel.markAllAsRead()
+                            Task { await viewModel.markAllAsRead() }
                         } label: {
                             Text("Mark all read")
                                 .dnLink()
@@ -24,7 +24,7 @@ struct NotificationsView: View {
                 }
                 .padding(DNSpace.lg)
 
-                if viewModel.notifications.isEmpty {
+                if viewModel.notifications.isEmpty, !viewModel.isLoading {
                     emptyState
                 } else {
                     ScrollView {
@@ -32,7 +32,7 @@ struct NotificationsView: View {
                             ForEach(viewModel.notifications) { notification in
                                 notificationCard(notification)
                                     .onTapGesture {
-                                        viewModel.markAsRead(notification)
+                                        Task { await viewModel.markAsRead(notification.id) }
                                     }
                             }
                         }
@@ -42,13 +42,12 @@ struct NotificationsView: View {
                 }
             }
         }
+        .task {
+            await viewModel.loadNotifications()
+        }
     }
 
-    private var notifications: [MockNotification] {
-        viewModel.notifications
-    }
-
-    private func notificationCard(_ notification: MockNotification) -> some View {
+    private func notificationCard(_ notification: AppNotification) -> some View {
         DNCard {
             HStack(spacing: DNSpace.md) {
                 // Icon circle
@@ -72,8 +71,10 @@ struct NotificationsView: View {
                         .dnCaption()
                         .lineLimit(1)
 
-                    Text(notification.timeAgo)
-                        .dnSmall()
+                    if let date = notification.createdAt {
+                        Text(date, style: .relative)
+                            .dnSmall()
+                    }
                 }
 
                 Spacer()
@@ -88,23 +89,25 @@ struct NotificationsView: View {
         }
     }
 
-    private func iconName(for type: NotificationType) -> String {
+    private func iconName(for type: String) -> String {
         switch type {
-        case .match: "heart.fill"
-        case .message: "message.fill"
-        case .event: "calendar.fill"
-        case .date: "heart.circle.fill"
-        case .friend: "person.badge.plus"
+        case "match": "heart.fill"
+        case "message": "message.fill"
+        case "event": "calendar.fill"
+        case "date": "heart.circle.fill"
+        case "friend": "person.badge.plus"
+        default: "bell.fill"
         }
     }
 
-    private func iconColor(for type: NotificationType) -> Color {
+    private func iconColor(for type: String) -> Color {
         switch type {
-        case .match: .dnAccentPink
-        case .message: .dnPrimary
-        case .event: .dnSuccess
-        case .date: .dnPrimary
-        case .friend: .dnInfo
+        case "match": .dnAccentPink
+        case "message": .dnPrimary
+        case "event": .dnSuccess
+        case "date": .dnPrimary
+        case "friend": .dnInfo
+        default: .dnTextSecondary
         }
     }
 

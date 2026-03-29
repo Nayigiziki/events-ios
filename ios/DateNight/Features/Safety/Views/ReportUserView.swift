@@ -4,7 +4,7 @@ struct ReportUserView: View {
     @StateObject private var viewModel: ReportUserViewModel
     @Environment(\.dismiss) private var dismiss
 
-    init(reportedUser: MockUser) {
+    init(reportedUser: UserProfile) {
         _viewModel = StateObject(wrappedValue: ReportUserViewModel(reportedUser: reportedUser))
     }
 
@@ -14,11 +14,11 @@ struct ReportUserView: View {
                 VStack(spacing: DNSpace.xl) {
                     Spacer().frame(height: DNSpace.lg)
 
-                    Text("REPORT USER")
+                    Text("report_title".localized())
                         .dnH2()
 
                     AvatarView(
-                        url: URL(string: viewModel.reportedUser.avatar),
+                        url: URL(string: viewModel.reportedUser.avatarUrl ?? ""),
                         size: 72
                     )
 
@@ -26,7 +26,7 @@ struct ReportUserView: View {
                         .dnH3()
 
                     // Reason picker
-                    Text("REASON")
+                    Text("report_reason".localized())
                         .dnLabel()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -39,7 +39,7 @@ struct ReportUserView: View {
                     }
 
                     // Additional details
-                    Text("ADDITIONAL DETAILS")
+                    Text("report_additional_details".localized())
                         .dnLabel()
                         .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -54,7 +54,7 @@ struct ReportUserView: View {
                         .dnNeuPressed(intensity: .medium, cornerRadius: DNRadius.md)
                         .overlay(alignment: .topLeading) {
                             if viewModel.additionalDetails.isEmpty {
-                                Text("Provide more details...")
+                                Text("report_details_placeholder".localized())
                                     .font(.system(size: 16, weight: .semibold))
                                     .tracking(-0.47)
                                     .foregroundColor(.dnTextTertiary)
@@ -73,7 +73,7 @@ struct ReportUserView: View {
                                 dismiss()
                             }
                         } label: {
-                            Text("BLOCK & REPORT")
+                            Text("report_block_and_report".localized())
                                 .font(.system(size: 20, weight: .bold))
                                 .tracking(0.05)
                                 .foregroundColor(.white)
@@ -88,7 +88,7 @@ struct ReportUserView: View {
                         .opacity(viewModel.selectedReason.isEmpty ? 0.5 : 1.0)
                         .disabled(viewModel.selectedReason.isEmpty)
 
-                        DNButton("Cancel", variant: .secondary) {
+                        DNButton("button_cancel".localized(), variant: .secondary) {
                             dismiss()
                         }
                     }
@@ -128,8 +128,4 @@ struct ReportUserView: View {
             .padding(.vertical, DNSpace.xs)
         }
     }
-}
-
-#Preview {
-    ReportUserView(reportedUser: MockData.users[0])
 }

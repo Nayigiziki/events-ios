@@ -1,8 +1,11 @@
+import PhotosUI
 import SwiftUI
 
 struct ProfileEditView: View {
+    @EnvironmentObject var authService: AuthService
     @StateObject private var viewModel = ProfileEditViewModel()
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedItem: PhotosPickerItem?
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: DNSpace.md), count: 3)
 
@@ -23,7 +26,7 @@ struct ProfileEditView: View {
 
                 // Sticky save button
                 VStack {
-                    DNButton("Save Changes", variant: .primary) {
+                    DNButton("profile_edit_save".localized(), variant: .primary) {
                         viewModel.saveProfile()
                         dismiss()
                     }
@@ -34,7 +37,10 @@ struct ProfileEditView: View {
                 .dnNeuRaised(intensity: .medium, cornerRadius: 0)
             }
         }
-        .navigationTitle("Edit Profile")
+        .onAppear {
+            viewModel.userId = authService.currentUser?.id
+        }
+        .navigationTitle("profile_edit".localized())
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -54,7 +60,7 @@ struct ProfileEditView: View {
 
     private var photoGridSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("Your Photos")
+            Text("profile_edit_photos_title".localized())
                 .dnH3()
 
             LazyVGrid(columns: columns, spacing: DNSpace.md) {
@@ -80,18 +86,21 @@ struct ProfileEditView: View {
                     }
                 }
 
-                if viewModel.photos.count < 6 {
-                    Button {
-                        viewModel.addPhoto()
-                    } label: {
+                if viewModel.photos.count < ProfileEditViewModel.maxPhotos {
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
                         VStack(spacing: DNSpace.sm) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .medium))
-                                .foregroundColor(.dnTextTertiary)
-                            Text("Add")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.dnTextTertiary)
-                                .textCase(.uppercase)
+                            if viewModel.isUploadingPhoto {
+                                ProgressView()
+                                    .tint(.dnPrimary)
+                            } else {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 24, weight: .medium))
+                                    .foregroundColor(.dnTextTertiary)
+                                Text("profile_edit_photos_add".localized())
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.dnTextTertiary)
+                                    .textCase(.uppercase)
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: 110)
@@ -104,10 +113,20 @@ struct ProfileEditView: View {
                         .dnNeuPressed(intensity: .light, cornerRadius: DNRadius.md)
                     }
                     .buttonStyle(.plain)
+                    .disabled(viewModel.isUploadingPhoto)
+                    .onChange(of: selectedItem) { _, newItem in
+                        guard let newItem else { return }
+                        Task {
+                            if let data = try? await newItem.loadTransferable(type: Data.self) {
+                                await viewModel.addPhotoData(data)
+                            }
+                            selectedItem = nil
+                        }
+                    }
                 }
             }
 
-            Text("Min 2 photos, max 6")
+            Text("profile_edit_photos_hint".localized())
                 .dnSmall()
         }
     }
@@ -116,23 +135,27 @@ struct ProfileEditView: View {
 
     private var formSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.md) {
-            Text("Basic Info")
+            Text("profile_edit_basic_info".localized())
                 .dnH3()
 
             VStack(alignment: .leading, spacing: DNSpace.xs) {
-                Text("Name")
+                Text("profile_edit_name".localized())
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.dnTextPrimary)
                     .textCase(.uppercase)
-                DNTextField(placeholder: "Your name", text: $viewModel.name, icon: "person.fill")
+                DNTextField(
+                    placeholder: "profile_edit_name_placeholder".localized(),
+                    text: $viewModel.name,
+                    icon: "person.fill"
+                )
             }
 
             VStack(alignment: .leading, spacing: DNSpace.xs) {
-                Text("Bio")
+                Text("profile_edit_bio".localized())
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.dnTextPrimary)
                     .textCase(.uppercase)
-                TextField("Tell us about yourself...", text: $viewModel.bio, axis: .vertical)
+                TextField("profile_edit_bio_placeholder".localized(), text: $viewModel.bio, axis: .vertical)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.dnTextPrimary)
                     .lineLimit(4 ... 6)
@@ -142,19 +165,27 @@ struct ProfileEditView: View {
             }
 
             VStack(alignment: .leading, spacing: DNSpace.xs) {
-                Text("Occupation")
+                Text("profile_edit_occupation".localized())
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.dnTextPrimary)
                     .textCase(.uppercase)
-                DNTextField(placeholder: "Your occupation", text: $viewModel.occupation, icon: "briefcase.fill")
+                DNTextField(
+                    placeholder: "profile_edit_occupation_placeholder".localized(),
+                    text: $viewModel.occupation,
+                    icon: "briefcase.fill"
+                )
             }
 
             VStack(alignment: .leading, spacing: DNSpace.xs) {
-                Text("Height (cm)")
+                Text("profile_edit_height".localized())
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.dnTextPrimary)
                     .textCase(.uppercase)
-                DNTextField(placeholder: "Height in cm", text: $viewModel.height, icon: "ruler")
+                DNTextField(
+                    placeholder: "profile_edit_height_placeholder".localized(),
+                    text: $viewModel.height,
+                    icon: "ruler"
+                )
             }
         }
     }
@@ -163,7 +194,7 @@ struct ProfileEditView: View {
 
     private var interestsSection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("Interests")
+            Text("profile_edit_interests".localized())
                 .dnH3()
 
             FlowLayout(spacing: DNSpace.sm) {
@@ -192,7 +223,7 @@ struct ProfileEditView: View {
             }
 
             HStack(spacing: DNSpace.sm) {
-                DNTextField(placeholder: "Add interest...", text: $viewModel.newInterest)
+                DNTextField(placeholder: "profile_edit_add_interest".localized(), text: $viewModel.newInterest)
 
                 Button {
                     viewModel.addInterest()
@@ -215,11 +246,11 @@ struct ProfileEditView: View {
             VStack(alignment: .leading, spacing: DNSpace.md) {
                 HStack {
                     VStack(alignment: .leading, spacing: DNSpace.xs) {
-                        Text("Ready to Mingle")
+                        Text("profile_edit_ready_to_mingle".localized())
                             .font(.system(size: 18, weight: .black))
                             .foregroundColor(.dnTextPrimary)
                             .textCase(.uppercase)
-                        Text("Are you looking to meet people?")
+                        Text("profile_edit_ready_subtitle".localized())
                             .dnCaption()
                     }
 
@@ -233,7 +264,7 @@ struct ProfileEditView: View {
                 if viewModel.isReadyToMingle {
                     VStack(alignment: .leading, spacing: DNSpace.sm) {
                         DatePicker(
-                            "From",
+                            "profile_edit_available_from".localized(),
                             selection: $viewModel.availableFrom,
                             displayedComponents: .date
                         )
@@ -241,7 +272,7 @@ struct ProfileEditView: View {
                         .foregroundColor(.dnTextPrimary)
 
                         DatePicker(
-                            "Until",
+                            "profile_edit_available_until".localized(),
                             selection: $viewModel.availableUntil,
                             displayedComponents: .date
                         )

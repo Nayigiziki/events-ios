@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-    @StateObject private var viewModel = ProfileViewModel()
+    @StateObject private var viewModel: ProfileViewModel
     @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showEditProfile = false
     @State private var showMatchPreferences = false
@@ -13,6 +13,10 @@ struct ProfileView: View {
     @State private var showFriends = false
     @State private var showOnboarding = false
     @State private var showMyEvents = false
+
+    init(profileService: ProfileServiceProtocol = ProfileService(), userId: UUID = UUID()) {
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(profileService: profileService, userId: userId))
+    }
 
     var body: some View {
         NavigationStack {
@@ -64,15 +68,22 @@ struct ProfileView: View {
             .sheet(isPresented: $showOnboarding) {
                 OnboardingView()
             }
+            .task {
+                await viewModel.loadProfile()
+            }
         }
     }
 
     // MARK: - Photo Gallery
 
+    private var photos: [String] {
+        viewModel.profile?.photos ?? []
+    }
+
     private var photoGallery: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $viewModel.selectedPhotoIndex) {
-                ForEach(Array(viewModel.profile.photos.enumerated()), id: \.offset) { index, photo in
+                ForEach(Array(photos.enumerated()), id: \.offset) { index, photo in
                     DNAsyncImage(
                         url: URL(string: photo),
                         height: UIScreen.main.bounds.height * 0.45,
@@ -93,7 +104,7 @@ struct ProfileView: View {
                     Spacer()
                     // Settings gear icon
                     Button {
-                        // Settings action
+                        showSettings = true
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 16, weight: .bold))
@@ -106,7 +117,7 @@ struct ProfileView: View {
                 }
 
                 HStack(spacing: 6) {
-                    ForEach(0 ..< viewModel.profile.photos.count, id: \.self) { index in
+                    ForEach(0 ..< photos.count, id: \.self) { index in
                         Capsule()
                             .fill(index == viewModel.selectedPhotoIndex ? Color.dnPrimary : Color.white.opacity(0.3))
                             .frame(height: 3)
@@ -135,7 +146,7 @@ struct ProfileView: View {
                     Button {
                         withAnimation {
                             viewModel.selectedPhotoIndex = min(
-                                viewModel.profile.photos.count - 1,
+                                max(photos.count - 1, 0),
                                 viewModel.selectedPhotoIndex + 1
                             )
                         }
@@ -152,12 +163,12 @@ struct ProfileView: View {
                 // Name + age overlay
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: DNSpace.xs) {
-                        Text("\(viewModel.profile.name), \(viewModel.profile.age)")
+                        Text("\(viewModel.profile?.name ?? ""), \(viewModel.profile?.age ?? 0)")
                             .font(.system(size: 30, weight: .heavy))
                             .tracking(-0.6)
                             .foregroundColor(.white)
 
-                        Text(viewModel.profile.bio)
+                        Text(viewModel.profile?.bio ?? "")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white.opacity(0.9))
                     }
@@ -190,7 +201,7 @@ struct ProfileView: View {
     private var interestTagsSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: DNSpace.sm) {
-                ForEach(viewModel.profile.interests, id: \.self) { interest in
+                ForEach(viewModel.profile?.interests ?? [], id: \.self) { interest in
                     Text(interest.uppercased())
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.dnTextPrimary)
@@ -207,7 +218,7 @@ struct ProfileView: View {
     private var photoThumbnailRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: DNSpace.md) {
-                ForEach(Array(viewModel.profile.photos.enumerated()), id: \.offset) { index, photo in
+                ForEach(Array(photos.enumerated()), id: \.offset) { index, photo in
                     DNAsyncImage(
                         url: URL(string: photo),
                         height: 64,
@@ -235,21 +246,21 @@ struct ProfileView: View {
         HStack(spacing: DNSpace.sm) {
             DNStatCard(
                 icon: "heart.fill",
-                label: "Matches",
+                label: "profile_stat_matches".localized(),
                 value: "\(viewModel.stats.matches)",
                 accentColor: .dnAccentPink
             )
 
             DNStatCard(
                 icon: "calendar",
-                label: "Citas",
+                label: "profile_stat_dates".localized(),
                 value: "\(viewModel.stats.dates)",
                 accentColor: .dnPrimary
             )
 
             DNStatCard(
                 icon: "mappin.and.ellipse",
-                label: "Eventos",
+                label: "profile_stat_events".localized(),
                 value: "\(viewModel.stats.events)",
                 accentColor: .dnSuccess
             )
@@ -260,7 +271,7 @@ struct ProfileView: View {
 
     private var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: DNSpace.sm) {
-            Text("ACTIVIDAD RECIENTE")
+            Text("profile_recent_activity".localized())
                 .dnLabel()
                 .textCase(.uppercase)
 
@@ -343,13 +354,13 @@ struct ProfileView: View {
             }
 
             VStack(spacing: DNSpace.sm) {
-                ForEach(settingsItems, id: \.self) { item in
+                ForEach(settingsItems, id: \.key) { item in
                     Button {
-                        handleSettingsTap(item)
+                        handleSettingsTap(item.key)
                     } label: {
                         DNCard {
                             HStack {
-                                Text(item)
+                                Text(item.label)
                                     .dnBody()
                                 Spacer()
                                 Image(systemName: "chevron.right")
@@ -362,11 +373,11 @@ struct ProfileView: View {
                 }
 
                 Button {
-                    authViewModel.signOut()
+                    Task { await authViewModel.signOut() }
                 } label: {
                     DNCard {
                         HStack {
-                            Text("Cerrar Sesión")
+                            Text("profile_sign_out".localized())
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.dnDestructive)
                             Spacer()
@@ -383,39 +394,55 @@ struct ProfileView: View {
 
     // MARK: - Helpers
 
-    private var settingsItems: [String] {
-        [
-            "Ver Tutorial de Inicio",
-            "Explorador de Diseños",
-            "Galería de Pantallas",
-            "Configuración de Cuenta",
-            "Preferencias",
-            "Notificaciones",
-            "Privacidad y Seguridad",
-            "Ayuda y Soporte",
-            "Mis Reseñas",
-            "Mis Amigos",
-            "Mis Eventos"
-        ]
+    private struct SettingsItem: Identifiable {
+        let key: String
+        let label: String
+        var id: String { key }
     }
 
-    private func handleSettingsTap(_ item: String) {
-        switch item {
-        case "Ver Tutorial de Inicio":
+    private var settingsItems: [SettingsItem] {
+        var items = [
+            SettingsItem(key: "tutorial", label: "profile_settings_tutorial".localized())
+        ]
+
+        #if DEBUG
+            items.append(contentsOf: [
+                SettingsItem(key: "design_explorer", label: "Explorador de Disenos"),
+                SettingsItem(key: "screen_gallery", label: "Galeria de Pantallas")
+            ])
+        #endif
+
+        items.append(contentsOf: [
+            SettingsItem(key: "account", label: "profile_settings_account".localized()),
+            SettingsItem(key: "preferences", label: "profile_settings_preferences".localized()),
+            SettingsItem(key: "notifications", label: "profile_settings_notifications".localized()),
+            SettingsItem(key: "privacy", label: "profile_settings_privacy".localized()),
+            SettingsItem(key: "help", label: "profile_settings_help".localized()),
+            SettingsItem(key: "reviews", label: "profile_settings_reviews".localized()),
+            SettingsItem(key: "friends", label: "profile_settings_friends".localized()),
+            SettingsItem(key: "events", label: "profile_settings_events".localized())
+        ])
+
+        return items
+    }
+
+    private func handleSettingsTap(_ key: String) {
+        switch key {
+        case "tutorial":
             showOnboarding = true
-        case "Configuración de Cuenta", "Privacidad y Seguridad":
+        case "account", "privacy":
             showSettings = true
-        case "Preferencias":
+        case "preferences":
             showMatchPreferences = true
-        case "Notificaciones":
+        case "notifications":
             showNotifications = true
-        case "Ayuda y Soporte":
+        case "help":
             showHelpSupport = true
-        case "Mis Reseñas":
+        case "reviews":
             showMyReviews = true
-        case "Mis Amigos":
+        case "friends":
             showFriends = true
-        case "Mis Eventos":
+        case "events":
             showMyEvents = true
         default:
             break

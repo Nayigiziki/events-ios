@@ -32,10 +32,8 @@ struct ChatListView: View {
                         ScrollView {
                             LazyVStack(spacing: DNSpace.xs) {
                                 ForEach(viewModel.filteredConversations) { conversation in
-                                    NavigationLink(destination: ConversationChatView(partner: conversation.user)) {
-                                        conversationRow(conversation)
-                                    }
-                                    .buttonStyle(.plain)
+                                    conversationRow(conversation)
+                                        .buttonStyle(.plain)
                                 }
                             }
                             .padding(.horizontal, DNSpace.lg)
@@ -45,17 +43,20 @@ struct ChatListView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task {
+                await viewModel.loadConversations()
+            }
         }
     }
 
     // MARK: - Conversation Row
 
-    private func conversationRow(_ conversation: MockConversation) -> some View {
+    private func conversationRow(_ conversation: ConversationListItem) -> some View {
         HStack(spacing: DNSpace.md) {
             ConversationAvatarView(conversation: conversation)
 
             VStack(alignment: .leading, spacing: DNSpace.xs) {
-                Text(conversation.isGroup ? (conversation.groupName ?? conversation.user.name) : conversation.user.name)
+                Text(conversationDisplayName(conversation))
                     .font(.system(size: 18, weight: .bold))
                     .tracking(-0.6)
                     .foregroundColor(.dnTextPrimary)
@@ -64,7 +65,7 @@ struct ChatListView: View {
                 if conversation.isTyping {
                     TypingIndicator()
                 } else {
-                    Text(conversation.lastMessage)
+                    Text(conversation.lastMessageText ?? "")
                         .dnCaption()
                         .lineLimit(1)
                 }
@@ -72,11 +73,20 @@ struct ChatListView: View {
 
             Spacer()
 
-            Text(conversation.timestamp.uppercased())
-                .font(.system(size: 12, weight: .bold))
-                .foregroundColor(.dnTextTertiary)
+            if let date = conversation.lastMessageDate {
+                Text(date.formatted(.relative(presentation: .named)))
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.dnTextTertiary)
+            }
         }
         .padding(.vertical, DNSpace.md)
+    }
+
+    private func conversationDisplayName(_ conversation: ConversationListItem) -> String {
+        if conversation.isGroup {
+            return conversation.groupName ?? conversation.participants.first?.name ?? ""
+        }
+        return conversation.participants.first?.name ?? ""
     }
 
     // MARK: - Empty State
@@ -95,10 +105,10 @@ struct ChatListView: View {
             }
             .dnNeuRaised()
 
-            Text("No hay conversaciones aún")
+            Text("No hay conversaciones aun")
                 .dnH3()
 
-            Text("Cuando hagas match con alguien, podrás chatear aquí")
+            Text("Cuando hagas match con alguien, podras chatear aqui")
                 .dnCaption()
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, DNSpace.xxl)
@@ -136,13 +146,13 @@ struct TypingIndicator: View {
 // MARK: - Conversation Avatar View
 
 struct ConversationAvatarView: View {
-    let conversation: MockConversation
+    let conversation: ConversationListItem
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             ZStack(alignment: .bottomTrailing) {
                 AvatarView(
-                    url: URL(string: conversation.user.avatar),
+                    url: URL(string: conversation.participants.first?.avatarUrl ?? ""),
                     size: 56
                 )
 
@@ -159,12 +169,12 @@ struct ConversationAvatarView: View {
                 }
             }
 
-            if conversation.unread > 0 {
+            if conversation.unreadCount > 0 {
                 ZStack {
                     Circle()
                         .fill(Color.dnAccentPink)
                         .frame(width: 24, height: 24)
-                    Text("\(conversation.unread)")
+                    Text("\(conversation.unreadCount)")
                         .font(.system(size: 12, weight: .black))
                         .foregroundColor(.white)
                 }
