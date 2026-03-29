@@ -10,19 +10,24 @@ final class SupabaseService: Sendable {
         NSClassFromString("XCTestCase") != nil
     }
 
+    let isConfigured: Bool
+
     private init() {
-        if Self.isRunningTests {
-            // Use a valid but non-functional client for tests to prevent crashes.
-            // All test code should use mock services injected via protocols.
-            self.client = SupabaseClient(
-                supabaseURL: URL(string: "https://test.supabase.co")!,
-                supabaseKey: "test-key"
-            )
+        let url = SupabaseConfig.supabaseURL
+        let key = SupabaseConfig.supabaseAnonKey
+        let hasRealConfig = !url.absoluteString.contains("placeholder") && !key.contains("placeholder")
+
+        if hasRealConfig {
+            self.client = SupabaseClient(supabaseURL: url, supabaseKey: key)
+            self.isConfigured = true
         } else {
+            // Placeholder credentials — use a dummy client that won't crash.
+            // Real Supabase calls will fail gracefully via service error handling.
             self.client = SupabaseClient(
-                supabaseURL: SupabaseConfig.supabaseURL,
-                supabaseKey: SupabaseConfig.supabaseAnonKey
+                supabaseURL: URL(string: "https://localhost.supabase.co")!,
+                supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.placeholder"
             )
+            self.isConfigured = false
         }
     }
 }

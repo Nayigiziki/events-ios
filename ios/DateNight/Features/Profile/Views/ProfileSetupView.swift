@@ -2,7 +2,6 @@ import PhotosUI
 import SwiftUI
 
 struct ProfileSetupView: View {
-    @EnvironmentObject var authService: AuthService
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = ProfileSetupViewModel()
     @State private var selectedItem: PhotosPickerItem?
@@ -51,7 +50,7 @@ struct ProfileSetupView: View {
             }
         }
         .onAppear {
-            viewModel.userId = authService.currentUser?.id
+            viewModel.userId = authViewModel.userId
         }
         .onChange(of: viewModel.isComplete) { _, newValue in
             if newValue {

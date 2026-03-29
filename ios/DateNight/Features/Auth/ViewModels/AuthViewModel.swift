@@ -10,6 +10,7 @@ final class AuthViewModel: ObservableObject {
     @Published var isFirstLaunch: Bool
     @Published var showBiometricPrompt = false
     @Published var profileComplete = false
+    @Published var userId: UUID?
 
     private let authService: AuthServiceProtocol
     private let profileService: any ProfileServiceProtocol
@@ -33,6 +34,7 @@ final class AuthViewModel: ObservableObject {
 
         do {
             let session = try await authService.signIn(email: email, password: password)
+            userId = session.user.id
             isAuthenticated = true
             await checkProfileComplete(userId: session.user.id)
         } catch {
@@ -105,6 +107,7 @@ final class AuthViewModel: ObservableObject {
 
         do {
             if let session = try await authService.checkSession() {
+                userId = session.user.id
                 if biometricService.isBiometricEnabled, biometricService.canUseBiometrics() {
                     let authenticated = try await biometricService.authenticate(reason: "Unlock DateNight")
                     isAuthenticated = authenticated
