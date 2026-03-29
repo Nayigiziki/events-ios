@@ -405,13 +405,6 @@ struct ProfileView: View {
             SettingsItem(key: "tutorial", label: "profile_settings_tutorial".localized())
         ]
 
-        #if DEBUG
-            items.append(contentsOf: [
-                SettingsItem(key: "design_explorer", label: "Explorador de Disenos"),
-                SettingsItem(key: "screen_gallery", label: "Galeria de Pantallas")
-            ])
-        #endif
-
         items.append(contentsOf: [
             SettingsItem(key: "account", label: "profile_settings_account".localized()),
             SettingsItem(key: "preferences", label: "profile_settings_preferences".localized()),
