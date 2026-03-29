@@ -7,13 +7,23 @@ final class AuthViewModelTests: XCTestCase {
     private var mockAuth: MockAuthService!
     private var mockBiometric: MockBiometricAuthService!
     private var mockProfile: MockProfileService!
+    private var testDefaults: UserDefaults!
 
     override func setUp() {
         super.setUp()
         mockAuth = MockAuthService()
         mockBiometric = MockBiometricAuthService()
         mockProfile = MockProfileService()
-        sut = AuthViewModel(authService: mockAuth, profileService: mockProfile, biometricService: mockBiometric)
+        testDefaults = UserDefaults(suiteName: "AuthViewModelTests")!
+        testDefaults.removePersistentDomain(forName: "AuthViewModelTests")
+        let rememberMe = RememberMeService(defaults: testDefaults)
+        rememberMe.save(email: "test@test.com", enabled: true)
+        sut = AuthViewModel(
+            authService: mockAuth,
+            profileService: mockProfile,
+            biometricService: mockBiometric,
+            rememberMeService: rememberMe
+        )
     }
 
     override func tearDown() {
@@ -21,6 +31,8 @@ final class AuthViewModelTests: XCTestCase {
         mockAuth = nil
         mockBiometric = nil
         mockProfile = nil
+        testDefaults?.removePersistentDomain(forName: "AuthViewModelTests")
+        testDefaults = nil
         super.tearDown()
     }
 
@@ -238,6 +250,30 @@ final class AuthViewModelTests: XCTestCase {
 
         XCTAssertTrue(sut.isAuthenticated)
         XCTAssertFalse(sut.profileComplete)
+    }
+
+    func testCheckSession_rememberMeDisabled_skipsSessionRestore() async {
+        let noRememberDefaults = UserDefaults(suiteName: "AuthViewModelTests_noRemember")!
+        noRememberDefaults.removePersistentDomain(forName: "AuthViewModelTests_noRemember")
+        let rememberMe = RememberMeService(defaults: noRememberDefaults)
+        rememberMe.save(email: "", enabled: false)
+        let vm = AuthViewModel(
+            authService: mockAuth,
+            profileService: mockProfile,
+            biometricService: mockBiometric,
+            rememberMeService: rememberMe
+        )
+
+        mockAuth.checkSessionResult = AuthSession(
+            user: AuthUser(id: UUID(), email: "test@test.com"),
+            accessToken: "token"
+        )
+
+        await vm.checkSession()
+
+        XCTAssertFalse(vm.isAuthenticated)
+        XCTAssertEqual(mockAuth.checkSessionCallCount, 0)
+        noRememberDefaults.removePersistentDomain(forName: "AuthViewModelTests_noRemember")
     }
 
     func testCheckSession_noSession_profileCompleteIsFalse() async {
