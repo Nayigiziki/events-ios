@@ -1,4 +1,5 @@
 import Foundation
+import Supabase
 
 @MainActor
 class ProfileEditViewModel: ObservableObject {
@@ -24,16 +25,35 @@ class ProfileEditViewModel: ObservableObject {
     init(profileService: any ProfileServiceProtocol = ProfileService(), userId: UUID? = nil) {
         self.profileService = profileService
         self.userId = userId
-        let user = MockData.currentUser
-        self.name = user.name
-        self.bio = user.bio
-        self.occupation = "Designer"
-        self.height = "170"
-        self.photos = user.photos
-        self.interests = user.interests
-        self.isReadyToMingle = true
+        self.name = ""
+        self.bio = ""
+        self.occupation = ""
+        self.height = ""
+        self.photos = []
+        self.interests = []
+        self.isReadyToMingle = false
         self.availableFrom = Date()
         self.availableUntil = Calendar.current.date(byAdding: .day, value: 7, to: Date()) ?? Date()
+    }
+
+    func loadCurrentUser() async {
+        do {
+            let session = try await SupabaseService.shared.client.auth.session
+            userId = session.user.id
+            let profile = try await profileService.fetchProfile(userId: session.user.id)
+            name = profile.name
+            bio = profile.bio ?? ""
+            occupation = profile.occupation ?? ""
+            height = profile.height.map { String($0) } ?? ""
+            photos = profile.photos
+            interests = profile.interests
+            isReadyToMingle = profile.readyToMingle
+            availableFrom = profile.availableFrom ?? Date()
+            availableUntil = profile.availableUntil ?? Calendar.current
+                .date(byAdding: .day, value: 7, to: Date()) ?? Date()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     func saveProfile() {

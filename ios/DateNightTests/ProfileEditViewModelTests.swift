@@ -17,18 +17,17 @@ final class ProfileEditViewModelTests: XCTestCase {
 
     // MARK: - Init
 
-    func testInit_loadsFromMockData() {
-        let user = MockData.currentUser
-        XCTAssertEqual(sut.name, user.name)
-        XCTAssertEqual(sut.bio, user.bio)
-        XCTAssertEqual(sut.photos, user.photos)
-        XCTAssertEqual(sut.interests, user.interests)
+    func testInit_setsEmptyDefaults() {
+        XCTAssertEqual(sut.name, "")
+        XCTAssertEqual(sut.bio, "")
+        XCTAssertEqual(sut.photos, [])
+        XCTAssertEqual(sut.interests, [])
     }
 
     func testInit_setsDefaults() {
-        XCTAssertEqual(sut.occupation, "Designer")
-        XCTAssertEqual(sut.height, "170")
-        XCTAssertTrue(sut.isReadyToMingle)
+        XCTAssertEqual(sut.occupation, "")
+        XCTAssertEqual(sut.height, "")
+        XCTAssertFalse(sut.isReadyToMingle)
         XCTAssertEqual(sut.newInterest, "")
     }
 

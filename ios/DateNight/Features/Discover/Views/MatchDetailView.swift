@@ -99,7 +99,7 @@ struct MatchDetailView: View {
         HStack(spacing: -24) {
             // Current user avatar (#53)
             AvatarView(
-                url: URL(string: currentUser?.avatarUrl ?? MockData.currentUser.avatar),
+                url: URL(string: currentUser?.avatarUrl ?? ""),
                 size: 96
             )
             .overlay(

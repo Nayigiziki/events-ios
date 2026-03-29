@@ -67,4 +67,8 @@ final class AuthService: ObservableObject {
             currentUser = nil
         }
     }
+
+    func updateUserMetadata(_ metadata: [String: AnyJSON]) async throws {
+        try await client.auth.update(user: UserAttributes(data: metadata))
+    }
 }

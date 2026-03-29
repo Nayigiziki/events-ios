@@ -21,8 +21,8 @@ final class StorageService {
             .remove(paths: [path])
     }
 
-    func getPhotoURL(path: String) -> URL {
-        try! client.storage.from(bucketName)
+    func getPhotoURL(path: String) throws -> URL {
+        try client.storage.from(bucketName)
             .getPublicURL(path: path)
     }
 }

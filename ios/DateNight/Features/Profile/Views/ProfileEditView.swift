@@ -2,7 +2,6 @@ import PhotosUI
 import SwiftUI
 
 struct ProfileEditView: View {
-    @EnvironmentObject var authService: AuthService
     @StateObject private var viewModel = ProfileEditViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var selectedItem: PhotosPickerItem?
@@ -37,8 +36,8 @@ struct ProfileEditView: View {
                 .dnNeuRaised(intensity: .medium, cornerRadius: 0)
             }
         }
-        .onAppear {
-            viewModel.userId = authService.currentUser?.id
+        .task {
+            await viewModel.loadCurrentUser()
         }
         .navigationTitle("profile_edit".localized())
         .navigationBarTitleDisplayMode(.inline)

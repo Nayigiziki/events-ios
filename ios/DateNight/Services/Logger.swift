@@ -27,7 +27,10 @@ final class Logger {
 
     private init() {
         // Use Documents directory for logs
-        let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        guard let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            self.fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("app.log")
+            return
+        }
         let logsDir = documentsDir.appendingPathComponent("logs")
 
         // Create directory if needed

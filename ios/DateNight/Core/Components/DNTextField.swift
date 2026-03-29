@@ -5,6 +5,7 @@ struct DNTextField: View {
     @Binding var text: String
     var icon: String?
     var label: String?
+    var isSecure: Bool = false
 
     @FocusState private var isFocused: Bool
 
@@ -19,13 +20,23 @@ struct DNTextField: View {
                     .animation(.easeInOut(duration: 0.2), value: isFocused)
             }
 
-            TextField(placeholder, text: $text)
-                .font(.system(size: 16, weight: .semibold))
-                .tracking(-0.47)
-                .foregroundColor(.dnTextPrimary)
-                .focused($isFocused)
-                .padding(.leading, icon != nil ? 12 : 56)
-                .padding(.trailing, 20)
+            if isSecure {
+                SecureField(placeholder, text: $text)
+                    .font(.system(size: 16, weight: .semibold))
+                    .tracking(-0.47)
+                    .foregroundColor(.dnTextPrimary)
+                    .focused($isFocused)
+                    .padding(.leading, icon != nil ? 12 : 56)
+                    .padding(.trailing, 20)
+            } else {
+                TextField(placeholder, text: $text)
+                    .font(.system(size: 16, weight: .semibold))
+                    .tracking(-0.47)
+                    .foregroundColor(.dnTextPrimary)
+                    .focused($isFocused)
+                    .padding(.leading, icon != nil ? 12 : 56)
+                    .padding(.trailing, 20)
+            }
         }
         .padding(.vertical, 20)
         .frame(height: 64)

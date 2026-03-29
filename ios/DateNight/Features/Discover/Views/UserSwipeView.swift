@@ -2,7 +2,6 @@ import SwiftUI
 
 struct UserSwipeView: View {
     @StateObject private var viewModel = DiscoverViewModel()
-    @EnvironmentObject private var authService: AuthService
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selectedProfileUser: UserProfile?
 
@@ -135,9 +134,9 @@ struct UserSwipeView: View {
                 MatchDetailView(
                     viewModel: MatchDetailViewModel(
                         matchedUser: matched,
-                        currentUserInterests: authService.currentUser?.interests ?? []
+                        currentUserInterests: viewModel.loggedInUser?.interests ?? []
                     ),
-                    currentUser: authService.currentUser,
+                    currentUser: viewModel.loggedInUser,
                     onSendMessage: {
                         viewModel.dismissMatch()
                     },

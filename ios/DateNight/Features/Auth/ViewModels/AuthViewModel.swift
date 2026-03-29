@@ -15,16 +15,19 @@ final class AuthViewModel: ObservableObject {
     private let authService: AuthServiceProtocol
     private let profileService: any ProfileServiceProtocol
     let biometricService: BiometricAuthServiceProtocol
+    private let rememberMeService: RememberMeService
     private let firstLaunchKey = "datenight_first_launch_completed"
 
     init(
         authService: AuthServiceProtocol = SupabaseAuthService(),
         profileService: any ProfileServiceProtocol = ProfileService(),
-        biometricService: BiometricAuthServiceProtocol = BiometricAuthService()
+        biometricService: BiometricAuthServiceProtocol = BiometricAuthService(),
+        rememberMeService: RememberMeService = RememberMeService()
     ) {
         self.authService = authService
         self.profileService = profileService
         self.biometricService = biometricService
+        self.rememberMeService = rememberMeService
         self.isFirstLaunch = !UserDefaults.standard.bool(forKey: firstLaunchKey)
     }
 
@@ -99,11 +102,19 @@ final class AuthViewModel: ObservableObject {
         } catch {
             // Log but don't block UI
         }
+        rememberMeService.save(email: "", enabled: false)
         isAuthenticated = false
     }
 
     func checkSession() async {
         isCheckingSession = true
+
+        let remembered = rememberMeService.restore()
+        guard remembered.enabled else {
+            isAuthenticated = false
+            isCheckingSession = false
+            return
+        }
 
         do {
             if let session = try await authService.checkSession() {

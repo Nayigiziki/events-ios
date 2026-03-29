@@ -12,6 +12,7 @@ class DiscoverViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var filters = DiscoverFilters()
+    @Published var loggedInUser: UserProfile?
 
     private let discoverService: any DiscoverServiceProtocol
 

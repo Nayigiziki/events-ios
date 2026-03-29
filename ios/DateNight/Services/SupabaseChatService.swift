@@ -7,7 +7,11 @@ final class SupabaseChatService: ChatServiceProtocol, @unchecked Sendable {
     func fetchConversations() async throws -> [ConversationListItem] { [] }
     func fetchMessages(conversationId: UUID) async throws -> [Message] { [] }
     func sendMessage(conversationId: UUID, content: String, messageType: MessageType) async throws -> Message {
-        fatalError("Not yet implemented")
+        throw NSError(
+            domain: "SupabaseChatService",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "sendMessage not yet implemented"]
+        )
     }
 
     func subscribeToMessages(conversationId: UUID, onMessage: @escaping @Sendable (Message) -> Void) async {}

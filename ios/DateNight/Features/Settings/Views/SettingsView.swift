@@ -4,6 +4,14 @@ struct SettingsView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var viewModel = SettingsViewModel()
     @State private var showDeleteConfirmation = false
+    @State private var showEditProfile = false
+    @State private var showChangePassword = false
+    @State private var showEmailSettings = false
+    @State private var showHelpCenter = false
+    @State private var showReportProblem = false
+    @State private var showTerms = false
+    @State private var showPrivacyPolicy = false
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         DNScreen {
@@ -17,15 +25,28 @@ struct SettingsView: View {
                     sectionHeader("settings_account".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            settingsRow(
-                                icon: "person.circle",
-                                title: "settings_edit_profile".localized(),
-                                showChevron: true
-                            )
+                            NavigationLink(destination: ProfileEditView()) {
+                                settingsRow(
+                                    icon: "person.circle",
+                                    title: "settings_edit_profile".localized(),
+                                    showChevron: true
+                                )
+                            }
+                            .foregroundColor(.dnTextPrimary)
                             divider
-                            settingsRow(icon: "lock", title: "settings_change_password".localized(), showChevron: true)
+                            Button(action: { showChangePassword = true }) {
+                                settingsRow(
+                                    icon: "lock",
+                                    title: "settings_change_password".localized(),
+                                    showChevron: true
+                                )
+                            }
+                            .foregroundColor(.dnTextPrimary)
                             divider
-                            settingsRow(icon: "envelope", title: "settings_email".localized(), showChevron: true)
+                            Button(action: { showEmailSettings = true }) {
+                                settingsRow(icon: "envelope", title: "settings_email".localized(), showChevron: true)
+                            }
+                            .foregroundColor(.dnTextPrimary)
                         }
                     }
 
@@ -34,20 +55,25 @@ struct SettingsView: View {
                     DNCard {
                         VStack(spacing: 0) {
                             toggleRow(title: "settings_matches".localized(), isOn: $viewModel.notifyMatches)
+                                .onChange(of: viewModel.notifyMatches) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(title: "settings_messages".localized(), isOn: $viewModel.notifyMessages)
+                                .onChange(of: viewModel.notifyMessages) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(title: "settings_events".localized(), isOn: $viewModel.notifyEvents)
+                                .onChange(of: viewModel.notifyEvents) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(
                                 title: "settings_date_reminders".localized(),
                                 isOn: $viewModel.notifyDateReminders
                             )
+                            .onChange(of: viewModel.notifyDateReminders) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(
                                 title: "settings_friend_requests".localized(),
                                 isOn: $viewModel.notifyFriendRequests
                             )
+                            .onChange(of: viewModel.notifyFriendRequests) { _ in viewModel.saveSettings() }
                         }
                     }
 
@@ -56,10 +82,13 @@ struct SettingsView: View {
                     DNCard {
                         VStack(spacing: 0) {
                             toggleRow(title: "settings_show_profile".localized(), isOn: $viewModel.showProfile)
+                                .onChange(of: viewModel.showProfile) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(title: "settings_show_distance".localized(), isOn: $viewModel.showDistance)
+                                .onChange(of: viewModel.showDistance) { _ in viewModel.saveSettings() }
                             divider
                             toggleRow(title: "settings_show_online".localized(), isOn: $viewModel.showOnlineStatus)
+                                .onChange(of: viewModel.showOnlineStatus) { _ in viewModel.saveSettings() }
                         }
                     }
 
@@ -77,9 +106,11 @@ struct SettingsView: View {
                                     }
                                 }
                                 .tint(.dnPrimary)
+                                .onChange(of: viewModel.selectedLanguage) { _ in viewModel.saveSettings() }
                             }
                             divider
                             toggleRow(title: "settings_dark_mode".localized(), isOn: $viewModel.darkModeEnabled)
+                                .onChange(of: viewModel.darkModeEnabled) { _ in viewModel.saveSettings() }
                         }
                     }
 
@@ -87,25 +118,37 @@ struct SettingsView: View {
                     sectionHeader("settings_support".localized().uppercased())
                     DNCard {
                         VStack(spacing: 0) {
-                            settingsRow(
-                                icon: "questionmark.circle",
-                                title: "settings_help_center".localized(),
-                                showChevron: true
-                            )
+                            Button(action: { showHelpCenter = true }) {
+                                settingsRow(
+                                    icon: "questionmark.circle",
+                                    title: "settings_help_center".localized(),
+                                    showChevron: true
+                                )
+                            }
+                            .foregroundColor(.dnTextPrimary)
                             divider
-                            settingsRow(
-                                icon: "exclamationmark.bubble",
-                                title: "settings_report_problem".localized(),
-                                showChevron: true
-                            )
+                            Button(action: { showReportProblem = true }) {
+                                settingsRow(
+                                    icon: "exclamationmark.bubble",
+                                    title: "settings_report_problem".localized(),
+                                    showChevron: true
+                                )
+                            }
+                            .foregroundColor(.dnTextPrimary)
                             divider
-                            settingsRow(icon: "doc.text", title: "settings_terms".localized(), showChevron: true)
+                            Button(action: { showTerms = true }) {
+                                settingsRow(icon: "doc.text", title: "settings_terms".localized(), showChevron: true)
+                            }
+                            .foregroundColor(.dnTextPrimary)
                             divider
-                            settingsRow(
-                                icon: "hand.raised",
-                                title: "settings_privacy_policy".localized(),
-                                showChevron: true
-                            )
+                            Button(action: { showPrivacyPolicy = true }) {
+                                settingsRow(
+                                    icon: "hand.raised",
+                                    title: "settings_privacy_policy".localized(),
+                                    showChevron: true
+                                )
+                            }
+                            .foregroundColor(.dnTextPrimary)
                         }
                     }
 
@@ -136,6 +179,24 @@ struct SettingsView: View {
                 .padding(DNSpace.lg)
             }
         }
+        .sheet(isPresented: $showChangePassword) {
+            ChangePasswordView()
+        }
+        .sheet(isPresented: $showEmailSettings) {
+            EmailSettingsView()
+        }
+        .sheet(isPresented: $showHelpCenter) {
+            HelpCenterView()
+        }
+        .sheet(isPresented: $showReportProblem) {
+            ReportProblemView()
+        }
+        .sheet(isPresented: $showTerms) {
+            TermsView()
+        }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            PrivacyPolicyView()
+        }
         .alert("settings_delete_confirm_title".localized(), isPresented: $showDeleteConfirmation) {
             Button("button_cancel".localized(), role: .cancel) {}
             Button("button_delete".localized(), role: .destructive) {
@@ -143,6 +204,16 @@ struct SettingsView: View {
             }
         } message: {
             Text("settings_delete_confirm_message".localized())
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error)
+            }
+        }
+        .onAppear {
+            viewModel.loadSettings()
         }
     }
 
